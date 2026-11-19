@@ -15,6 +15,7 @@ const iconClass = "size-4";
     const root = document.documentElement;
     root.classList.add('no-transitions');
     dark = root.classList.toggle('dark');
+    root.dataset.theme = dark ? 'dark' : 'light';
     localStorage.setItem('theme', dark ? 'dark' : 'light');
     setTimeout(() => root.classList.remove('no-transitions'), 100);
   "

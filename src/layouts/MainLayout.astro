@@ -58,7 +58,7 @@ const structuredData = [
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="dark" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -84,7 +84,12 @@ const structuredData = [
       (() => {
         const root = document.documentElement;
         try {
-          root.classList.toggle("dark", (localStorage.getItem("theme") ?? "dark") === "dark");
+          const dark = root.classList.toggle(
+            "dark",
+            (localStorage.getItem("theme") ?? "dark") === "dark",
+          );
+          // Mirrored for astro-mermaid, which picks its diagram theme from data-theme
+          root.dataset.theme = dark ? "dark" : "light";
           root.classList.toggle("view-list", localStorage.getItem("classView") === "list");
         } catch {
           // Storage blocked (private mode): keep the defaults

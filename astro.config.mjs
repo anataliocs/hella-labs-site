@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
 import mdx from "@astrojs/mdx";
+import mermaid from "astro-mermaid";
+import { satteri } from "@astrojs/markdown-satteri";
 import icon from "astro-icon";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
@@ -24,6 +26,9 @@ export default defineConfig({
   },
 
   markdown: {
+    // rawHtml lets MDX compile the <pre class="mermaid"> HTML node astro-mermaid emits (without it
+    // the MDX build fails with "Cannot compile a `raw` node"). astro-mermaid extends this processor.
+    processor: satteri({ features: { rawHtml: true } }),
     // Dual themes: light colors inline, dark colors as --shiki-dark vars (switched in style.css)
     shikiConfig: {
       themes: { light: "github-light", dark: "github-dark" },
@@ -113,6 +118,9 @@ export default defineConfig({
         ],
       },
     }),
+    // Renders ```mermaid code blocks client-side; must come before mdx(). The diagram theme follows
+    // data-theme on <html> (kept in sync with the .dark class by MainLayout and ThemeToggle).
+    mermaid({ theme: "dark", autoTheme: true }),
     mdx(),
     // Writes sitemap-index.xml + sitemap-0.xml at build. The 404 page is excluded.
     sitemap({

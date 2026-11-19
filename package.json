@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
+    "@astrojs/markdown-satteri": "0.4.10",
     "@astrojs/mdx": "^8.1.6",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.5",
@@ -34,6 +35,8 @@
     "alpinejs": "^3.17.5",
     "astro": "^7.2.1",
     "astro-icon": "^1.2.0",
+    "astro-mermaid": "^2.2.0",
+    "mermaid": "^12.3.0",
     "tailwindcss": "^4.3.5",
     "typescript": "^6.0.3"
   },
