@@ -43,7 +43,7 @@ export const siteData = {
   footer: {
     description:
       "Unleash the potential of your startup with Onsite, Remote and Offshore consulting and staff augmentation. We provide the expertise of Silicon Valley multiplied by the cost-effectiveness of Offshore resources.",
-    copyrightName: "Hella Web3",
+    copyrightName: "Hella Labs",
     builtBy: { name: "Chris Anatalio", href: "https://www.linkedin.com/in/anataliocs/" },
     // Machine-readable files generated at build (astro-llms-md + @astrojs/sitemap)
     resourceLinks: [

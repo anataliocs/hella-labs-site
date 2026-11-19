@@ -88,7 +88,7 @@ it("manipulates the chain fluently", async () => {
 });
 ```
 
-Check out the [docs](https://www.npmjs.com/package/@hellaweb3/foundryanvil-testcontainers-nodejs) for more info.
+Check out the [docs](https://hella-labs.github.io/foundryanvil-testcontainers-nodejs/) for more info.
 
 ---
 
