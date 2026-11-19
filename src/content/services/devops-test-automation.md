@@ -20,7 +20,7 @@ compete with entrenched players.
 
 ## Open Source Projects
 
-- [**Foundry Anvil Testcontainers:**](https://github.com/hella-web3/foundryanvil-testcontainers-nodejs)
+- [**Foundry Anvil Testcontainers:**](https://github.com/hella-labs/foundryanvil-testcontainers-nodejs)
   A Node.js module to run a customized Anvil node in your E2E tests.
-- [**Wiremock Testcontainers:**](https://github.com/hella-web3/wiremock-testcontainers-nodejs) A
+- [**Wiremock Testcontainers:**](https://github.com/hella-labs/wiremock-testcontainers-nodejs) A
   TypeScript library for spinning up WireMock instances for high-fidelity API mocking.

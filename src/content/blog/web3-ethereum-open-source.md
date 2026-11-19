@@ -11,7 +11,7 @@ featured: true
 
 ## Open Source Web3 Ethereum Projects
 
-[Hella Labs](https://github.com/hella-web3) supports several Ethereum open-source projects. These projects specialize in test automation.
+[Hella Labs](https://github.com/hella-labs) supports several Ethereum open-source projects. These projects specialize in test automation.
 
 **Projects:**
 
@@ -34,7 +34,7 @@ This Typescript module provides a **Fluent API** style method of configuring and
 - **Advanced EVM Features:** Support for EIP-712 and EIP-7702 signing, chain reorgs, and call tracing.
 - **Improved DX:** Immediate validation of conflicting flags prevents misconfiguration before the container even starts.
 
-- [https://github.com/hella-web3/foundryanvil-testcontainers-nodejs](https://github.com/hella-web3/foundryanvil-testcontainers-nodejs)
+- [https://github.com/hella-labs/foundryanvil-testcontainers-nodejs](https://github.com/hella-labs/foundryanvil-testcontainers-nodejs)
 - [https://www.npmjs.com/package/@hellaweb3/foundryanvil-testcontainers-nodejs](https://www.npmjs.com/package/@hellaweb3/foundryanvil-testcontainers-nodejs)
 
 _Get started with Foundry Anvil Testcontainers Nodejs by following the steps below._
@@ -105,7 +105,7 @@ It provides a fluent API to configure and start WireMock containers, including s
 - **Extensibility:** Load WireMock extensions from JARs (no local JDK required) or use TypeScript extensions.
 - **No-Docker Mode:** Optional support for running via local JVM for environments without a container runtime.
 
-- [https://github.com/hella-web3/wiremock-testcontainers-nodejs](https://github.com/hella-web3/wiremock-testcontainers-nodejs)
+- [https://github.com/hella-labs/wiremock-testcontainers-nodejs](https://github.com/hella-labs/wiremock-testcontainers-nodejs)
 - [https://www.npmjs.com/package/@hellaweb3/wiremock-testcontainers-nodejs](https://www.npmjs.com/package/@hellaweb3/wiremock-testcontainers-nodejs)
 
 _Get started with Wiremock Testcontainers Nodejs by following the steps below._
@@ -147,7 +147,7 @@ it("lists the recorded payments", async () => {
 ```
 
 Check out the [npm repo](https://www.npmjs.com/package/@hellaweb3/wiremock-testcontainers-nodejs) for more info.
-Check out the [docs](https://hella-web3.github.io/wiremock-testcontainers-nodejs/) for more info.
+Check out the [docs](https://hella-labs.github.io/wiremock-testcontainers-nodejs/) for more info.
 
 ---
 

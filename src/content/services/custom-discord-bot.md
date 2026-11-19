@@ -21,4 +21,4 @@ with your community at scale.
 
 - **Coming Soon:** We are currently developing several open-source Discord modules for Web3
   authentication and community gated access. Stay tuned to our
-  [GitHub](https://github.com/hella-web3) for updates.
+  [GitHub](https://github.com/hella-labs) for updates.

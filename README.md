@@ -8,8 +8,8 @@ collections. Ported from the original Jekyll site (`hella-site-base`).
 
 We maintain open-source Ethereum test automation tools:
 
-- [Foundry Anvil Testcontainers for Node.js](https://github.com/hella-web3/foundryanvil-testcontainers-nodejs)
-- [WireMock Testcontainers for Node.js](https://github.com/hella-web3/wiremock-testcontainers-nodejs)
+- [Foundry Anvil Testcontainers for Node.js](https://github.com/hella-labs/foundryanvil-testcontainers-nodejs)
+- [WireMock Testcontainers for Node.js](https://github.com/hella-labs/wiremock-testcontainers-nodejs)
 - [Ethereum Transaction Explorer TUI](https://github.com/anataliocs/etherscan-tui-go)
 
 ## Development

@@ -11,11 +11,11 @@ export const socialLinks: SocialLink[] = [
   { name: "GitHub", href: "https://github.com/hella-labs", icon: "fa6-brands:github" },
   {
     name: "LinkedIn",
-    href: "https://www.linkedin.com/company/hella-web3",
+    href: "https://www.linkedin.com/company/hella-labs",
     icon: "fa6-brands:linkedin",
   },
-  { name: "YouTube", href: "https://www.youtube.com/@hella-web3", icon: "fa6-brands:youtube" },
-  { name: "Dev.to", href: "https://dev.to/hella-web3", icon: "fa6-brands:dev" },
+  { name: "YouTube", href: "https://www.youtube.com/@hella-labs", icon: "fa6-brands:youtube" },
+  { name: "Dev.to", href: "https://dev.to/hella-labs", icon: "fa6-brands:dev" },
   { name: "RSS feed", href: "/feed.xml", icon: "fa6-solid:rss" },
 ];
 
