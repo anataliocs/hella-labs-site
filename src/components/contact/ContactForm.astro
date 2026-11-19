@@ -1,67 +1,125 @@
 ---
-// Contact form, posted to Formspree (works without JavaScript)
+// Contact form, posted to the Cloudflare Worker at /api/contact (worker/index.ts), which emails it.
+// With JS, Alpine submits it via fetch and shows the result inline; without JS it's a normal POST
+// and the Worker redirects to /contact/thanks/.
 import Button from "@src/components/Button.astro";
 import { siteData } from "@src/data/siteData";
+import { url } from "@src/utils/path";
 
-const { formAction, buttonText, inquiryTypes } = siteData.contact;
+const { formAction, buttonText, sendingText, successMessage, errorMessage, inquiryTypes } =
+  siteData.contact;
 const fieldClass =
   "w-full resize-y rounded-xl border-[1.4px] border-line-alt bg-surface-muted px-5 py-4 text-base text-heading outline-none placeholder:text-fg-muted focus:bg-transparent focus:outline-2 focus:outline-offset-4 focus:outline-primary focus:placeholder:text-heading";
 ---
 
-<form class="space-y-5" action={formAction} method="POST">
-  <div>
-    <label class="sr-only" for="form-name">
-      Name
-    </label>
-    <input
-      class={fieldClass}
-      id="form-name"
-      type="text"
-      name="name"
-      placeholder="Name"
-      autocomplete="name"
-      required
-    />
-  </div>
-  <div>
-    <label class="sr-only" for="form-email">
-      Email
-    </label>
-    <input
-      class={fieldClass}
-      id="form-email"
-      type="email"
-      name="_replyto"
-      placeholder="Email"
-      autocomplete="email"
-      required
-    />
-  </div>
-  <div>
-    <label class="sr-only" for="form-inquiry">
-      Inquiry Type
-    </label>
-    <select class={fieldClass} id="form-inquiry" name="inquiry_type" required>
-      <option value="">Select Inquiry Type</option>
-      {inquiryTypes.map((type) => (
-        <option value={type}>{type}</option>
-      ))}
-    </select>
-  </div>
-  <div>
-    <label class="sr-only" for="form-text">
-      Message
-    </label>
-    <textarea
-      class={fieldClass}
-      id="form-text"
-      name="text"
-      rows="5"
-      placeholder="What do you want to build today?"
-      required
-    ></textarea>
-  </div>
-  <div>
-    <Button type="submit">{buttonText}</Button>
-  </div>
+<form
+  class="space-y-5"
+  action={url(formAction)}
+  method="POST"
+  data-sending={sendingText}
+  data-success={successMessage}
+  data-error={errorMessage}
+  x-data="{
+    status: 'idle',
+    message: '',
+    async submit(form) {
+      this.status = 'sending';
+      this.message = '';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) throw new Error(data.error);
+        form.reset();
+        this.status = 'sent';
+        this.message = form.dataset.success;
+      } catch (err) {
+        this.message = err.message || form.dataset.error;
+        this.status = 'error';
+      }
+    },
+  }"
+  @submit.prevent="submit($el)"
+>
+  <fieldset class="space-y-5" :disabled="status === 'sending'">
+    <div>
+      <label class="sr-only" for="form-name">
+        Name
+      </label>
+      <input
+        class={fieldClass}
+        id="form-name"
+        type="text"
+        name="name"
+        placeholder="Name"
+        autocomplete="name"
+        maxlength="200"
+        required
+      />
+    </div>
+    <div>
+      <label class="sr-only" for="form-email">
+        Email
+      </label>
+      <input
+        class={fieldClass}
+        id="form-email"
+        type="email"
+        name="email"
+        placeholder="Email"
+        autocomplete="email"
+        maxlength="254"
+        required
+      />
+    </div>
+    <div>
+      <label class="sr-only" for="form-inquiry">
+        Inquiry Type
+      </label>
+      <select class={fieldClass} id="form-inquiry" name="inquiry_type" required>
+        <option value="">Select Inquiry Type</option>
+        {inquiryTypes.map((type) => (
+          <option value={type}>{type}</option>
+        ))}
+      </select>
+    </div>
+    <div>
+      <label class="sr-only" for="form-text">
+        Message
+      </label>
+      <textarea
+        class={fieldClass}
+        id="form-text"
+        name="text"
+        rows="5"
+        placeholder="What do you want to build today?"
+        maxlength="5000"
+        required
+      ></textarea>
+    </div>
+    <!-- Spam honeypot: hidden from people and assistive tech, but bots tend to fill it in -->
+    <div class="hidden" aria-hidden="true">
+      <label for="form-company">Company</label>
+      <input id="form-company" type="text" name="company" tabindex="-1" autocomplete="off" />
+    </div>
+    <div>
+      <Button type="submit">
+        <span
+          x-text="status === 'sending' ? $root.dataset.sending : $el.dataset.label"
+          data-label={buttonText}
+        >
+          {buttonText}
+        </span>
+      </Button>
+    </div>
+  </fieldset>
+  <p
+    class="text-base empty:hidden"
+    role="status"
+    x-text="message"
+    :class="status === 'error' ? 'text-red-600 dark:text-red-400' : 'text-heading'"
+  ></p>
 </form>

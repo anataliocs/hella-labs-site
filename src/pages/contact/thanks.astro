@@ -1,0 +1,20 @@
+---
+// Landing page for contact-form posts made without JavaScript (the Worker redirects here)
+import MainLayout from "@src/layouts/MainLayout.astro";
+import Container from "@src/components/Container.astro";
+import Button from "@src/components/Button.astro";
+import { siteData } from "@src/data/siteData";
+import { withBrand } from "@src/utils/seo";
+---
+
+<MainLayout
+  title={withBrand("Message Sent")}
+  description="Thanks for reaching out to Hella Labs. Your message has been sent and we'll get back to you soon."
+  noindex
+>
+  <Container class="text-center">
+    <h1 class="mb-5">Message sent</h1>
+    <p class="mb-8 text-fg-muted">{siteData.contact.successMessage}</p>
+    <Button href="/">Back to homepage</Button>
+  </Container>
+</MainLayout>

@@ -1,12 +1,23 @@
-// Cloudflare Workers static-assets deploy (`pnpm deploy`). The site is fully static: wrangler
-// uploads dist/ as-is; there is no Worker script or bindings.
+// Cloudflare Workers deploy (`pnpm deploy`). The site itself is static: wrangler uploads dist/
+// as-is. Only /api/* runs the Worker script (worker/index.ts), which sends contact-form email.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "hella-labs-site",
+  "main": "./worker/index.ts",
   "compatibility_date": "2026-11-01",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"],
   },
+  // Cloudflare Email Sending. CONTACT_FROM must be on a domain onboarded to Email Sending /
+  // Email Routing in the Cloudflare dashboard (hellalabs.dev).
+  "send_email": [{ "name": "SEND_EMAIL" }],
+  "vars": {
+    "CONTACT_FROM": "website@hellalabs.dev",
+    "CONTACT_TO": "inbound@hellalabs.dev",
+  },
+  "observability": { "enabled": true },
 }

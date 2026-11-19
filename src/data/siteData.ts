@@ -55,9 +55,12 @@ export const siteData = {
   },
 
   contact: {
-    // Formspree form endpoint (https://formspree.io/f/<id>)
-    formAction: "https://formspree.io/f/xwpqrreq",
+    // Handled by the Cloudflare Worker in worker/index.ts, which emails the submission
+    formAction: "/api/contact",
     buttonText: "LFG!",
+    sendingText: "Sending…",
+    successMessage: "Thanks! Your message is on its way. We'll get back to you soon.",
+    errorMessage: "Sorry, your message couldn't be sent. Please try again or reach us on Telegram.",
     inquiryTypes: ["Consulting", "Fractional Engineering", "Questions", "OSS", "Events"],
     telegram: "https://t.me/hella_web3",
     directMessage: "https://t.me/anataliocs",

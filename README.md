@@ -58,4 +58,4 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-_Made with ❤️ by the Hella Labs team. Speeding up the transition to a Web3 future._
+_Made with ❤️ by the Hella Labs team. Speeding up the transition to a decentralized future._

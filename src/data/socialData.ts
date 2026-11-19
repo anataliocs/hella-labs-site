@@ -7,8 +7,8 @@ export interface SocialLink {
 }
 
 export const socialLinks: SocialLink[] = [
-  { name: "X (Twitter)", href: "https://x.com/Hella_Web3", icon: "fa6-brands:x-twitter" },
-  { name: "GitHub", href: "https://github.com/hella-web3", icon: "fa6-brands:github" },
+  { name: "X (Twitter)", href: "http://twitter.hellalabs.dev/", icon: "fa6-brands:x-twitter" },
+  { name: "GitHub", href: "https://github.com/hella-labs", icon: "fa6-brands:github" },
   {
     name: "LinkedIn",
     href: "https://www.linkedin.com/company/hella-web3",

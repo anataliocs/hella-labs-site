@@ -116,14 +116,17 @@ export default defineConfig({
     mdx(),
     // Writes sitemap-index.xml + sitemap-0.xml at build. The 404 page is excluded.
     sitemap({
-      filter: (page) => !new URL(page).pathname.startsWith("/404"),
+      filter: (page) => {
+        const { pathname } = new URL(page);
+        return !pathname.startsWith("/404") && pathname !== "/contact/thanks/";
+      },
       serialize: (item) => ({ ...item, lastmod: lastmodFor(item.url)?.toISOString() }),
     }),
     llmsIntegration({
       name: "Hella Labs",
       description:
         "Hella Labs provides Web3-native fractional engineering, DevRel and consulting for Fintech, Blockchain and Web3 startups, and maintains open-source Ethereum test automation tools such as Foundry Anvil Testcontainers and WireMock Testcontainers for Node.js.",
-      exclude: ["/404"],
+      exclude: ["/404", "/contact/thanks"],
       titleSelector: "title",
       contentSelector: "main",
       excludeSelectors: ["form"],

@@ -4,5 +4,6 @@
     "paths": {
       "@src/*": ["./src/*"]
     }
-  }
+  },
+  "exclude": ["dist", "worker", "worker-configuration.d.ts"]
 }
