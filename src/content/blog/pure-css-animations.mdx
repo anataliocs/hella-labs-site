@@ -2,7 +2,7 @@
 title: "Pure CSS Animated Gradient Background and More!"
 description: "You can do amazing things with pure CSS nowadays, including animations without any Javascript."
 date: 2025-08-05T09:29:35+03:00
-image: ../../assets/images/hella-bg-1.jpg
+image: ../../assets/images/blog/css-animations.jpg
 imageAlt: "Glowing neon Hella logo, a rock-on hand sign above the word Hella"
 tags: ["CSS-tricks", "Animation"]
 tagsColor: "#4643ec"
@@ -18,8 +18,6 @@ Let's take a look at how to create a animated background with no Javascript and 
 Keep your code simple & manageable, with super fast page loads leveraging Pure CSS animations.
 
 </Callout>
-
-Build a lean, mean site without the hassle and overhead of node.js, npm, react/next.js, Vercel etc.
 
 > The best code is no code at all.
 >
@@ -43,13 +41,7 @@ Now let's check out a live example on [CodePen](https://codepen.io/anataliocs/pe
 
 You can build super slick features and animations for your site + blog with just [Astro](https://astro.build/) hosted on Cloudflare.
 
-[https://github.com/hella-labs/hella-site-base](https://github.com/hella-labs/hella-site-base)
-
-<Callout type="tip">
-
-Open this site in a [Github Codespace Devcontainer](https://codespaces.new/hella-labs/hella-site-base) to check out how it works!
-
-</Callout>
+---
 
 The CSS `@keyframes` rule is the secret sauce for these slick animations that don't require a single line of JS!
 
@@ -178,6 +170,561 @@ But hover over a sticker and you'll see each one is actually a interactive eleme
 
 <CodePen slug="LEpWQNP" title="Personal Concept" />
 
+---
+
+## Pure CSS Text Effects: A Deep Dive
+
+Backgrounds and buttons are only half the story. Type itself can be animated with nothing but CSS,
+and [Colorion's CSS Text Effects library](https://text-effects.colorion.co/) is a great showcase:
+123 copy-and-paste effects, each one a single class and a handful of declarations.
+
+Let's break down a set of them line by line. Once you see the handful of building blocks they all
+share, you can mix and match your own.
+
+<Callout type="note">
+
+All snippets below come from [text-effects.colorion.co](https://text-effects.colorion.co/), lightly
+trimmed. Every effect shares one set of colour tokens, so re-skinning is a one-line change:
+
+```css
+:root {
+  --ink: currentColor; /* main text colour */
+  --ink-2: #ff4fd8; /* primary accent */
+  --ink-3: #4ff8ff; /* secondary accent */
+}
+```
+
+</Callout>
+
+### The Building Blocks
+
+Almost every text effect is a combination of five techniques:
+
+1. **`background-clip: text`**: paint a gradient (or any background) _inside_ the glyphs, then make
+   the text itself `color: transparent`.
+2. **Stacked `text-shadow`**: a comma-separated list of shadows builds glows, extrusions and long
+   shadows.
+3. **Pseudo-element copies**: `content: attr(data-text)` on `::before`/`::after` duplicates the
+   word so each layer can be coloured, clipped and moved on its own.
+4. **Per-letter custom properties**: wrap each letter in an element with `style="--i: n"` and use
+   `calc(var(--i) * …)` to stagger the animation.
+5. **`@keyframes` + timing functions**: `steps()` for mechanical, jumpy motion; `ease-in-out` for
+   organic, floaty motion.
+
+---
+
+### 1. Aurora Gradient Text (`background-clip: text`)
+
+```html
+<div class="fx-aurora">BUILD SOMETHING</div>
+```
+
+```css
+.fx-aurora {
+  background: linear-gradient(115deg, var(--ink-2), var(--ink-3), var(--ink-2), var(--ink-3)) 0 0 /
+    300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fx-aurora 7s linear infinite;
+}
+@keyframes fx-aurora {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    background-position: 300% 50%;
+    filter: hue-rotate(360deg);
+  }
+}
+```
+
+**Breakdown:**
+
+- The `background` shorthand sets a four-stop gradient and, after the `/`, a `background-size` of
+  `300% 100%`. The gradient is three times wider than the text, so only a slice is visible at once.
+- `background-clip: text` (plus the `-webkit-` prefix that Safari and older Chromium still want)
+  clips that background to the glyph shapes. `color: transparent` lets it show through.
+- The keyframes slide `background-position` from `0%` to `300%`. That is exactly the same trick as
+  the animated background at the top of this post, only applied to text.
+- `filter: hue-rotate()` spins the whole colour wheel on top, so the palette keeps shifting instead
+  of just scrolling. The gradient repeats its stops (`2, 3, 2, 3`), which keeps the loop seamless.
+
+---
+
+### 2. Glitch Text (pseudo-element copies + `clip-path`)
+
+```html
+<div class="fx-glitch" data-text="GLITCH">GLITCH</div>
+```
+
+```css
+.fx-glitch {
+  position: relative;
+  color: var(--ink);
+}
+.fx-glitch::before,
+.fx-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+}
+.fx-glitch::before {
+  color: var(--ink-2);
+  clip-path: inset(0 0 55% 0);
+  animation: fx-glitch-a 2.6s steps(1) infinite;
+}
+.fx-glitch::after {
+  color: var(--ink-3);
+  clip-path: inset(45% 0 0 0);
+  animation: fx-glitch-b 2.6s steps(1) infinite;
+}
+@keyframes fx-glitch-a {
+  0%,
+  12%,
+  20%,
+  55%,
+  100% {
+    transform: translate(0);
+    opacity: 0;
+  }
+  13% {
+    transform: translate(-5px, -2px);
+    opacity: 0.9;
+  }
+  16% {
+    transform: translate(4px, 1px);
+    opacity: 0.9;
+  }
+  48% {
+    transform: translate(-3px, 2px);
+    opacity: 0.9;
+  }
+  51% {
+    transform: translate(2px, -1px);
+    opacity: 0.9;
+  }
+}
+/* fx-glitch-b mirrors this with slightly offset timings and opposite directions */
+```
+
+**Breakdown:**
+
+- `content: attr(data-text)` reads the `data-text` attribute so the pseudo-elements render a copy
+  of the word with no duplicated markup. `position: absolute; inset: 0` stacks each copy exactly
+  on top of the original.
+- `clip-path: inset(0 0 55% 0)` keeps only the top 45% of the `::before` copy;
+  `inset(45% 0 0 0)` keeps only the bottom 55% of `::after`. Together they form two "slices" in
+  different accent colours, which is the RGB channel-split look.
+- `steps(1)` is the key timing function here. It disables interpolation, so each keyframe _snaps_
+  into place rather than gliding. That's what makes it read as digital corruption instead of a
+  wobble.
+- Most of the timeline is `opacity: 0`. The glitch only fires in short bursts (13–16% and 48–51%),
+  and the two layers use offset timings so they never quite line up. Short, irregular bursts look
+  far more convincing than a constant jitter.
+
+---
+
+### 3. Typewriter (`steps()` + `ch` units)
+
+```html
+<div class="fx-typewriter">TYPEWRITER</div>
+```
+
+```css
+.fx-typewriter {
+  box-sizing: content-box;
+  font:
+    600 24px/1.2 "JetBrains Mono",
+    monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 10ch;
+  border-right: 0.55ch solid var(--ink-2);
+  animation:
+    fx-type 3.6s steps(10) infinite,
+    fx-caret 0.65s steps(1) infinite;
+}
+@keyframes fx-type {
+  0%,
+  8% {
+    width: 0;
+  }
+  55%,
+  100% {
+    width: 10ch;
+  }
+}
+@keyframes fx-caret {
+  50% {
+    border-color: transparent;
+  }
+}
+```
+
+**Breakdown:**
+
+- The `ch` unit is the width of the `0` glyph. In a **monospace** font every character is that
+  wide, so `10ch` is exactly ten letters.
+- `overflow: hidden` + `white-space: nowrap` turn `width` into a reveal mask. Animating it from `0`
+  to `10ch` uncovers the word.
+- `steps(10)` splits that animation into ten discrete jumps, one per character, so letters appear
+  whole rather than sliding in pixel by pixel. The step count must match the character count.
+- The caret is just `border-right`. A second animation with `steps(1)` blinks it by toggling
+  `border-color` to `transparent` at 50%. Two animations, comma-separated, on one element.
+- `box-sizing: content-box` keeps the border _outside_ the `10ch` width so the caret doesn't eat
+  into the last letter.
+
+---
+
+### 4. Neon Sign Flicker (stacked `text-shadow`)
+
+```css
+.fx-neon {
+  color: var(--ink);
+  animation: fx-neon 3.2s linear infinite;
+}
+@keyframes fx-neon {
+  0%,
+  18%,
+  21%,
+  24%,
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 4px var(--ink),
+      0 0 11px var(--ink-2),
+      0 0 24px var(--ink-2),
+      0 0 48px var(--ink-2);
+  }
+  19%,
+  22%,
+  62% {
+    opacity: 0.35;
+    text-shadow: none;
+  }
+  63%,
+  64.5% {
+    opacity: 0.6;
+    text-shadow: 0 0 4px var(--ink-2);
+  }
+}
+```
+
+**Breakdown:**
+
+- The glow is four shadows with zero offset and growing blur radii (`4px → 48px`). A tight
+  white-ish core plus wider coloured halos imitates how a real gas tube bleeds light. This is the
+  same layered `box-shadow` trick used in the neon buttons above, applied to text.
+- The flicker comes from keyframe _placement_, not easing. `18% → 19% → 21% → 22% → 24%` packs
+  two quick off/on blinks into a tiny window, then the tube stays lit until a weaker stutter around
+  62–64.5%.
+- Irregular, clustered keyframes are what sell "faulty hardware." Evenly spaced keyframes would
+  just look like a pulse.
+
+---
+
+### 5. Liquid Fill (gradient hard stops + `-webkit-text-stroke`)
+
+```css
+.fx-liquid {
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--ink-3) 65%, transparent);
+  background: linear-gradient(
+      0deg,
+      var(--ink-3) 0 46%,
+      color-mix(in srgb, var(--ink-3) 55%, transparent) 48%,
+      transparent 52% 100%
+    )
+    0 0 / 100% 220%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: fx-liquid 3.4s ease-in-out infinite;
+}
+@keyframes fx-liquid {
+  0%,
+  100% {
+    background-position: 0 -110%;
+  }
+  50% {
+    background-position: 0 10%;
+  }
+}
+```
+
+**Breakdown:**
+
+- `-webkit-text-stroke` draws an outline around the transparent glyphs, so the empty "glass"
+  letters are visible before they fill.
+- The gradient runs bottom-to-top (`0deg`) with near-hard stops: solid colour up to 46%, a
+  semi-transparent band at 48% (the meniscus), then nothing from 52%. It's a liquid level, not a
+  smooth fade.
+- `background-size: 100% 220%` makes the gradient over twice the text height. Animating
+  `background-position-y` raises and lowers the "water line" through the letters.
+- `color-mix(in srgb, var(--ink-3) 55%, transparent)` derives translucent variants from one token
+  instead of hard-coding extra colours.
+- `ease-in-out` gives the slosh a natural slow-down at the top and bottom.
+
+---
+
+### 6. Wave Text (per-letter `--i` + negative delays)
+
+```html
+<div class="fx-wave" role="img" aria-label="WAVE">
+  <b aria-hidden="true" style="--i:0">W</b>
+  <b aria-hidden="true" style="--i:1">A</b>
+  <b aria-hidden="true" style="--i:2">V</b>
+  <b aria-hidden="true" style="--i:3">E</b>
+</div>
+```
+
+```css
+.fx-wave b {
+  font-weight: inherit;
+  display: inline-block;
+  animation: fx-wave 1.3s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.14s);
+}
+@keyframes fx-wave {
+  0%,
+  100% {
+    transform: translateY(7px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+```
+
+**Breakdown:**
+
+- Each letter gets its own element and an index custom property (`--i`). One keyframe animation is
+  shared; only the delay differs.
+- `calc(var(--i) * -0.14s)` uses a **negative** delay. Negative delays start the animation
+  _partway through_ its cycle immediately, so the wave is already in motion on page load instead
+  of letters waking up one by one.
+- `display: inline-block` is required because `transform` doesn't apply to plain inline elements.
+- Accessibility: splitting a word into letters makes screen readers spell it out. The wrapper's
+  `role="img"` + `aria-label` exposes the whole word once, and `aria-hidden` on each letter hides
+  the fragments.
+
+---
+
+### 7. 3D Extruded Text (stepped `text-shadow`)
+
+```css
+.fx-extrude {
+  color: var(--ink);
+  text-shadow:
+    1px 1px 0 color-mix(in srgb, var(--ink-2) 80%, #000),
+    2px 2px 0 color-mix(in srgb, var(--ink-2) 70%, #000),
+    3px 3px 0 color-mix(in srgb, var(--ink-2) 60%, #000),
+    4px 4px 0 color-mix(in srgb, var(--ink-2) 50%, #000),
+    5px 5px 0 color-mix(in srgb, var(--ink-2) 40%, #000),
+    6px 6px 0 color-mix(in srgb, var(--ink-2) 30%, #000),
+    7px 7px 12px rgba(0, 0, 0, 0.5);
+  animation: fx-extrude 3s ease-in-out infinite;
+}
+@keyframes fx-extrude {
+  0%,
+  100% {
+    transform: rotate(-3.5deg) translateY(2px);
+  }
+  50% {
+    transform: rotate(3.5deg) translateY(-4px);
+  }
+}
+```
+
+**Breakdown:**
+
+- Six zero-blur shadows, each offset one more pixel diagonally, stack into a solid "side" of the
+  letter. That's the extrusion.
+- Each layer mixes in progressively more black (`80% → 30%` accent), so the depth darkens as it
+  recedes, a cheap but convincing lighting cue.
+- The final shadow _does_ have blur (`12px`) and sits under everything as a soft drop shadow,
+  grounding the block on the page.
+- A gentle `rotate` + `translateY` rock makes it feel like a physical object.
+
+---
+
+### 8. Long Shadow "Sundial" (animating `text-shadow` offsets)
+
+```css
+@keyframes fx-sundial {
+  0%,
+  100% {
+    text-shadow:
+      4px 0 var(--ink-2),
+      8px 0 color-mix(in srgb, var(--ink-2) 55%, transparent),
+      12px 0 color-mix(in srgb, var(--ink-2) 25%, transparent);
+  }
+  25% {
+    text-shadow:
+      0 4px var(--ink-2),
+      0 8px color-mix(in srgb, var(--ink-2) 55%, transparent),
+      0 12px color-mix(in srgb, var(--ink-2) 25%, transparent);
+  }
+  /* …50% (left), 75% (up), plus diagonal stops at every 12.5% */
+}
+```
+
+**Breakdown:**
+
+- Three shadows at `4px`, `8px` and `12px` with fading opacity create a short trail.
+- Keyframes every 12.5% move the offsets around a circle: right, down-right, down, down-left and so
+  on. The diagonals use `2.8px` (≈ `4 × cos 45°`) so the shadow stays the same length at every
+  angle.
+- The browser interpolates between the shadow lists because each keyframe has the **same number**
+  of shadows. Mismatched counts would snap instead of animating.
+
+---
+
+### 9. Animated SVG Outline (`stroke-dasharray` / `stroke-dashoffset`)
+
+```html
+<svg class="fx-contour" viewBox="0 0 260 56" role="img" aria-label="OUTLINE">
+  <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">OUTLINE</text>
+</svg>
+```
+
+```css
+.fx-contour text {
+  fill: color-mix(in srgb, var(--ink) 10%, transparent);
+  stroke: var(--ink-3);
+  stroke-width: 1.2;
+  stroke-dasharray: 34 66;
+  animation: fx-contour 3.2s linear infinite;
+}
+@keyframes fx-contour {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+```
+
+**Breakdown:**
+
+- SVG `<text>` can be styled with CSS `fill` and `stroke`, which unlocks the dash properties
+  regular HTML text doesn't have.
+- `stroke-dasharray: 34 66` draws a 34-unit dash then a 66-unit gap: a 100-unit repeating pattern.
+- Animating `stroke-dashoffset` by exactly one pattern length (`-100`) with `linear` timing makes
+  the dashes crawl around the letterforms in a perfectly seamless loop.
+- `x="50%"`, `text-anchor="middle"` and `dominant-baseline="central"` centre the text in the
+  `viewBox` on both axes.
+
+---
+
+### 10. Highlighter Marker (animating `background-size`)
+
+```css
+.fx-marker {
+  padding: 0.1em 0.2em;
+  background: linear-gradient(
+      100deg,
+      color-mix(in srgb, var(--ink-2) 85%, transparent),
+      color-mix(in srgb, var(--ink-2) 60%, transparent)
+    )
+    no-repeat 0 62%;
+  background-size: 0% 46%;
+  animation: fx-marker 3s ease-in-out infinite;
+}
+@keyframes fx-marker {
+  0% {
+    background-size: 0% 46%;
+    background-position: 0 62%;
+  }
+  38%,
+  62% {
+    background-size: 100% 46%;
+    background-position: 0 62%;
+  }
+  100% {
+    background-size: 0% 46%;
+    background-position: 100% 62%;
+  }
+}
+```
+
+**Breakdown:**
+
+- A `no-repeat` gradient sized `46%` tall and positioned `62%` down sits behind the lower half of
+  the text, just like a real highlighter stroke.
+- Growing `background-size` width from `0%` to `100%` "paints" it left to right.
+- The trick on the way out: the position jumps from `0` to `100%` while the size shrinks, so the
+  stroke retracts toward the _right_ and appears to lift off the page instead of rewinding.
+- The `100deg` gradient with two opacities fakes uneven ink density.
+
+---
+
+### 11. Water Reflection (`-webkit-box-reflect`)
+
+```css
+.fx-mirror {
+  -webkit-box-reflect: below 2px linear-gradient(transparent 45%, rgba(255, 255, 255, 0.28));
+  animation: fx-mirror 3s ease-in-out infinite;
+}
+@keyframes fx-mirror {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+```
+
+**Breakdown:**
+
+- `-webkit-box-reflect` renders a mirrored copy of the element `below` it, `2px` away. The optional
+  gradient is a **mask** for the reflection, fading it out the further it gets from the text.
+- It's non-standard (Chromium and Safari only), but it degrades gracefully: Firefox simply shows the
+  text without a reflection. That's a perfectly fine progressive enhancement.
+- The float animation moves the element _and_ its reflection together, so the word bobs over its
+  own image.
+
+<Callout type="tip">
+
+Notice the pattern: most of these effects animate cheap properties like `transform`, `opacity` and
+`background-position`. `transform` and `opacity` run on the compositor and stay smooth even on
+low-end phones. Animating `text-shadow`, `width` or `filter` triggers repaints, so use those
+sparingly and on small amounts of text.
+
+</Callout>
+
+### Respect Reduced Motion
+
+Fun animations shouldn't make anyone feel ill. Colorion ships a global guard, and you should too:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+```
+
+**Breakdown:**
+
+- Users who enable "Reduce motion" in their OS settings match this media query.
+- Instead of `animation: none` (which can leave elements stuck in their hidden `0%` state, like
+  an empty typewriter), it makes every animation finish almost instantly and run once. Elements
+  land on their final keyframe and stay readable.
+
+<Callout type="note">
+
+Browse all 123 effects, grouped into gradient, glitch, neon, reveal, 3D, retro, letter and textured
+categories, at [text-effects.colorion.co](https://text-effects.colorion.co/). There's also a
+[text effect generator](https://text-effects.colorion.co/text-effect-generator/) for tweaking
+colours and timing live.
+
+</Callout>
+
+---
+
 I hope you had as much fun as I did walking through the amazing creativity present in our OSS community &lt;3
 
 It's truly never been a better time to be a developer :D
@@ -188,6 +735,63 @@ Hats off to [Mozilla](https://developer.mozilla.org/en-US/) and the OSS communit
 Such a joy to work with and spin up a cute, animated, responsive site in just a couple days :D
 
 </Callout>
+
+## How Hella Labs Can Help
+
+Want a site that looks this good and still loads instantly? Here's what we do:
+
+<FeatureGrid>
+  <FeatureCard
+    title="dApp Front-Ends"
+    icon="fa6-solid:laptop-code"
+    bordered
+    cta={{ label: "See the service", href: "/services/dapp-web-front-end/" }}
+  >
+    Fast, responsive, animated front-ends built static-first, with polish from pure CSS instead of
+    heavy JavaScript bundles.
+  </FeatureCard>
+  <FeatureCard
+    title="Technical Articles"
+    icon="fa6-solid:pen-to-square"
+    bordered
+    cta={{ label: "See the service", href: "/services/technical-articles/" }}
+  >
+    Deep-dive tutorials like this one, with working example code, written for your developer
+    audience.
+  </FeatureCard>
+  <FeatureCard
+    title="GTM Launch Package"
+    icon="fa6-solid:rocket"
+    bordered
+    cta={{ label: "See the service", href: "/services/gtm-launch-package/" }}
+  >
+    Landing pages, launch content and developer-facing docs to get your product in front of the
+    right people.
+  </FeatureCard>
+  <FeatureCard
+    title="DevOps & Test Automation"
+    icon="fa6-brands:github"
+    bordered
+    cta={{ label: "See the service", href: "/services/devops-test-automation/" }}
+  >
+    CI/CD pipelines and automated test suites so every pull request ships with confidence.
+  </FeatureCard>
+</FeatureGrid>
+
+<CtaSection
+  variant="banner"
+  title="Let's build something that pops."
+  button={{ label: "Start a Project", href: "/contact/" }}
+  link={{ label: "Explore All Service Offerings →", href: "/web3-consultant-service-offerings/" }}
+>
+  <p>
+    From animated hero sections to full dApp front-ends, we ship{" "}
+    <strong>fast, accessible, static-first</strong> sites that look great without slowing your users
+    down.
+  </p>
+</CtaSection>
+
+---
 
 Thanks for reading! Check out more [CodePen here](https://codepen.io/anataliocs)!
 
