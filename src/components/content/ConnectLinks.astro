@@ -1,0 +1,21 @@
+---
+// Inline "LinkedIn | X | GitHub" profile links with brand icons (team bios)
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  links: { label: string; href: string; icon: string }[];
+}
+
+const { links } = Astro.props;
+---
+
+<ul class="mb-8! flex list-none! flex-wrap items-center gap-x-4 gap-y-2 pl-0!">
+  {links.map((link) => (
+    <li class="mt-0! flex items-center gap-1.5">
+      <Icon name={link.icon} class="size-4 text-heading" aria-hidden="true" />
+      <a href={link.href} target="_blank" rel="noopener">
+        {link.label}
+      </a>
+    </li>
+  ))}
+</ul>

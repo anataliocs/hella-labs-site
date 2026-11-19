@@ -1,0 +1,32 @@
+---
+// Brand mark: the pastel logo in light mode, the neon one in dark mode
+import { Image } from "astro:assets";
+import { siteData } from "@src/data/siteData";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const { light, dark, alt } = siteData.logo;
+const imgClass = "h-12.5 w-auto";
+---
+
+<span class:list={["inline-flex", className]}>
+  <Image
+    src={light}
+    alt={alt}
+    height={50}
+    densities={[1, 2]}
+    loading="eager"
+    class:list={[imgClass, "dark:hidden"]}
+  />
+  <Image
+    src={dark}
+    alt={alt}
+    height={50}
+    densities={[1, 2]}
+    loading="eager"
+    class:list={[imgClass, "hidden dark:block"]}
+  />
+</span>

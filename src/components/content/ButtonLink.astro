@@ -1,0 +1,17 @@
+---
+// Centered stand-alone button for MDX content
+import Button from "@src/components/Button.astro";
+
+interface Props {
+  href: string;
+  variant?: "primary" | "secondary";
+}
+
+const { href, variant = "primary" } = Astro.props;
+---
+
+<div class="my-8 text-center">
+  <Button href={href} variant={variant}>
+    <slot />
+  </Button>
+</div>

@@ -1,0 +1,61 @@
+---
+// Wrapper for rendered Markdown/MDX. Adds "Copy" buttons to code blocks and opens content images
+// in a full-screen viewer on click (progressive enhancement; content works without JS).
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["prose", className]} data-prose>
+  <slot />
+</div>
+
+<dialog
+  class="m-auto max-h-none max-w-none bg-transparent p-0 backdrop:bg-black/80 backdrop:backdrop-blur-sm"
+  aria-label="Image viewer"
+  data-image-viewer
+>
+  <form method="dialog" class="contents">
+    <button
+      class="flex max-h-dvh max-w-dvw cursor-zoom-out items-center justify-center p-4"
+      aria-label="Close image"
+    >
+      <img alt="" class="max-h-[calc(100dvh-2rem)] w-auto rounded-xl object-contain" />
+    </button>
+  </form>
+</dialog>
+
+<script>
+  // Copy-to-clipboard button on every code block
+  for (const pre of document.querySelectorAll<HTMLPreElement>("[data-prose] pre")) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Copy";
+    button.setAttribute("aria-label", "Copy code to clipboard");
+    button.className =
+      "absolute top-3 right-3 rounded-full bg-heading px-3 py-2 font-heading text-sm leading-none font-medium text-surface opacity-0 transition-opacity group-hover/pre:opacity-100 hover:bg-primary hover:text-white focus-visible:opacity-100";
+    button.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(pre.querySelector("code")?.innerText.trimEnd() ?? "");
+      button.textContent = "Copied!";
+      setTimeout(() => (button.textContent = "Copy"), 2000);
+    });
+    pre.classList.add("group/pre");
+    pre.append(button);
+  }
+
+  // Click a content image to view it full size
+  const viewer = document.querySelector<HTMLDialogElement>("[data-image-viewer]");
+  const viewerImg = viewer?.querySelector("img");
+  for (const img of document.querySelectorAll<HTMLImageElement>("[data-prose] img")) {
+    if (img.closest("a")) continue;
+    img.classList.add("cursor-zoom-in");
+    img.addEventListener("click", () => {
+      if (!viewer || !viewerImg) return;
+      viewerImg.src = img.currentSrc || img.src;
+      viewerImg.alt = img.alt;
+      viewer.showModal();
+    });
+  }
+</script>

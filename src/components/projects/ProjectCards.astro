@@ -1,0 +1,11 @@
+---
+// All open-source projects, in `order`
+import { getCollection } from "astro:content";
+import ProjectCard from "@src/components/projects/ProjectCard.astro";
+
+const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+---
+
+{projects.map((project) => (
+  <ProjectCard project={project} />
+))}

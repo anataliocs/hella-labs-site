@@ -1,0 +1,70 @@
+---
+// Call-to-action block. Slot holds the supporting paragraphs.
+//  card   – compact box with a brand left rule (service pages)
+//  center – centered panel on the alt background (pages)
+//  banner – violet gradient banner (articles)
+import Button from "@src/components/Button.astro";
+import { url } from "@src/utils/path";
+
+interface Props {
+  title: string;
+  button: { label: string; href: string };
+  // Optional text link under the button
+  link?: { label: string; href: string };
+  variant?: "card" | "center" | "banner";
+  as?: "h2" | "h3";
+}
+
+const { title, button, link, variant = "center", as: Heading = "h3" } = Astro.props;
+
+const box = {
+  card: "mt-8 rounded-2xl border-l-4 border-primary bg-surface-muted p-6 shadow-card",
+  center: "my-12 rounded-lg bg-surface-alt px-8 py-12 text-center",
+  banner:
+    "my-12 rounded-xl bg-linear-135 from-violet-from to-violet-to px-8 py-12 text-center text-white shadow-violet",
+}[variant];
+---
+
+<section class:list={["[&_p]:text-lg", box]}>
+  <Heading
+    class:list={[
+      "mt-0!",
+      variant === "card" ? "mb-4 text-2xl" : "mb-4 text-3xl",
+      variant === "banner" && "text-white",
+    ]}
+  >
+    {title}
+  </Heading>
+  <div
+    class:list={[
+      "[&_p]:mb-6",
+      variant !== "card" && "mx-auto max-w-200",
+      variant === "banner" && "[&_p]:text-white/95 [&_strong]:text-white",
+    ]}
+  >
+    <slot />
+  </div>
+  {variant === "banner" ? (
+    <a
+      href={url(button.href)}
+      class="inline-block rounded-lg bg-white px-8 py-4 font-heading font-semibold text-violet-to transition-[transform,box-shadow] hover:-translate-y-0.5 hover:text-violet-to hover:shadow-lg"
+    >
+      {button.label}
+    </a>
+  ) : (
+    <Button href={button.href}>{button.label}</Button>
+  )}
+  {link && (
+    <p class="mt-6 mb-0! text-base!">
+      <a
+        href={url(link.href)}
+        class:list={[
+          "underline underline-offset-2",
+          variant === "banner" ? "text-white hover:text-white" : "hover:text-primary",
+        ]}
+      >
+        {link.label}
+      </a>
+    </p>
+  )}
+</section>

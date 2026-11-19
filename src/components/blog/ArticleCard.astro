@@ -1,0 +1,69 @@
+---
+// Post card. `flexible` cards switch to a horizontal row when the blog list view is on
+// (html.view-list, toggled by BlogViewToggle) on screens ≥ sm.
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import TagList from "@src/components/blog/TagList.astro";
+import { url } from "@src/utils/path";
+import { formatDate, postPath, readingTime, type Post } from "@src/utils/posts";
+
+interface Props {
+  post: Post;
+  flexible?: boolean;
+  headingLevel?: "h2" | "h3";
+  class?: string;
+}
+
+const { post, flexible = false, headingLevel: Heading = "h3", class: className } = Astro.props;
+const { title, description, image, tags, tagsColor, date } = post.data;
+const href = url(postPath(post));
+---
+
+<article
+  class:list={[
+    "motion-safe:animate-rise",
+    flexible && "sm:list-view:border-b sm:list-view:border-line sm:list-view:pb-8",
+    className,
+  ]}
+>
+  <div class:list={[flexible && "sm:list-view:flex sm:list-view:items-start sm:list-view:gap-8"]}>
+    <a
+      href={href}
+      tabindex="-1"
+      aria-hidden="true"
+      class:list={[
+        "relative mb-6 block aspect-4/3 overflow-hidden rounded-2xl bg-surface-alt transition-[transform,box-shadow] duration-250 hover:scale-104 hover:shadow-lift",
+        flexible &&
+          "sm:list-view:mb-0 sm:list-view:w-full sm:list-view:max-w-45 sm:list-view:shrink-0 sm:list-view:rounded-lg",
+      ]}
+    >
+      <OptimizedImage
+        src={image}
+        alt=""
+        widths={[360, 480, 640, 960]}
+        sizes="(min-width: 1024px) 420px, (min-width: 640px) 600px, 100vw"
+        class="absolute inset-0 size-full object-cover select-none"
+      />
+    </a>
+
+    <div class="min-w-0">
+      {tags.length > 0 && (
+        <TagList tags={tags.map((name) => ({ name, color: tagsColor }))} class="mb-3" />
+      )}
+      <Heading class="mb-3 text-xl leading-relaxed font-semibold">
+        <a
+          href={href}
+          class="underline decoration-transparent decoration-[1.6px] underline-offset-2 hover:decoration-heading"
+        >
+          {title}
+        </a>
+      </Heading>
+      <p class="line-clamp-3 text-base">{description}</p>
+      <div class="mt-5 font-heading leading-none tracking-wide text-fg-muted uppercase">
+        <time class="text-sm" datetime={date.toISOString()}>
+          {formatDate(date)}
+        </time>
+        <div class="mt-2 text-xs">{readingTime(post)}</div>
+      </div>
+    </div>
+  </div>
+</article>

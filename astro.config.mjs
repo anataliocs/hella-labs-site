@@ -1,0 +1,156 @@
+// @ts-check
+import { defineConfig, fontProviders } from "astro/config";
+import mdx from "@astrojs/mdx";
+import icon from "astro-icon";
+import tailwindcss from "@tailwindcss/vite";
+import sitemap from "@astrojs/sitemap";
+import llmsIntegration from "astro-llms-md";
+import { createLastmodResolver } from "./src/utils/sitemap";
+
+const lastmodFor = createLastmodResolver();
+
+// https://astro.build/config
+export default defineConfig({
+  site: "https://www.hellalabs.dev",
+
+  // Every page URL ends in "/" (pages build to <route>/index.html). url() in src/utils/path.ts
+  // adds the slash to internal links, so canonicals, sitemap and links all agree.
+  trailingSlash: "always",
+  build: { format: "directory" },
+
+  // Global image defaults so <Image>/<Picture> (including MDX images) share responsive breakpoints
+  image: {
+    breakpoints: [640, 828, 1080, 1280, 1600, 1920],
+  },
+
+  markdown: {
+    // Dual themes: light colors inline, dark colors as --shiki-dark vars (switched in style.css)
+    shikiConfig: {
+      themes: { light: "github-light", dark: "github-dark" },
+      wrap: true,
+    },
+  },
+
+  integrations: [
+    // Font Awesome 6 (the Hella brand icon set). Every icon name used in the site must be listed
+    // here, or it won't render.
+    icon({
+      include: {
+        "fa6-solid": [
+          "arrow-left",
+          "arrow-right",
+          "arrow-up",
+          "book",
+          "book-open",
+          "briefcase",
+          "chart-line",
+          "check",
+          "chevron-down",
+          "circle-check",
+          "circle-exclamation",
+          "code",
+          "code-branch",
+          "credit-card",
+          "cubes",
+          "diagram-project",
+          "dollar-sign",
+          "file-contract",
+          "flask",
+          "globe",
+          "graduation-cap",
+          "grip",
+          "hand-holding-dollar",
+          "heart",
+          "laptop-code",
+          "lightbulb",
+          "list",
+          "lock",
+          "marker",
+          "maximize",
+          "microchip",
+          "moon",
+          "network-wired",
+          "pen-nib",
+          "pen-to-square",
+          "people-group",
+          "rocket",
+          "rotate",
+          "rss",
+          "shield-halved",
+          "sun",
+          "triangle-exclamation",
+          "users",
+          "users-gear",
+          "wand-magic-sparkles",
+          "wrench",
+          "xmark",
+          "bars",
+        ],
+        "fa6-brands": [
+          "aws",
+          "chrome",
+          "css3",
+          "dev",
+          "discord",
+          "docker",
+          "ethereum",
+          "github",
+          "html5",
+          "java",
+          "linkedin",
+          "linkedin-in",
+          "linux",
+          "medium",
+          "node",
+          "node-js",
+          "npm",
+          "rust",
+          "sass",
+          "stack-overflow",
+          "telegram",
+          "x-twitter",
+          "youtube",
+        ],
+      },
+    }),
+    mdx(),
+    // Writes sitemap-index.xml + sitemap-0.xml at build. The 404 page is excluded.
+    sitemap({
+      filter: (page) => !new URL(page).pathname.startsWith("/404"),
+      serialize: (item) => ({ ...item, lastmod: lastmodFor(item.url)?.toISOString() }),
+    }),
+    llmsIntegration({
+      name: "Hella Labs",
+      description:
+        "Hella Labs provides Web3-native fractional engineering, DevRel and consulting for Fintech, Blockchain and Web3 startups, and maintains open-source Ethereum test automation tools such as Foundry Anvil Testcontainers and WireMock Testcontainers for Node.js.",
+      exclude: ["/404"],
+      titleSelector: "title",
+      contentSelector: "main",
+      excludeSelectors: ["form"],
+      generateLlmsTxt: true,
+      generateLlmsFullTxt: true,
+      generateIndividualMd: true,
+    }),
+  ],
+
+  fonts: [
+    {
+      provider: fontProviders.google(),
+      name: "Poppins",
+      cssVariable: "--font-poppins",
+      weights: ["400", "500", "600", "700"],
+      styles: ["normal"],
+    },
+    {
+      provider: fontProviders.google(),
+      name: "Roboto Mono",
+      cssVariable: "--font-roboto-mono",
+      weights: ["400", "500", "700"],
+      styles: ["normal", "italic"],
+    },
+  ],
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
+});

@@ -1,0 +1,66 @@
+---
+// Full-screen contact page: photo on the left (≥ lg), form + socials on the right
+import { Icon } from "astro-icon/components";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import SocialLinks from "@src/components/SocialLinks.astro";
+import ContactForm from "@src/components/contact/ContactForm.astro";
+import contactImage from "@src/assets/images/thinking-girl.jpg";
+import { socialLinks, telegramLink } from "@src/data/socialData";
+import { url } from "@src/utils/path";
+import { webPageJsonLd, withBrand } from "@src/utils/seo";
+
+const title = "Let's Build the Future";
+const description =
+  "Got a revolutionary idea? A groundbreaking technical concept? Let's transform it into reality. Whether it's blockchain infrastructure, fintech innovation, or cutting-edge Web3 solutions—we're here to architect, engineer, and scale your vision.";
+const imageAlt =
+  "Woman gazing upward on a neon-lit city street, with holographic network diagrams floating beside her";
+---
+
+<MainLayout
+  title={withBrand("Contact")}
+  description={description}
+  image={contactImage}
+  imageAlt={imageAlt}
+  jsonLd={webPageJsonLd({ title, description, path: "/contact/" })}
+  bare
+>
+  <div class="flex min-h-dvh lg:h-full">
+    <div class="relative overflow-hidden bg-surface-alt max-lg:hidden lg:w-2/5 xl:w-1/2">
+      <OptimizedImage
+        src={contactImage}
+        alt={imageAlt}
+        widths={[640, 828, 1080, 1195]}
+        sizes="(min-width: 1280px) 50vw, 40vw"
+        class="absolute inset-0 size-full object-cover select-none"
+        priority
+      />
+      <p class="absolute bottom-5 left-5 rounded-lg bg-black/50 px-3 py-1.5 font-heading text-xs leading-snug text-white [&_a]:font-medium [&_a]:text-white [&_a]:underline [&_a]:decoration-transparent [&_a]:underline-offset-2 [&_a:hover]:decoration-white">
+        Photo by <a href="https://www.lummi.ai/creator/pablostanley">Pablo Stanley</a> /{" "}
+        <a href="https://www.lummi.ai/">Lummi</a>
+      </p>
+    </div>
+
+    <div class="flex w-full items-center justify-center px-5 py-8 sm:p-8 lg:w-3/5 xl:w-1/2">
+      <div class="w-full max-w-125">
+        <a
+          href={url("/")}
+          class="mb-6 inline-flex items-center gap-2 rounded-xl border border-line px-4 py-1.5 font-heading text-base hover:outline hover:outline-line-alt"
+        >
+          <Icon name="fa6-solid:arrow-left" class="size-3.5" aria-hidden="true" /> Back to home
+        </a>
+        <header class="mb-8">
+          <h1 class="text-[2rem] sm:text-5xl">{title}</h1>
+          <p class="mt-3 text-base sm:text-lg">{description}</p>
+        </header>
+
+        <ContactForm />
+
+        <div class="mt-8 border-t border-line pt-8">
+          <h2 class="mb-4 text-lg font-semibold">Connect with us</h2>
+          <SocialLinks links={[telegramLink, ...socialLinks]} variant="tile" />
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>

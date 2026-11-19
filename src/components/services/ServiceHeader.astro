@@ -1,0 +1,35 @@
+---
+// Service page header: image, glowing service icon, title, gradient rule and Build/Launch label
+import type { CollectionEntry } from "astro:content";
+import { Icon } from "astro-icon/components";
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import { serviceTypeIcon } from "@src/components/services/serviceType";
+
+interface Props {
+  service: CollectionEntry<"services">;
+}
+
+const { title, image, imageAlt, icon, type } = Astro.props.service.data;
+---
+
+<header class="mb-10 text-center">
+  <div class="relative mb-8 aspect-4/3 overflow-hidden rounded-2xl bg-surface-alt">
+    <OptimizedImage
+      src={image}
+      alt={imageAlt}
+      widths={[640, 828, 1080, 1280]}
+      sizes="(min-width: 1364px) 860px, (min-width: 1024px) 63vw, 100vw"
+      class="absolute inset-0 size-full object-cover"
+      priority
+    />
+  </div>
+  <div class="mb-2.5 flex justify-center text-5xl text-heading motion-safe:animate-hue">
+    <Icon name={icon} class="icon-glow" aria-hidden="true" />
+  </div>
+  <h1 class="mb-2.5 text-[2rem] sm:text-[2.5rem]">{title}</h1>
+  <div class="mx-auto my-5 h-0.5 w-15 bg-brand-gradient" aria-hidden="true"></div>
+  <p class="flex items-center justify-center gap-2.5 text-xl font-bold">
+    <Icon name={serviceTypeIcon[type]} class="text-primary" aria-hidden="true" />
+    <span class="text-gradient">{type}</span>
+  </p>
+</header>

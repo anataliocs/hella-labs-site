@@ -1,0 +1,498 @@
+@import "tailwindcss";
+
+/* Theme + view switches. `.dark` and `.view-list` are set on <html> by the inline script in
+   MainLayout (before first paint) and toggled by the header / blog view buttons. */
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant list-view (&:where(.view-list, .view-list *));
+
+/* ---------------------------------------------------------------------------------------------
+   Brand palette (ported from the Jekyll color-scheme.scss). Light values on :root, dark overrides
+   on .dark; components use the semantic tokens below (bg-surface, text-heading, …) and never
+   need a dark: variant for color.
+   --------------------------------------------------------------------------------------------- */
+:root {
+  --hl-primary: #ae00ee;
+  --hl-gradient-from: #f70077;
+  --hl-gradient-to: #ae00ee;
+
+  --hl-bg: #fff;
+  --hl-bg-alt: #ecf0f6;
+  --hl-bg-muted: #f8fafc;
+  --hl-bg-glass: rgb(255 255 255 / 0.95);
+
+  --hl-text: #10141f;
+  --hl-text-muted: #697585;
+  --hl-heading: #10141f;
+
+  --hl-border: #f3f3f4;
+  --hl-border-alt: #e7e7e9;
+  --hl-th: #e7e7e9;
+  --hl-tr: #f3f3f4;
+
+  --hl-callout-note: #e5f5fd;
+  --hl-callout-tip: #e7f6e9;
+  --hl-callout-important: #efeafb;
+  --hl-callout-warning: #fdf3e4;
+  --hl-callout-caution: #fae6e6;
+
+  --hl-code-bg: #f3f3f3;
+}
+
+.dark {
+  --hl-primary: #d60067;
+  --hl-gradient-from: #d60067;
+  --hl-gradient-to: #8311c0;
+
+  --hl-bg: #0f172a;
+  --hl-bg-alt: #2d3b4e;
+  --hl-bg-muted: #1a2334;
+  --hl-bg-glass: rgb(15 23 42 / 0.85);
+
+  --hl-text: #9e9e9e;
+  --hl-text-muted: #9e9e9e;
+  --hl-heading: #f0f0f0;
+
+  --hl-border: #232939;
+  --hl-border-alt: #232939;
+  --hl-th: #2d3b4e;
+  --hl-tr: #1a2334;
+
+  --hl-callout-note: #1f3962;
+  --hl-callout-tip: #26483b;
+  --hl-callout-important: #3f2e6d;
+  --hl-callout-warning: #ac6f13;
+  --hl-callout-caution: #952222;
+
+  --hl-code-bg: #1e293b;
+}
+
+@theme inline {
+  --color-primary: var(--hl-primary);
+  --color-gradient-from: var(--hl-gradient-from);
+  --color-gradient-to: var(--hl-gradient-to);
+
+  --color-surface: var(--hl-bg);
+  --color-surface-alt: var(--hl-bg-alt);
+  --color-surface-muted: var(--hl-bg-muted);
+  --color-surface-glass: var(--hl-bg-glass);
+
+  --color-fg: var(--hl-text);
+  --color-fg-muted: var(--hl-text-muted);
+  --color-heading: var(--hl-heading);
+
+  --color-line: var(--hl-border);
+  --color-line-alt: var(--hl-border-alt);
+
+  --color-callout-note: var(--hl-callout-note);
+  --color-callout-tip: var(--hl-callout-tip);
+  --color-callout-important: var(--hl-callout-important);
+  --color-callout-warning: var(--hl-callout-warning);
+  --color-callout-caution: var(--hl-callout-caution);
+
+  --color-code: var(--hl-code-bg);
+
+  /* Fonts come from the Astro Fonts API (astro.config.mjs) */
+  --font-heading: var(--font-poppins), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-roboto-mono), "Courier New", "Lucida Console", Monaco, monospace;
+}
+
+@theme {
+  /* Teal accent. `secondary-strong` is the same hue darkened so white button text meets WCAG AA
+     (#60b0ba with white text is only 2.5:1). */
+  --color-secondary: #60b0ba;
+  --color-secondary-strong: #367a82;
+  /* Default tag pill color and the indigo → violet gradient used by article CTA banners */
+  --color-tag: #4643ec;
+  --color-violet-from: #667eea;
+  --color-violet-to: #764ba2;
+  --color-success: #10b981;
+
+  --container-site: 85.25rem;
+
+  --text-nav: 0.9375rem;
+  --text-hero: 4.25rem;
+  --text-error: 8.75rem;
+
+  --shadow-card: rgb(50 50 93 / 0.25) 0 13px 27px -5px, rgb(0 0 0 / 0.3) 0 8px 16px -8px;
+  --shadow-glow:
+    0 0 5px 5px rgb(247 0 119 / 0.25), 0 0 10px 5px rgb(174 0 238 / 0.25),
+    0 0 12px 5px rgb(255 255 255 / 0.25);
+  --shadow-button: 0 0 2px 3px rgb(239 151 232 / 0.25), 0 0 4px 5px rgb(239 151 232 / 0.25);
+  --shadow-button-hover:
+    0 0 10px rgb(239 151 232), 0 0 20px #ef97e8, 0 0 20px rgb(255 255 255) inset;
+  --shadow-popover: 0 8px 40px -8px rgb(0 0 0 / 0.22);
+  --shadow-lift: 0 20px 40px -20px rgb(0 0 0 / 0.6);
+  --shadow-violet: 0 10px 30px rgb(102 126 234 / 0.3);
+
+  --animate-hue: hue 3s ease-in-out infinite;
+  --animate-hue-slow: hue 5s linear infinite;
+  --animate-rise: rise 0.5s cubic-bezier(0.3, 0.45, 0.45, 0.95);
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite alternate;
+
+  /* Signature neon effect: the icon's yellow glow is hue-rotated through the rainbow */
+  @keyframes hue {
+    to {
+      filter: hue-rotate(360deg);
+    }
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(50px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes pulse-glow {
+    from {
+      filter: drop-shadow(0 0 6px #667eea) drop-shadow(0 0 14px #667eea);
+    }
+    to {
+      filter: drop-shadow(0 0 10px #667eea) drop-shadow(0 0 20px #764ba2);
+    }
+  }
+}
+
+/* Brand gradient (pink → purple; deeper in dark mode) as a background or as text fill */
+@utility bg-brand-gradient {
+  background-image: linear-gradient(90deg, var(--hl-gradient-from) 0%, var(--hl-gradient-to) 100%);
+}
+@utility text-gradient {
+  background-image: linear-gradient(90deg, var(--hl-gradient-from) 0%, var(--hl-gradient-to) 100%);
+  background-clip: text;
+  color: transparent;
+}
+/* Yellow neon halo for SVG icons (text-shadow doesn't apply to SVG). Pair with animate-hue on a
+   wrapper to cycle the glow color. */
+@utility icon-glow {
+  filter: drop-shadow(0 0 4px yellow) drop-shadow(0 0 10px yellow) saturate(1.5);
+}
+@utility icon-glow-sm {
+  filter: drop-shadow(0 0 1px yellow) drop-shadow(0 0 4px yellow);
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------------------------- */
+@layer base {
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-fg);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: -0.2px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    @variant sm {
+      font-size: 1.125rem;
+    }
+  }
+  /* Set briefly while switching theme so colors don't animate (see ThemeToggle) */
+  html.no-transitions *,
+  html.no-transitions *::before,
+  html.no-transitions *::after {
+    transition: none !important;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-heading);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.2px;
+  }
+  a {
+    color: var(--color-heading);
+    transition: all 0.2s;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+  [x-cloak] {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Components
+   --------------------------------------------------------------------------------------------- */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes spin-angle {
+  to {
+    --angle: 360deg;
+  }
+}
+
+@layer components {
+  /* Primary "neon" button: brand gradient with a slowly rotating sheen behind the label */
+  .btn-glow {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-image: linear-gradient(
+      90deg,
+      var(--hl-gradient-from) 0%,
+      var(--hl-gradient-to) 100%
+    );
+    box-shadow: var(--shadow-button);
+    opacity: 0.95;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      width: 115%;
+      height: 115%;
+      opacity: 0.35;
+      background: linear-gradient(
+        var(--angle),
+        rgb(255 255 255 / 0.65),
+        rgb(239 151 232 / 0.85),
+        rgb(239 151 232 / 0.15)
+      );
+      animation: spin-angle 3s linear infinite;
+    }
+
+    &:hover {
+      box-shadow: var(--shadow-button-hover);
+      transform: scale(1.05);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &::after {
+        animation: none;
+      }
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+
+  /* Long-form content from Markdown/MDX (posts, pages, services, projects) */
+  .prose {
+    color: var(--color-fg);
+
+    & > :first-child {
+      margin-top: 0;
+    }
+    & > :last-child {
+      margin-bottom: 0;
+    }
+
+    & :where(h1, h2, h3, h4, h5, h6) {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      scroll-margin-top: 6rem;
+    }
+    & :where(h1) {
+      font-size: 2.25rem;
+    }
+    & :where(h2) {
+      font-size: 1.75rem;
+    }
+    & :where(h3) {
+      font-size: 1.5rem;
+    }
+    & :where(h4) {
+      font-size: 1.25rem;
+    }
+    & :where(h5) {
+      font-size: 1.125rem;
+    }
+    & :where(h6) {
+      font-size: 1rem;
+    }
+
+    & :where(p, ul, ol, dl, blockquote, address, table, figure, pre) {
+      margin-bottom: 2rem;
+    }
+    & :where(ul) {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    & :where(ol) {
+      list-style: decimal;
+      padding-left: 1.5rem;
+    }
+    & :where(li + li) {
+      margin-top: 0.25rem;
+    }
+    & :where(li > ul, li > ol) {
+      margin-bottom: 0;
+    }
+    & :where(strong) {
+      color: var(--color-heading);
+    }
+
+    & :where(a:not([class])) {
+      border-bottom: 1px solid var(--hl-border-alt);
+      font-weight: 500;
+
+      &:hover {
+        border-bottom-color: var(--color-heading);
+      }
+    }
+
+    & :where(blockquote) {
+      position: relative;
+      margin-top: 4.25rem;
+      margin-bottom: 2.5rem;
+      color: var(--color-heading);
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: center;
+
+      &::before {
+        display: block;
+        color: var(--color-primary);
+        content: "\201C";
+        font-size: 300%;
+        line-height: 0.3;
+      }
+
+      & p {
+        margin-bottom: 0;
+      }
+      & p + p {
+        margin-top: 0.75rem;
+      }
+
+      @variant sm {
+        font-size: 1.75rem;
+      }
+    }
+    & :where(cite) {
+      display: inline-block;
+      color: var(--color-heading);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    & :where(img) {
+      height: auto;
+      border-radius: 0.75rem;
+
+      @variant md {
+        border-radius: 1rem;
+      }
+    }
+    & :where(img + em) {
+      display: block;
+      margin-top: 0.75rem;
+      color: var(--color-fg-muted);
+      font-family: var(--font-heading);
+      font-size: 0.875rem;
+      font-style: normal;
+      line-height: 1.4;
+      text-align: center;
+    }
+    & :where(figcaption) {
+      margin-top: 0.75rem;
+      color: var(--color-fg-muted);
+      font-family: var(--font-heading);
+      font-size: 0.875rem;
+      text-align: center;
+    }
+
+    & :where(hr) {
+      height: 1px;
+      margin: 3rem 0;
+      border: 0;
+      background: var(--color-line);
+
+      @variant sm {
+        margin: 4rem 0;
+      }
+    }
+
+    /* Inline code */
+    & :where(:not(pre) > code) {
+      padding: 0.125rem 0.3rem;
+      border-radius: 0.375rem;
+      background: var(--color-code);
+      color: var(--color-primary);
+      font-size: 0.875em;
+      font-weight: 700;
+    }
+
+    /* Shiki code blocks (dual theme: light inline, dark via --shiki-dark vars) */
+    & :where(pre) {
+      position: relative;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+    & pre.astro-code {
+      background-color: var(--color-code) !important;
+    }
+
+    & :where(table) {
+      width: 100%;
+      border-collapse: collapse;
+      color: var(--color-heading);
+      font-size: 0.875rem;
+    }
+    & :where(th, td) {
+      padding: 0.625rem;
+      border: 1px solid var(--hl-th);
+      text-align: left;
+    }
+    & :where(th) {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    & :where(tbody tr:nth-child(odd)) {
+      background: var(--hl-tr);
+    }
+  }
+
+  html.dark .astro-code,
+  html.dark .astro-code span {
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

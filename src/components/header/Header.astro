@@ -1,0 +1,91 @@
+---
+// Sticky glass header: logo, nav with hover/focus dropdowns (desktop) or a hamburger panel
+// (below lg), theme toggle and the rocket CTA.
+import { Icon } from "astro-icon/components";
+import Logo from "@src/components/header/Logo.astro";
+import ThemeToggle from "@src/components/header/ThemeToggle.astro";
+import Button from "@src/components/Button.astro";
+import { mainNav, navCta } from "@src/data/navigationData";
+import { isActivePath, url } from "@src/utils/path";
+
+const pathname = Astro.url.pathname;
+const linkClass =
+  "block rounded-lg px-4 py-2 font-heading text-nav leading-6 font-medium tracking-normal hover:bg-surface-alt aria-[current=page]:bg-surface-alt max-lg:px-3 max-lg:py-1.5 max-lg:leading-snug";
+---
+
+<header class="sticky top-0 z-30 mb-12 border-b border-line bg-surface-glass backdrop-blur-md backdrop-saturate-180 sm:mb-15">
+  <div
+    class="relative flex flex-wrap items-center justify-between p-4 sm:px-8"
+    x-data="{ open: false }"
+    x-on:keydown.escape="open = false"
+    x-on:click.outside="open = false"
+  >
+    <a href={url("/")} class="shrink-0" aria-label="Hella Labs home">
+      <Logo />
+    </a>
+
+    <nav
+      id="main-nav"
+      aria-label="Main menu"
+      class="flex-1 not-data-open:max-lg:hidden max-lg:absolute max-lg:top-full max-lg:right-4 max-lg:z-50 max-lg:mt-2 max-lg:min-w-56 max-lg:rounded-xl max-lg:border max-lg:border-line max-lg:bg-surface max-lg:p-5 max-lg:shadow-popover lg:ml-12 dark:max-lg:bg-surface-muted"
+      x-bind:data-open="open"
+    >
+      <ul class="flex items-center gap-3 max-lg:flex-col max-lg:items-stretch max-lg:gap-1">
+        {mainNav.map((item) => {
+          const active = isActivePath(pathname, item.href);
+          return (
+            <li class:list={["relative", item.children && "group"]}>
+              <a href={url(item.href)} class={linkClass} aria-current={active ? "page" : undefined}>
+                {item.title}
+                {item.children && (
+                  <Icon
+                    name="fa6-solid:chevron-down"
+                    class="ml-1 inline size-2.5 opacity-70 max-lg:hidden"
+                    aria-hidden="true"
+                  />
+                )}
+              </a>
+              {item.children && (
+                <ul
+                  aria-label={`${item.title} pages`}
+                  class="lg:invisible lg:absolute lg:top-full lg:-left-6 lg:z-50 lg:mt-3 lg:min-w-64 lg:rounded-xl lg:border lg:border-line lg:bg-surface lg:p-3 lg:opacity-0 lg:shadow-popover lg:transition-all lg:group-focus-within:visible lg:group-focus-within:opacity-100 lg:group-hover:visible lg:group-hover:opacity-100 lg:before:absolute lg:before:inset-x-0 lg:before:-top-3 lg:before:h-3 dark:lg:bg-surface-muted max-lg:pl-3"
+                >
+                  {item.children.map((child) => (
+                    <li class="mb-1 last:mb-0">
+                      <a
+                        href={url(child.href)}
+                        class={linkClass}
+                        aria-current={isActivePath(pathname, child.href) ? "page" : undefined}
+                      >
+                        {child.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    <div class="ml-auto flex items-center max-lg:mr-2">
+      <div class="mr-6 border-r border-line-alt pr-4 max-lg:mr-2 max-lg:pr-2">
+        <ThemeToggle />
+      </div>
+      <Button href={navCta.href} size="sm" icon="fa6-solid:rocket" label={navCta.label} />
+    </div>
+
+    <button
+      type="button"
+      class="group/burger relative flex size-6 items-center justify-center lg:hidden"
+      aria-controls="main-nav"
+      aria-label="Open menu"
+      x-bind:aria-expanded="open"
+      x-bind:aria-label="open ? 'Close menu' : 'Open menu'"
+      x-on:click="open = !open"
+    >
+      <span class="relative h-0.75 w-5.5 rounded-full bg-fg-muted transition-all duration-150 group-hover/burger:bg-heading group-aria-expanded/burger:bg-transparent before:absolute before:left-0 before:h-0.75 before:w-5.5 before:-translate-y-[200%] before:rounded-full before:bg-fg-muted before:transition-all before:duration-150 after:absolute after:left-0 after:h-0.75 after:w-5.5 after:translate-y-[200%] after:rounded-full after:bg-fg-muted after:transition-all after:duration-150 group-hover/burger:before:bg-heading group-hover/burger:after:bg-heading group-aria-expanded/burger:before:translate-y-0 group-aria-expanded/burger:before:rotate-45 group-aria-expanded/burger:after:translate-y-0 group-aria-expanded/burger:after:-rotate-45"></span>
+    </button>
+  </div>
+</header>

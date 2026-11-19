@@ -1,0 +1,41 @@
+---
+// Icon + title + text tile (benefits, use cases, resources). Use inside FeatureGrid.
+import { Icon } from "astro-icon/components";
+import Button from "@src/components/Button.astro";
+
+interface Props {
+  title: string;
+  icon: string;
+  as?: "h3" | "h4" | "h5";
+  align?: "left" | "center";
+  // Bordered tile on the alt background; the icon sits inline before the title
+  bordered?: boolean;
+  cta?: { label: string; href: string };
+}
+
+const { title, icon, as: Heading = "h3", align = "left", bordered = false, cta } = Astro.props;
+---
+
+<div
+  class:list={[
+    "flex flex-col p-6 [&_p]:mb-0",
+    align === "center" && "items-center text-center",
+    bordered && "rounded-lg border border-line bg-surface-alt",
+  ]}
+>
+  {!bordered && <Icon name={icon} class="mb-4 size-10 text-primary" aria-hidden="true" />}
+  <Heading class:list={["mt-0! mb-3!", Heading === "h3" ? "text-xl" : "text-lg"]}>
+    {bordered && (
+      <Icon name={icon} class="mr-1 inline size-[1em] align-[-0.125em]" aria-hidden="true" />
+    )}
+    {title}
+  </Heading>
+  <div class="text-base [&_p]:mb-0">
+    <slot />
+  </div>
+  {cta && (
+    <Button href={cta.href} variant="secondary" size="sm" class="mt-4">
+      {cta.label}
+    </Button>
+  )}
+</div>

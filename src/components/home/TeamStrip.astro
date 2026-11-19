@@ -1,0 +1,42 @@
+---
+// Auto-scrolling strip of team photos (pure CSS marquee; static when reduced motion is on)
+import { Image } from "astro:assets";
+import Button from "@src/components/Button.astro";
+import Container from "@src/components/Container.astro";
+import { teamStripData } from "@src/data/homeData";
+
+const { title, cta, images } = teamStripData;
+// The track holds two identical halves and slides by -50% for a seamless loop
+const loop = [...images, ...images, ...images, ...images];
+---
+
+<section class="mb-15 sm:mb-20">
+  <Container>
+    <h2 class="text-center text-2xl sm:text-[2rem]">{title}</h2>
+
+    <div class="mx-auto mt-6 max-w-170 overflow-hidden mask-x-from-80% mask-x-to-100% max-md:max-w-full">
+      <ul class="flex w-max motion-safe:animate-marquee">
+        {[loop, loop].map((half, copy) =>
+          half.map((img) => (
+            <li class="mr-4 shrink-0" aria-hidden={copy > 0 ? "true" : undefined}>
+              <Image
+                src={img.src}
+                alt={copy > 0 ? "" : img.alt}
+                height={140}
+                width={140}
+                densities={[1, 2]}
+                class="size-25 rounded-full object-cover md:size-35"
+              />
+            </li>
+          )),
+        )}
+      </ul>
+    </div>
+
+    <div class="mt-6 mb-2.5 text-center">
+      <Button href={cta.href} variant="secondary" icon={cta.icon}>
+        {cta.label}
+      </Button>
+    </div>
+  </Container>
+</section>

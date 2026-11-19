@@ -1,0 +1,321 @@
+---
+title: "WireMock Testcontainers for Node.js"
+description: "Professional API mocking for Node.js testing. Containerized WireMock integration for reliable, reproducible integration tests."
+image: ../../assets/images/wiremock-testcontainers.jpg
+imageAlt: "WireMock Testcontainers architecture: a Node.js test suite sends HTTP requests to a WireMock Docker container that returns mocked responses in place of third-party APIs"
+icon: fa6-solid:network-wired
+order: 2
+tagline: "Professional API mocking for reliable integration testing."
+summary: "Container-isolated WireMock instances that eliminate dependencies on external services. Test payment integrations, authentication flows, and third-party APIs with complete control and zero flakiness."
+highlights:
+  - "**90% faster** integration test execution"
+  - "Complete isolation from external services"
+  - "Flexible stub registration and verification"
+github: https://github.com/hella-web3/wiremock-testcontainers-nodejs
+npm: https://www.npmjs.com/package/@hellaweb3/wiremock-testcontainers-nodejs
+---
+
+## Overview
+
+The **WireMock Testcontainers for Node.js** module brings professional-grade API mocking to the Node.js ecosystem. By combining the power of WireMock with Testcontainers, this tool enables developers to create robust, isolated integration tests that mock external HTTP dependencies with precision and reliability.
+
+<BadgeRow>
+  <a href="https://github.com/hella-web3/wiremock-testcontainers-nodejs">
+    <img
+      src="https://img.shields.io/github/stars/hella-web3/wiremock-testcontainers-nodejs?style=social"
+      alt="GitHub Stars"
+      height="20"
+    />
+  </a>
+  <a href="https://www.npmjs.com/package/@hellaweb3/wiremock-testcontainers-nodejs">
+    <img
+      src="https://img.shields.io/npm/dm/@hellaweb3/wiremock-testcontainers-nodejs"
+      alt="NPM Downloads"
+      height="20"
+    />
+  </a>
+  <img src="https://img.shields.io/badge/TypeScript-100%25-blue" alt="TypeScript" height="20" />
+</BadgeRow>
+
+### Key Features
+
+- **[Fluent, Typed Builder](https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/guides/registering-stubs)** - Register stubs from directories, files, npm packages or inline objects – validated before Docker starts
+- **[Fast Test Isolation](https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/guides/test-isolation)** - One container per suite; `reset()` restores stubs, scenarios and journal in milliseconds
+- **[Request Verification](https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/guides/verifying-requests)** - Assert on what your code actually sent with `countRequests()` and `findRequests()`
+- **[WireMock Extensions](https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/extensions/java-extensions)** - Load compiled extension JARs with typed stub helpers – no JDK needed
+- **[No Docker? Develop Anyway](https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/guides/running-without-docker)** - Serve every container from a local WireMock JVM for development
+- **Response Templating** - Dynamic responses using Handlebars templates
+- **Stateful Scenarios** - Model complex multi-step API interactions
+- **TypeScript First** - Built with TypeScript for superior type safety and IntelliSense
+
+<LinkBanner
+  href="https://hella-web3.github.io/wiremock-testcontainers-nodejs/"
+  label="View Full Documentation"
+  icon="fa6-solid:book"
+>
+  {" "}
+  - Complete guides, API reference, and working examples
+</LinkBanner>
+
+---
+
+## Why This Matters
+
+Modern applications depend on numerous external APIs and services. Testing these integrations reliably requires **precision, control, and consistency**. Our WireMock Testcontainers module demonstrates our dedication to:
+
+- **Test Reliability** - No more flaky tests due to network issues or external service downtime
+- **Development Velocity** - Test without waiting for staging environments or third-party sandbox APIs
+- **Security Best Practices** - Test against realistic scenarios including error conditions and edge cases
+- **Team Productivity** - Developers can work offline with full testing capabilities
+
+---
+
+## Installation
+
+```bash
+npm install @hellaweb3/wiremock-testcontainers-nodejs
+```
+
+or
+
+```bash
+yarn add @hellaweb3/wiremock-testcontainers-nodejs
+```
+
+## Complete Test Suite Example
+
+Here's a real-world example showing how to set up WireMock for your entire test suite:
+
+```typescript
+import { afterAll, afterEach, beforeAll, expect, it } from "vitest"; // or Jest
+import {
+  type StartedWiremockContainer,
+  WiremockContainer,
+} from "@hellaweb3/wiremock-testcontainers-nodejs";
+import { PaymentsClient } from "../app/payments-client"; // the code under test
+
+let wiremock: StartedWiremockContainer;
+
+beforeAll(async () => {
+  wiremock = await new WiremockContainer()
+    .withMappings("./__mocks__/wiremock") // mappings/ + __files/
+    .start();
+  await wiremock.waitUntilReady();
+}, 120_000); // the first image pull can be slow
+
+afterEach(() => wiremock.reset()); // pristine stubs, empty journal – no restart
+afterAll(() => wiremock?.stop());
+
+it("lists the recorded payments", async () => {
+  const page = await new PaymentsClient(wiremock.getUrl()).list();
+
+  expect(page.meta.totalItems).toBe(2);
+  expect(await wiremock.countRequests({ method: "GET", url: "/payments" })).toBe(1);
+});
+```
+
+<Callout type="tip">
+
+**Performance Tip:** Notice the `reset()` call in `afterEach` - this restores pristine stubs and
+empties the request journal without restarting the container, making your test suite dramatically
+faster. [Learn more about test isolation →](https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/guides/test-isolation)
+
+</Callout>
+
+---
+
+## Engineering Excellence
+
+This project exemplifies our commitment to quality software engineering:
+
+- **Battle-Tested Architecture** - Built on the proven WireMock and Testcontainers foundations
+- **Comprehensive Testing** - Extensive test suite ensuring reliability
+- **Clean API Design** - Intuitive, developer-friendly interfaces
+- **Performance Optimized** - Fast container lifecycle with minimal overhead
+- **Production-Ready** - Used in real-world projects with demanding requirements
+- **Well-Documented** - Clear examples covering common use cases
+
+---
+
+## Advanced Features & Use Cases
+
+### Registering Stubs from Multiple Sources
+
+The fluent builder API lets you register stubs from various sources:
+
+```typescript
+await new WiremockContainer()
+  .withMappings("./__mocks__/wiremock") // from recorded sessions
+  .withMappingsFromFile("./stripe-stubs.json") // from individual files
+  .withMappingsFromPackage("@acme/api-mocks") // from npm packages
+  .withMapping({
+    // or inline
+    request: { method: "POST", url: "/webhook" },
+    response: { status: 201 },
+  })
+  .start();
+```
+
+[**Explore stub registration options →**](https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/guides/registering-stubs)
+
+### Request Verification
+
+Assert that your code made the correct HTTP calls:
+
+```typescript
+// Count specific requests
+const count = await wiremock.countRequests({
+  method: "POST",
+  urlPathPattern: "/api/payments/.*",
+});
+
+// Find and inspect requests
+const requests = await wiremock.findRequests({
+  method: "GET",
+  url: "/users/123",
+});
+```
+
+[**Learn about request verification →**](https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/guides/verifying-requests)
+
+### Real-World Use Cases
+
+<FeatureGrid>
+  <FeatureCard icon="fa6-solid:credit-card" title="Payment Gateway Testing" as="h4" bordered>
+    Mock Stripe, PayPal, or Square APIs to test payment flows without hitting real endpoints or
+    incurring transaction fees.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:lock" title="OAuth & Authentication" as="h4" bordered>
+    Simulate OAuth providers and authentication services to test login flows, token refresh, and
+    error scenarios.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:cubes" title="Microservices Integration" as="h4" bordered>
+    Validate service-to-service communication patterns in isolation before integration, including
+    failure scenarios.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:file-contract" title="Third-Party API Contracts" as="h4" bordered>
+    Ensure your code correctly handles API contracts from external services, including edge cases
+    and version changes.
+  </FeatureCard>
+</FeatureGrid>
+
+---
+
+## Real-World Benefits
+
+Teams integrating this module experience:
+
+- **90% faster** integration test execution compared to hitting real APIs
+- **Zero dependency** on external service availability during testing
+- **Complete control** over edge cases, error conditions, and timeout scenarios
+- **Simplified CI/CD** with no need for complex staging environment coordination
+
+---
+
+## Resources & Documentation
+
+<FeatureGrid>
+  <FeatureCard
+    icon="fa6-solid:book-open"
+    title="Full Documentation"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "View Docs →",
+      href: "https://hella-web3.github.io/wiremock-testcontainers-nodejs/",
+    }}
+  >
+    Complete guides, tutorials, and API reference with tested examples that cannot drift from the
+    actual codebase.
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-solid:wrench"
+    title="API Reference"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "API Docs →",
+      href: "https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/api",
+    }}
+  >
+    Detailed API documentation for all container methods, stub registration, and verification
+    functions.
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-solid:code"
+    title="Working Examples"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "View Examples →",
+      href: "https://github.com/hella-web3/wiremock-testcontainers-nodejs/tree/main/examples",
+    }}
+  >
+    Real, runnable examples covering quick start, advanced features, and common integration
+    patterns.
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-brands:npm"
+    title="NPM Package"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "View on NPM →",
+      href: "https://www.npmjs.com/package/@hellaweb3/wiremock-testcontainers-nodejs",
+    }}
+  >
+    Install via npm or yarn. MIT licensed with full TypeScript support and no peer dependencies.
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-brands:github"
+    title="GitHub Repository"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "View on GitHub →",
+      href: "https://github.com/hella-web3/wiremock-testcontainers-nodejs",
+    }}
+  >
+    Source code, issue tracking, and contribution guidelines. PRs welcome!
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-solid:circle-exclamation"
+    title="Troubleshooting"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "Troubleshooting →",
+      href: "https://hella-web3.github.io/wiremock-testcontainers-nodejs/docs/reference/troubleshooting",
+    }}
+  >
+    Common issues, solutions, and tips for Docker, networking, and WireMock configuration.
+  </FeatureCard>
+</FeatureGrid>
+
+**Additional Resources:**
+
+- [WireMock Official Documentation](http://wiremock.org/docs/) - Learn about WireMock's powerful stubbing and matching capabilities
+- [Testcontainers for Node.js](https://node.testcontainers.org/) - Understand the underlying container framework
+
+---
+
+<CtaSection
+  title="Need a high-performance testing infrastructure?"
+  button={{ label: "Contact Us for a Consultation", href: "/contact/" }}
+>
+  <p>
+    These open-source contributions represent just a fraction of our expertise in test automation,
+    DevOps, and software quality engineering. We help teams implement comprehensive testing
+    strategies that accelerate delivery while maintaining the highest quality standards.
+  </p>
+</CtaSection>
+
+---
+
+_Created with precision by Hella Labs - where quality meets innovation._

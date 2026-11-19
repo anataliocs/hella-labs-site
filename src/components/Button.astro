@@ -1,0 +1,69 @@
+---
+// Brand button: renders <a> when href is given, otherwise <button>.
+// primary = neon gradient with animated sheen, secondary = teal, light = bordered neutral
+import { Icon } from "astro-icon/components";
+import { isExternal, resolveHref } from "@src/utils/path";
+
+type Variant = "primary" | "secondary" | "light";
+type Size = "sm" | "md" | "lg";
+
+interface Props {
+  href?: string;
+  variant?: Variant;
+  size?: Size;
+  icon?: string;
+  type?: "button" | "submit" | "reset";
+  class?: string;
+  // Accessible name for icon-only buttons
+  label?: string;
+  // Extra rel values for external links, e.g. "nofollow"
+  rel?: string;
+}
+
+const {
+  href,
+  variant = "primary",
+  size = "md",
+  icon,
+  type = "button",
+  class: className,
+  label,
+  rel,
+} = Astro.props;
+
+const variants: Record<Variant, string> = {
+  primary: "btn-glow text-white hover:text-white",
+  secondary: "bg-secondary-strong text-white hover:text-white hover:shadow-button-hover",
+  light: "border border-line bg-surface-muted text-heading hover:bg-surface-alt",
+};
+
+const sizes: Record<Size, string> = {
+  sm: "px-3 py-2 text-sm",
+  md: "px-6 py-4 text-base",
+  lg: "w-full justify-center px-6 py-4 text-lg",
+};
+
+const classes = [
+  "relative inline-flex items-center gap-2 rounded-lg font-heading leading-tight font-semibold tracking-normal no-underline transition-all duration-200",
+  variants[variant],
+  sizes[size],
+  className,
+];
+
+const external = href ? isExternal(href) : false;
+const externalAttrs = external
+  ? { target: "_blank", rel: ["noopener", rel].filter(Boolean).join(" ") }
+  : {};
+---
+
+{href ? (
+  <a href={resolveHref(href)} class:list={classes} aria-label={label} {...externalAttrs}>
+    {icon && <Icon name={icon} class="size-[1.15em] shrink-0" aria-hidden="true" />}
+    <slot />
+  </a>
+) : (
+  <button type={type} class:list={classes} aria-label={label}>
+    {icon && <Icon name={icon} class="size-[1.15em] shrink-0" aria-hidden="true" />}
+    <slot />
+  </button>
+)}

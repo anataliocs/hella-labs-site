@@ -1,0 +1,45 @@
+---
+// Service offering detail page
+import { getCollection, render } from "astro:content";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import PageShell from "@src/components/PageShell.astro";
+import ContentSection from "@src/components/page/ContentSection.astro";
+import ServiceHeader from "@src/components/services/ServiceHeader.astro";
+import CtaSection from "@src/components/content/CtaSection.astro";
+import { breadcrumbJsonLd, webPageJsonLd, withBrand } from "@src/utils/seo";
+
+export async function getStaticPaths() {
+  const services = await getCollection("services");
+  return services.map((service) => ({ params: { slug: service.id }, props: { service } }));
+}
+
+const { service } = Astro.props;
+const { Content } = await render(service);
+const { title, description, image, imageAlt, cta } = service.data;
+const path = `/services/${service.id}/`;
+---
+
+<MainLayout
+  title={withBrand(title)}
+  description={description}
+  image={image}
+  imageAlt={imageAlt}
+  jsonLd={[
+    webPageJsonLd({ title, description, path }),
+    breadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Services", path: "/web3-consultant-service-offerings/" },
+      { name: title, path },
+    ]),
+  ]}
+>
+  <PageShell>
+    <article>
+      <ServiceHeader service={service} />
+      <ContentSection content={Content} />
+      <CtaSection title={cta.title} button={{ label: cta.label, href: cta.href }} variant="card">
+        <p>{cta.text}</p>
+      </CtaSection>
+    </article>
+  </PageShell>
+</MainLayout>

@@ -1,0 +1,53 @@
+---
+// Every topic with its post count. Old Jekyll links (/tags/?tag=Foo) redirect to /tags/foo/.
+import MainLayout from "@src/layouts/MainLayout.astro";
+import PageShell from "@src/components/PageShell.astro";
+import { url } from "@src/utils/path";
+import { getPosts, getTags, tagPath } from "@src/utils/posts";
+import { withBrand } from "@src/utils/seo";
+
+const tags = getTags(await getPosts());
+---
+
+<MainLayout
+  title={withBrand("Topics")}
+  description="Browse Hella Labs articles by topic: Ethereum, Solidity, Foundry, testing, Testcontainers, WebSockets, RxJS, CSS animation and more."
+>
+  <PageShell>
+    <div class="mb-8 rounded-2xl border border-line bg-surface-muted p-8">
+      <h1 class="mb-1 text-5xl max-sm:text-[2rem]">Topics</h1>
+      <p class="mb-0">
+        <span class="font-semibold text-heading">{tags.length} topics</span> across the blog
+      </p>
+    </div>
+    <ul class="grid gap-3 sm:grid-cols-2">
+      {tags.map((tag) => (
+        <li>
+          <a
+            href={url(tagPath(tag.name))}
+            class="flex items-center justify-between rounded-xl border border-line bg-surface-muted px-5 py-4 font-heading font-semibold hover:border-primary"
+          >
+            <span class="flex items-center gap-3">
+              <span class="size-3 rounded-full bg-(--tag)" style={`--tag: ${tag.color}`} />
+              {tag.name}
+            </span>
+            <span class="text-sm font-medium text-fg-muted">
+              {tag.count} {tag.count === 1 ? "post" : "posts"}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </PageShell>
+</MainLayout>
+
+<script>
+  import { tagSlug } from "@src/utils/text";
+
+  const legacyTag = new URLSearchParams(window.location.search).get("tag");
+  if (legacyTag) {
+    window.location.replace(
+      `${import.meta.env.BASE_URL.replace(/\/$/, "")}/tags/${tagSlug(legacyTag)}/`,
+    );
+  }
+</script>

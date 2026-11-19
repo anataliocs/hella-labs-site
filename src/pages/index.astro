@@ -1,0 +1,29 @@
+---
+// Homepage: hero, team strip and the first page of the blog feed
+import MainLayout from "@src/layouts/MainLayout.astro";
+import Hero from "@src/components/home/Hero.astro";
+import TeamStrip from "@src/components/home/TeamStrip.astro";
+import PageShell from "@src/components/PageShell.astro";
+import PostFeed from "@src/components/blog/PostFeed.astro";
+import { siteData } from "@src/data/siteData";
+import { getPosts } from "@src/utils/posts";
+
+const posts = await getPosts();
+const { title, pageSize } = siteData.blog;
+const hasMore = posts.length > pageSize;
+---
+
+<MainLayout
+  title="Hella Labs | Fintech & Blockchain Fractional Engineering"
+  description={siteData.description}
+>
+  <Hero />
+  <TeamStrip />
+  <PageShell>
+    <PostFeed
+      title={title}
+      posts={posts.slice(0, pageSize)}
+      nextUrl={hasMore ? "/page/2/" : undefined}
+    />
+  </PageShell>
+</MainLayout>

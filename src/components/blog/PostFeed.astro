@@ -1,0 +1,42 @@
+---
+// Paginated post grid with the grid/list toggle and a "Load More" link (homepage + /page/N/)
+import Button from "@src/components/Button.astro";
+import SectionHeading from "@src/components/SectionHeading.astro";
+import ArticleCard from "@src/components/blog/ArticleCard.astro";
+import BlogViewToggle from "@src/components/blog/BlogViewToggle.astro";
+import type { Post } from "@src/utils/posts";
+
+interface Props {
+  title: string;
+  posts: Post[];
+  nextUrl?: string;
+  prevUrl?: string;
+  // h1 on /page/N/, where the feed is the page's main content
+  as?: "h1" | "h2";
+}
+
+const { title, posts, nextUrl, prevUrl, as = "h2" } = Astro.props;
+---
+
+<section>
+  <SectionHeading title={title} as={as}>
+    <BlogViewToggle />
+  </SectionHeading>
+
+  <div class="grid gap-8 md:grid-cols-2 list-view:md:grid-cols-1">
+    {posts.map((post) => (
+      <ArticleCard post={post} flexible />
+    ))}
+  </div>
+
+  {(nextUrl || prevUrl) && (
+    <nav class="mt-8 flex justify-center gap-4" aria-label="Post pages">
+      {prevUrl && (
+        <Button href={prevUrl} variant="light">
+          Newer posts
+        </Button>
+      )}
+      {nextUrl && <Button href={nextUrl}>Load More</Button>}
+    </nav>
+  )}
+</section>

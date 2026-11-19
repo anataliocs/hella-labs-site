@@ -1,0 +1,86 @@
+import { defineCollection } from "astro:content";
+import { glob } from "astro/loaders";
+import { z } from "astro/zod";
+
+// Hex color like "#4643ec"
+const hexColor = z.string().regex(/^#[0-9a-f]{6}$/i, "Expected a hex color like #4643ec");
+
+// Call to action box rendered at the end of service pages
+const cta = z.object({
+  title: z.string(),
+  text: z.string(),
+  label: z.string(),
+  href: z.string().default("/contact/"),
+});
+
+// Blog posts, served at the site root (/<id>/) like the original Jekyll permalinks
+const blog = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      date: z.coerce.date(),
+      image: image(),
+      imageAlt: z.string(),
+      tags: z.array(z.string()).default([]),
+      // Background of this post's tag pills
+      tagsColor: hexColor.default("#4643ec"),
+      // Listed in the sidebar "Featured posts" widget
+      featured: z.boolean().default(false),
+    }),
+});
+
+// Service offerings (/services/<id>/), ordered by `order` on the services index
+const services = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/services" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      // Shorter title for the services index card (defaults to `title`)
+      cardTitle: z.string().optional(),
+      description: z.string(),
+      image: image(),
+      imageAlt: z.string(),
+      icon: z.string(),
+      type: z.enum(["Build", "Launch"]),
+      order: z.number(),
+      cta,
+    }),
+});
+
+// Open-source projects (/open-source/<id>/). The card fields feed the /open-source/ listing.
+const projects = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/projects" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      image: image(),
+      imageAlt: z.string(),
+      icon: z.string(),
+      order: z.number(),
+      tagline: z.string(),
+      summary: z.string(),
+      // Short wins for the listing card; **bold** is supported
+      highlights: z.array(z.string()),
+      github: z.url(),
+      npm: z.url(),
+    }),
+});
+
+// Standalone long-form pages (team, open-source overview)
+const pages = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/pages" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      image: image(),
+      imageAlt: z.string(),
+      // Shown above the title in the icon header style
+      icon: z.string().optional(),
+    }),
+});
+
+export const collections = { blog, services, projects, pages };

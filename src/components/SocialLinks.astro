@@ -1,0 +1,34 @@
+---
+// Row of icon-only social links. `variant` matches where it's shown.
+import { Icon } from "astro-icon/components";
+import { socialLinks, type SocialLink } from "@src/data/socialData";
+import { resolveHref } from "@src/utils/path";
+
+interface Props {
+  links?: SocialLink[];
+  variant?: "plain" | "tile";
+  class?: string;
+}
+
+const { links = socialLinks, variant = "plain", class: className } = Astro.props;
+
+const linkClass = {
+  plain: "flex items-center p-1 text-2xl text-heading hover:text-primary",
+  tile: "flex size-13 items-center justify-center rounded-lg border border-line bg-surface-muted text-[1.375rem] text-heading hover:-translate-y-0.5 hover:border-primary hover:text-primary",
+}[variant];
+---
+
+<ul class:list={["flex flex-wrap items-center gap-2", variant === "plain" && "gap-4", className]}>
+  {links.map((link) => (
+    <li>
+      <a
+        class={linkClass}
+        href={resolveHref(link.href)}
+        aria-label={link.name}
+        {...(link.href.startsWith("http") && { target: "_blank", rel: "noopener" })}
+      >
+        <Icon name={link.icon} aria-hidden="true" />
+      </a>
+    </li>
+  ))}
+</ul>

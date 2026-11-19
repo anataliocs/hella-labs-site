@@ -1,0 +1,79 @@
+---
+// Site footer: brand + socials, recent posts, services and nav link columns, copyright
+import Container from "@src/components/Container.astro";
+import Logo from "@src/components/header/Logo.astro";
+import SocialLinks from "@src/components/SocialLinks.astro";
+import PostThumbLink from "@src/components/blog/PostThumbLink.astro";
+import { siteData } from "@src/data/siteData";
+import { mainNav } from "@src/data/navigationData";
+import { url } from "@src/utils/path";
+import { getPosts } from "@src/utils/posts";
+
+const recentPosts = (await getPosts()).slice(0, 3);
+const services = mainNav.find((item) => item.title === "Services")?.children ?? [];
+const year = new Date().getFullYear();
+
+const titleClass = "mb-6 text-lg font-semibold";
+const navLinkClass =
+  "font-heading text-nav leading-relaxed font-medium underline decoration-transparent decoration-[1.2px] underline-offset-2 hover:decoration-heading";
+---
+
+<footer class="mt-15 border-t border-line bg-surface-muted sm:mt-20">
+  <Container class="py-15">
+    <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+      <div class="md:col-span-2 lg:col-span-4">
+        <Logo />
+        <h2 class="mt-3 mb-6 text-[2rem] leading-none tracking-[-1px]">{siteData.title}</h2>
+        <p class="text-base">{siteData.footer.description}</p>
+        <SocialLinks class="mt-6 lg:mt-7" />
+      </div>
+
+      <div class="md:col-span-2 lg:col-span-4">
+        <h2 class={titleClass}>Recent Posts</h2>
+        <ul class="max-w-96 space-y-6 max-lg:max-w-none">
+          {recentPosts.map((post) => (
+            <li>
+              <PostThumbLink post={post} />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <nav class="lg:col-span-2" aria-label="Services">
+        <h2 class={titleClass}>Services</h2>
+        <ul class="flex flex-col items-start gap-3">
+          {services.map((item) => (
+            <li>
+              <a class={navLinkClass} href={url(item.href)}>
+                {item.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <nav class="lg:col-span-2" aria-label="Footer">
+        <h2 class={titleClass}>Nav</h2>
+        <ul class="flex flex-col items-start gap-3">
+          {mainNav.map((item) => (
+            <li>
+              <a class={navLinkClass} href={url(item.href)}>
+                {item.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </Container>
+
+  <Container>
+    <p class="border-t border-line py-8 font-heading text-sm leading-6 text-fg-muted lg:text-center [&_a]:text-heading [&_a]:underline [&_a]:decoration-transparent [&_a]:underline-offset-2 [&_a:hover]:decoration-heading">
+      {year} &copy; <a href={url("/")}>{siteData.footer.copyrightName}</a>. Built by{" "}
+      <a href={siteData.footer.builtBy.href} target="_blank" rel="noopener">
+        {siteData.footer.builtBy.name}
+      </a>
+      .
+    </p>
+  </Container>
+</footer>

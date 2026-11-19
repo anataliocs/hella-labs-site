@@ -1,0 +1,31 @@
+---
+// Highlighted note (replaces the Jekyll kramdown `{: .tip }` / `{: .note }` paragraphs)
+type CalloutType = "note" | "tip" | "important" | "warning" | "caution";
+
+interface Props {
+  type?: CalloutType;
+}
+
+const { type = "note" } = Astro.props;
+
+const backgrounds: Record<CalloutType, string> = {
+  note: "bg-callout-note",
+  tip: "bg-callout-tip",
+  important: "bg-callout-important",
+  warning: "bg-callout-warning",
+  caution: "bg-callout-caution",
+};
+---
+
+<div
+  role="note"
+  class:list={[
+    "relative mb-8 rounded-lg py-8 pr-8 pl-16 font-heading text-lg text-heading [&>p:last-child]:mb-0 [&>p]:mb-4",
+    backgrounds[type],
+  ]}
+>
+  <span class="absolute top-8 left-8 leading-none" aria-hidden="true">
+    💡
+  </span>
+  <slot />
+</div>

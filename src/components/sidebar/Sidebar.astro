@@ -1,0 +1,46 @@
+---
+// Sidebar: social links, featured posts and the topic (tag) cloud
+import SocialLinks from "@src/components/SocialLinks.astro";
+import SectionHeading from "@src/components/SectionHeading.astro";
+import TagList from "@src/components/blog/TagList.astro";
+import PostThumbLink from "@src/components/blog/PostThumbLink.astro";
+import { getFeaturedPosts, getPosts, getTags } from "@src/utils/posts";
+
+interface Props {
+  currentPostId?: string;
+}
+
+const { currentPostId } = Astro.props;
+const posts = await getPosts();
+const featured = getFeaturedPosts(posts, currentPostId);
+const tags = getTags(posts);
+---
+
+<aside class="space-y-8" aria-label="Sidebar">
+  <div class="rounded-2xl border border-line p-6">
+    <SocialLinks variant="tile" class="justify-center" />
+  </div>
+
+  {featured.length > 0 && (
+    <section>
+      <SectionHeading title="Featured posts" size="sm" />
+      <ul class="space-y-6">
+        {featured.map((post) => (
+          <li>
+            <PostThumbLink
+              post={post}
+              class="rounded-2xl border border-line bg-surface-muted p-6"
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {tags.length > 0 && (
+    <section>
+      <SectionHeading title="Topics" size="sm" />
+      <TagList tags={tags} size="md" class="rounded-2xl border border-line p-6" />
+    </section>
+  )}
+</aside>

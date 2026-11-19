@@ -1,0 +1,24 @@
+---
+// Light/dark switch. The initial theme is applied by the inline script in MainLayout.
+import { Icon } from "astro-icon/components";
+
+const iconClass = "size-4";
+---
+
+<button
+  type="button"
+  class="flex size-9 items-center justify-center rounded-[10px] bg-surface-alt text-fg-muted hover:text-heading max-lg:size-auto max-lg:bg-transparent max-lg:p-2"
+  aria-label="Toggle dark mode"
+  x-data="{ dark: document.documentElement.classList.contains('dark') }"
+  x-bind:aria-pressed="dark"
+  x-on:click="
+    const root = document.documentElement;
+    root.classList.add('no-transitions');
+    dark = root.classList.toggle('dark');
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+    setTimeout(() => root.classList.remove('no-transitions'), 100);
+  "
+>
+  <Icon name="fa6-solid:moon" class:list={[iconClass, "dark:hidden"]} aria-hidden="true" />
+  <Icon name="fa6-solid:sun" class:list={[iconClass, "hidden dark:block"]} aria-hidden="true" />
+</button>

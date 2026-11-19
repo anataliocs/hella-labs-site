@@ -1,0 +1,55 @@
+---
+// Compact post teaser: 90px thumbnail + title + date/label (sidebar, footer, post navigation)
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import { url } from "@src/utils/path";
+import { formatDate, postPath, type Post } from "@src/utils/posts";
+
+interface Props {
+  post: Post;
+  // Small caption above the title (e.g. "Older post"); defaults to showing the date below it
+  label?: string;
+  reverse?: boolean;
+  class?: string;
+}
+
+const { post, label, reverse = false, class: className } = Astro.props;
+const href = url(postPath(post));
+---
+
+<div class:list={["flex items-start gap-4", reverse && "flex-row-reverse text-right", className]}>
+  <a
+    href={href}
+    class="relative block aspect-4/3 w-full max-w-22.5 shrink-0 overflow-hidden rounded bg-surface transition-[transform,box-shadow] duration-250 hover:scale-104 hover:shadow-lift"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <OptimizedImage
+      src={post.data.image}
+      alt=""
+      widths={[180]}
+      sizes="90px"
+      class="absolute inset-0 size-full object-cover"
+    />
+  </a>
+  <div class:list={["leading-none", reverse && "ml-auto"]}>
+    {label && (
+      <span class="font-heading text-sm tracking-wide text-fg-muted uppercase">{label}</span>
+    )}
+    <h3 class:list={["text-base leading-relaxed font-semibold", label ? "mt-2" : "mb-2"]}>
+      <a
+        href={href}
+        class="underline decoration-transparent decoration-[1.4px] underline-offset-2 hover:decoration-heading"
+      >
+        {post.data.title}
+      </a>
+    </h3>
+    {!label && (
+      <time
+        class="font-heading text-sm tracking-wide text-fg-muted uppercase"
+        datetime={post.data.date.toISOString()}
+      >
+        {formatDate(post.data.date)}
+      </time>
+    )}
+  </div>
+</div>

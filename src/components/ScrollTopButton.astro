@@ -1,0 +1,18 @@
+---
+// Floating "back to top" button that slides in after scrolling one viewport height
+import { Icon } from "astro-icon/components";
+---
+
+<button
+  type="button"
+  class="fixed right-3 bottom-3 z-20 flex size-10 translate-x-[calc(100%+1rem)] items-center justify-center rounded-full bg-primary text-white transition-transform duration-250 hover:opacity-90 data-visible:translate-x-0 md:size-11"
+  aria-label="Back to top"
+  x-data="{ visible: false }"
+  x-bind:data-visible="visible"
+  x-bind:tabindex="visible ? 0 : -1"
+  x-on:scroll.window.throttle.100ms="visible = window.scrollY > window.innerHeight"
+  x-on:click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+  tabindex="-1"
+>
+  <Icon name="fa6-solid:arrow-up" aria-hidden="true" />
+</button>

@@ -1,0 +1,24 @@
+---
+// Section title with a hairline running to the right edge (the theme's .section__head)
+interface Props {
+  title: string;
+  as?: "h1" | "h2" | "h3";
+  size?: "md" | "sm";
+  class?: string;
+}
+
+const { title, as: Tag = "h2", size = "md", class: className } = Astro.props;
+---
+
+<div
+  class:list={[
+    "relative z-0 flex flex-wrap items-center justify-between md:after:absolute md:after:-z-10 md:after:h-px md:after:w-full md:after:bg-line",
+    size === "md" ? "mb-8" : "mb-6",
+    className,
+  ]}
+>
+  <Tag class:list={["bg-surface pr-5", size === "md" ? "text-2xl" : "pr-4 text-lg font-semibold"]}>
+    {title}
+  </Tag>
+  <slot />
+</div>

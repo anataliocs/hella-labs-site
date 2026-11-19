@@ -1,0 +1,41 @@
+---
+// Services index (URL kept from the Jekyll site)
+import { getCollection } from "astro:content";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import Container from "@src/components/Container.astro";
+import ServiceCard from "@src/components/services/ServiceCard.astro";
+import defaultImage from "@src/assets/images/hella-bg-1.jpg";
+import { webPageJsonLd, withBrand } from "@src/utils/seo";
+
+const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
+const description =
+  "Specific service offerings tailored for your on-chain emerging technology startup delivered by experts with experience across Web2 and Web3.";
+---
+
+<MainLayout
+  title={withBrand("Web3 Consulting Services")}
+  description={description}
+  image={defaultImage}
+  imageAlt="Glowing neon Hella logo"
+  jsonLd={webPageJsonLd({
+    title: "Web3 Consulting Services",
+    description,
+    path: "/web3-consultant-service-offerings/",
+  })}
+>
+  <Container as="section" class="mb-15 text-center sm:mb-17.5">
+    <h1 class="mb-4 text-4xl">Hella Web3 Service Offerings</h1>
+    <p class="mx-auto max-w-4xl font-heading text-xl font-bold text-fg-muted">
+      US Expertise + Offshore Cost Effectiveness: Curated to specifically address unique issues and
+      strengths present in emerging tech web3 startups
+    </p>
+    <hr class="my-12 h-px border-0 bg-line sm:my-16" />
+    <ul class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {services.map((service) => (
+        <li>
+          <ServiceCard service={service} />
+        </li>
+      ))}
+    </ul>
+  </Container>
+</MainLayout>

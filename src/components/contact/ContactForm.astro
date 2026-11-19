@@ -1,0 +1,67 @@
+---
+// Contact form, posted to Formspree (works without JavaScript)
+import Button from "@src/components/Button.astro";
+import { siteData } from "@src/data/siteData";
+
+const { formAction, buttonText, inquiryTypes } = siteData.contact;
+const fieldClass =
+  "w-full resize-y rounded-xl border-[1.4px] border-line-alt bg-surface-muted px-5 py-4 text-base text-heading outline-none placeholder:text-fg-muted focus:bg-transparent focus:outline-2 focus:outline-offset-4 focus:outline-primary focus:placeholder:text-heading";
+---
+
+<form class="space-y-5" action={formAction} method="POST">
+  <div>
+    <label class="sr-only" for="form-name">
+      Name
+    </label>
+    <input
+      class={fieldClass}
+      id="form-name"
+      type="text"
+      name="name"
+      placeholder="Name"
+      autocomplete="name"
+      required
+    />
+  </div>
+  <div>
+    <label class="sr-only" for="form-email">
+      Email
+    </label>
+    <input
+      class={fieldClass}
+      id="form-email"
+      type="email"
+      name="_replyto"
+      placeholder="Email"
+      autocomplete="email"
+      required
+    />
+  </div>
+  <div>
+    <label class="sr-only" for="form-inquiry">
+      Inquiry Type
+    </label>
+    <select class={fieldClass} id="form-inquiry" name="inquiry_type" required>
+      <option value="">Select Inquiry Type</option>
+      {inquiryTypes.map((type) => (
+        <option value={type}>{type}</option>
+      ))}
+    </select>
+  </div>
+  <div>
+    <label class="sr-only" for="form-text">
+      Message
+    </label>
+    <textarea
+      class={fieldClass}
+      id="form-text"
+      name="text"
+      rows="5"
+      placeholder="What do you want to build today?"
+      required
+    ></textarea>
+  </div>
+  <div>
+    <Button type="submit">{buttonText}</Button>
+  </div>
+</form>

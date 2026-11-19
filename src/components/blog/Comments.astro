@@ -1,0 +1,63 @@
+---
+// Disqus thread, loaded only when the reader asks for it (keeps third-party JS off page load)
+import Button from "@src/components/Button.astro";
+import { siteData } from "@src/data/siteData";
+
+interface Props {
+  // Absolute canonical URL and a stable id for the thread
+  pageUrl: string;
+  identifier: string;
+}
+
+const { pageUrl, identifier } = Astro.props;
+const { enabled, shortname, title, buttonText } = siteData.disqus;
+---
+
+{enabled && (
+  <section
+    class="my-10 border-y border-line py-10 text-center sm:my-12 sm:py-12"
+    data-comments
+    data-shortname={shortname}
+    data-url={pageUrl}
+    data-identifier={identifier}
+  >
+    <h2 class="text-2xl font-semibold">{title}</h2>
+    <div class="mt-5" data-comments-button>
+      <Button>{buttonText}</Button>
+    </div>
+    <div id="disqus_thread" class="text-left" />
+    <noscript>
+      Please enable JavaScript to view the{" "}
+      <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+    </noscript>
+  </section>
+)}
+
+<script>
+  interface DisqusConfig {
+    page: { url?: string; identifier?: string };
+  }
+  declare global {
+    interface Window {
+      disqus_config?: (this: DisqusConfig) => void;
+    }
+  }
+
+  const section = document.querySelector<HTMLElement>("[data-comments]");
+  const wrapper = section?.querySelector<HTMLElement>("[data-comments-button]");
+  if (section && wrapper) {
+    const { shortname, url, identifier } = section.dataset;
+    wrapper.querySelector("button")?.addEventListener("click", () => {
+      window.disqus_config = function () {
+        this.page.url = url;
+        this.page.identifier = identifier;
+      };
+      const script = document.createElement("script");
+      script.src = `https://${shortname}.disqus.com/embed.js`;
+      script.async = true;
+      script.dataset.timestamp = String(Date.now());
+      document.head.append(script);
+      wrapper.remove();
+    });
+  }
+</script>

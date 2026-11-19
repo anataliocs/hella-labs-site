@@ -1,0 +1,20 @@
+---
+// Rendered entry body inside Prose, with the shared MDX component map
+import type { render } from "astro:content";
+import Prose from "@src/components/Prose.astro";
+import { mdxComponents } from "@src/components/content";
+
+interface Props {
+  // `Content` returned by render(entry)
+  content: Awaited<ReturnType<typeof render>>["Content"];
+  as?: "article" | "div";
+}
+
+const { content: Content, as: Tag = "div" } = Astro.props;
+---
+
+<Tag>
+  <Prose>
+    <Content components={mdxComponents} />
+  </Prose>
+</Tag>

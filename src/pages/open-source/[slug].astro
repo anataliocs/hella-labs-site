@@ -1,0 +1,41 @@
+---
+// Open-source project detail page
+import { getCollection, render } from "astro:content";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import PageShell from "@src/components/PageShell.astro";
+import PageHeader from "@src/components/page/PageHeader.astro";
+import ContentSection from "@src/components/page/ContentSection.astro";
+import { breadcrumbJsonLd, webPageJsonLd, withBrand } from "@src/utils/seo";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, description, image, imageAlt, icon } = project.data;
+const path = `/open-source/${project.id}/`;
+---
+
+<MainLayout
+  title={withBrand(title)}
+  description={description}
+  image={image}
+  imageAlt={imageAlt}
+  jsonLd={[
+    webPageJsonLd({ title, description, path }),
+    breadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Open Source", path: "/open-source/" },
+      { name: title, path },
+    ]),
+  ]}
+>
+  <PageShell>
+    <article>
+      <PageHeader title={title} image={image} imageAlt={imageAlt} icon={icon} />
+      <ContentSection content={Content} />
+    </article>
+  </PageShell>
+</MainLayout>

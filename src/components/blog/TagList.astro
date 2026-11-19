@@ -1,0 +1,32 @@
+---
+// Colored tag pills linking to /tags/<tag>/. Color comes from the post's `tagsColor`.
+import { url } from "@src/utils/path";
+import { tagPath } from "@src/utils/posts";
+
+interface Props {
+  tags: { name: string; color: string }[];
+  size?: "sm" | "md";
+  class?: string;
+}
+
+const { tags, size = "sm", class: className } = Astro.props;
+---
+
+<ul class:list={["flex flex-wrap items-center gap-2", className]}>
+  {tags.map((tag) => (
+    <li>
+      <a
+        href={url(tagPath(tag.name))}
+        class:list={[
+          "block rounded bg-(--tag) font-heading leading-tight text-white hover:text-white hover:opacity-90",
+          size === "sm"
+            ? "px-2 py-1 text-xs font-medium"
+            : "rounded-lg px-3 py-2 text-sm font-semibold",
+        ]}
+        style={`--tag: ${tag.color}`}
+      >
+        {tag.name}
+      </a>
+    </li>
+  ))}
+</ul>

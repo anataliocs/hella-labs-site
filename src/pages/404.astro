@@ -1,0 +1,18 @@
+---
+import MainLayout from "@src/layouts/MainLayout.astro";
+import Container from "@src/components/Container.astro";
+import Button from "@src/components/Button.astro";
+import { withBrand } from "@src/utils/seo";
+---
+
+<MainLayout
+  title={withBrand("Page Not Found")}
+  description="This page doesn't exist. Head back to the Hella Labs homepage to explore our services, open-source projects and blog."
+  noindex
+>
+  <Container class="text-center">
+    <h1 class="mb-5 text-[5rem] leading-none sm:text-error">404</h1>
+    <p class="mb-8 text-fg-muted">Page could not be found</p>
+    <Button href="/">Back to homepage</Button>
+  </Container>
+</MainLayout>

@@ -1,0 +1,30 @@
+---
+// Service tile on the offerings index: glowing icon, gradient title link and Build/Launch label
+import type { CollectionEntry } from "astro:content";
+import { Icon } from "astro-icon/components";
+import { serviceTypeIcon } from "@src/components/services/serviceType";
+import { url } from "@src/utils/path";
+
+interface Props {
+  service: CollectionEntry<"services">;
+}
+
+const { service } = Astro.props;
+const { title, cardTitle, icon, type } = service.data;
+---
+
+<article class="flex h-full flex-col items-center rounded-2xl border border-line bg-surface-muted p-5 text-center shadow-glow">
+  <div class="my-1 flex justify-center text-3xl text-heading motion-safe:animate-hue">
+    <Icon name={icon} class="icon-glow" aria-hidden="true" />
+  </div>
+  <h2 class="mx-auto my-3 w-fit text-2xl">
+    <a href={url(`/services/${service.id}/`)} class="text-gradient hover:opacity-80">
+      {cardTitle ?? title}
+    </a>
+    <span class="mt-1 block h-0.5 bg-brand-gradient" aria-hidden="true"></span>
+  </h2>
+  <p class="flex items-center gap-2 font-bold">
+    <Icon name={serviceTypeIcon[type]} class="text-primary" aria-hidden="true" />
+    <span class="text-gradient">{type}</span>
+  </p>
+</article>

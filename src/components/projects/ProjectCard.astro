@@ -1,0 +1,62 @@
+---
+// Open-source project summary card (on /open-source/)
+import type { CollectionEntry } from "astro:content";
+import { Icon } from "astro-icon/components";
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import Button from "@src/components/Button.astro";
+import { url } from "@src/utils/path";
+import { renderInline } from "@src/utils/text";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const { title, image, tagline, summary, highlights, github, npm } = project.data;
+const href = url(`/open-source/${project.id}/`);
+const externalLink = "inline-flex items-center gap-1.5 border-0! font-semibold hover:text-primary";
+---
+
+<article class="my-12 rounded-lg border border-line bg-surface-alt p-6 sm:p-8">
+  <a href={href} class="mb-6 block border-0!" tabindex="-1" aria-hidden="true">
+    <OptimizedImage
+      src={image}
+      alt=""
+      widths={[640, 828, 1080]}
+      sizes="(min-width: 1024px) 800px, 100vw"
+      class="w-full rounded"
+    />
+  </a>
+  <h3 class="mt-0!">
+    <a href={href} class="border-0! hover:text-primary">
+      {title}
+    </a>
+  </h3>
+  <p class="mt-2 mb-4! text-lg">
+    <strong>{tagline}</strong>
+  </p>
+  <p class="mb-4!">{summary}</p>
+  <ul class="my-4! list-none! space-y-2 pl-0!">
+    {highlights.map((item) => (
+      <li class="flex items-start gap-2">
+        <Icon
+          name="fa6-solid:circle-check"
+          class="mt-1.5 size-4 shrink-0 text-success"
+          aria-hidden="true"
+        />
+        <span set:html={renderInline(item)} />
+      </li>
+    ))}
+  </ul>
+  <div class="mt-6 flex flex-wrap items-center gap-4">
+    <a href={github} target="_blank" rel="noopener" class={externalLink}>
+      <Icon name="fa6-brands:github" aria-hidden="true" /> GitHub
+    </a>
+    <a href={npm} target="_blank" rel="noopener" class={externalLink}>
+      <Icon name="fa6-brands:npm" aria-hidden="true" /> NPM
+    </a>
+    <Button href={href} size="sm" variant="secondary">
+      Learn More <Icon name="fa6-solid:arrow-right" aria-hidden="true" />
+    </Button>
+  </div>
+</article>

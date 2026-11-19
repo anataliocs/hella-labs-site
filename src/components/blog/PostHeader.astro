@@ -1,0 +1,68 @@
+---
+// Post hero: cover image, tags, title and author/date/reading-time byline
+import { Image } from "astro:assets";
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import TagList from "@src/components/blog/TagList.astro";
+import { siteData } from "@src/data/siteData";
+import { url } from "@src/utils/path";
+import { formatDate, readingTime, type Post } from "@src/utils/posts";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { title, image, imageAlt, tags, tagsColor, date } = post.data;
+const { author } = siteData;
+---
+
+<header class="mb-8">
+  <div class="relative mb-8 aspect-4/3 overflow-hidden rounded-2xl bg-surface-alt">
+    <OptimizedImage
+      src={image}
+      alt={imageAlt}
+      widths={[640, 828, 1080, 1280]}
+      sizes="(min-width: 1364px) 880px, (min-width: 1024px) 64vw, 100vw"
+      class="absolute inset-0 size-full object-cover"
+      priority
+    />
+  </div>
+
+  {tags.length > 0 && (
+    <TagList
+      tags={tags.map((name) => ({ name, color: tagsColor }))}
+      size="md"
+      class="mb-4 sm:mb-5"
+    />
+  )}
+
+  <h1 class="mb-5 text-[2rem] sm:mb-7 sm:text-[2.5rem]">{title}</h1>
+
+  <div class="flex items-center leading-none">
+    <a
+      href={url(author.href)}
+      class="relative mr-3 size-12.5 shrink-0 overflow-hidden rounded-full bg-surface-alt hover:-translate-y-0.5"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <Image
+        src={author.avatar}
+        alt=""
+        width={50}
+        densities={[1, 2]}
+        class="size-full object-cover"
+      />
+    </a>
+    <div class="font-heading">
+      <a
+        href={url(author.href)}
+        class="text-base font-medium underline decoration-transparent decoration-[1.2px] underline-offset-2 hover:decoration-heading"
+      >
+        {author.name}
+      </a>
+      <div class="mt-2 text-xs tracking-wide text-fg-muted uppercase">
+        <time datetime={date.toISOString()}>{formatDate(date)}</time> – {readingTime(post)}
+      </div>
+    </div>
+  </div>
+</header>

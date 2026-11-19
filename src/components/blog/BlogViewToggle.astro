@@ -1,0 +1,22 @@
+---
+// Grid ⇄ list switch for the post feed. Persists in localStorage ("classView") and toggles
+// html.view-list, which ArticleCard's list-view: variants respond to.
+import { Icon } from "astro-icon/components";
+---
+
+<div class="rounded-xl bg-surface pl-5 max-md:hidden">
+  <button
+    type="button"
+    class="flex h-12 min-w-12 items-center justify-center rounded-xl bg-surface-alt p-3 text-heading transition-transform duration-150 dark:bg-surface-muted"
+    aria-label="Show posts as a list"
+    x-data="{ list: document.documentElement.classList.contains('view-list') }"
+    x-bind:aria-pressed="list"
+    x-on:click="
+      list = document.documentElement.classList.toggle('view-list');
+      list ? localStorage.setItem('classView', 'list') : localStorage.removeItem('classView');
+    "
+  >
+    <Icon name="fa6-solid:grip" class="size-5 list-view:hidden" aria-hidden="true" />
+    <Icon name="fa6-solid:list" class="hidden size-5 list-view:block" aria-hidden="true" />
+  </button>
+</div>

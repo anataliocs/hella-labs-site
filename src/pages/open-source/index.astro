@@ -1,0 +1,29 @@
+---
+// Open-source overview (content in src/content/pages/open-source.mdx)
+import { getEntry, render } from "astro:content";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import PageShell from "@src/components/PageShell.astro";
+import PageHeader from "@src/components/page/PageHeader.astro";
+import ContentSection from "@src/components/page/ContentSection.astro";
+import { webPageJsonLd, withBrand } from "@src/utils/seo";
+
+const page = await getEntry("pages", "open-source");
+if (!page) throw new Error("Missing src/content/pages/open-source.mdx");
+const { Content } = await render(page);
+const { title, description, image, imageAlt } = page.data;
+---
+
+<MainLayout
+  title={withBrand(title)}
+  description={description}
+  image={image}
+  imageAlt={imageAlt}
+  jsonLd={webPageJsonLd({ title, description, path: "/open-source/" })}
+>
+  <PageShell>
+    <article>
+      <PageHeader title={title} image={image} imageAlt={imageAlt} />
+      <ContentSection content={Content} />
+    </article>
+  </PageShell>
+</MainLayout>

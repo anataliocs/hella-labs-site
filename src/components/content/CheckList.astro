@@ -1,0 +1,7 @@
+---
+// Wraps a Markdown list and swaps the bullets for green check marks
+---
+
+<div class="[&_li]:relative [&_li]:pl-7 [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:font-bold [&_li]:before:text-success [&_li]:before:content-['✓'] [&_ul]:list-none [&_ul]:pl-0">
+  <slot />
+</div>

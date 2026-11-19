@@ -1,0 +1,23 @@
+---
+// Up to three posts sharing a tag, always shown in the list layout
+import SectionHeading from "@src/components/SectionHeading.astro";
+import ArticleCard from "@src/components/blog/ArticleCard.astro";
+import type { Post } from "@src/utils/posts";
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <section class="view-list mt-10 sm:mt-12">
+    <SectionHeading title="Related" />
+    <div class="space-y-8">
+      {posts.map((post) => (
+        <ArticleCard post={post} flexible />
+      ))}
+    </div>
+  </section>
+)}

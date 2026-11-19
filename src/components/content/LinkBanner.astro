@@ -1,0 +1,22 @@
+---
+// Full-width violet gradient banner with a single prominent link (e.g. "View Full Documentation")
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  href: string;
+  label: string;
+  icon?: string;
+}
+
+const { href, label, icon } = Astro.props;
+---
+
+<div class="my-8 rounded-lg bg-linear-135 from-violet-from to-violet-to p-6 text-center text-white [&_a]:text-white">
+  {icon && <Icon name={icon} class="mr-1 inline size-5 align-[-0.2em]" aria-hidden="true" />}
+  <strong class="text-white">
+    <a href={href} class="underline hover:no-underline">
+      {label}
+    </a>
+  </strong>
+  <slot />
+</div>

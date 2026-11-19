@@ -1,0 +1,14 @@
+---
+// Large centered icon used between article sections
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  icon: string;
+}
+
+const { icon } = Astro.props;
+---
+
+<div class="my-8 flex justify-center text-5xl text-heading" aria-hidden="true">
+  <Icon name={icon} />
+</div>

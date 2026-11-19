@@ -1,0 +1,12 @@
+---
+// Responsive grid of FeatureCards
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["my-8 grid gap-6 sm:grid-cols-2 sm:gap-8", className]}>
+  <slot />
+</div>

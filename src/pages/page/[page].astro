@@ -1,0 +1,36 @@
+---
+// Blog feed pages 2…N (page 1 is the homepage), matching the Jekyll /page/:num/ paths
+import type { GetStaticPaths } from "astro";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import PageShell from "@src/components/PageShell.astro";
+import PostFeed from "@src/components/blog/PostFeed.astro";
+import { siteData } from "@src/data/siteData";
+import { getPosts } from "@src/utils/posts";
+import { withBrand } from "@src/utils/seo";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPosts();
+  return paginate(posts, { pageSize: siteData.blog.pageSize }).filter(
+    ({ props }) => props.page.currentPage > 1,
+  );
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+const n = page.currentPage;
+const title = `${siteData.blog.title}, Page ${n}`;
+---
+
+<MainLayout
+  title={withBrand(title)}
+  description={`Page ${n} of the ${siteData.blog.title}: articles on Web3, Ethereum, test automation and developer tooling from Hella Labs.`}
+>
+  <PageShell>
+    <PostFeed
+      title={title}
+      as="h1"
+      posts={page.data}
+      prevUrl={n === 2 ? "/" : `/page/${n - 1}/`}
+      nextUrl={n < page.lastPage ? `/page/${n + 1}/` : undefined}
+    />
+  </PageShell>
+</MainLayout>

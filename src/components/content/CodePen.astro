@@ -1,0 +1,29 @@
+---
+// Lazy-loaded CodePen embed (an iframe instead of CodePen's embed script)
+interface Props {
+  slug: string;
+  title: string;
+  user?: string;
+  author?: string;
+  height?: number;
+}
+
+const { slug, title, user = "anataliocs", author = "Chris Anatalio", height = 300 } = Astro.props;
+const penUrl = `https://codepen.io/${user}/pen/${slug}`;
+const embedUrl = `https://codepen.io/${user}/embed/${slug}?default-tab=html%2Cresult&theme-id=dark`;
+---
+
+<figure class="mb-8">
+  <iframe
+    src={embedUrl}
+    title={`${title} (CodePen)`}
+    height={height}
+    loading="lazy"
+    allowfullscreen
+    class="w-full rounded-2xl border-2 border-line"
+  ></iframe>
+  <figcaption>
+    See the Pen <a href={penUrl}>{title}</a> by {author} (
+    <a href={`https://codepen.io/${user}`}>@{user}</a>) on <a href="https://codepen.io">CodePen</a>.
+  </figcaption>
+</figure>

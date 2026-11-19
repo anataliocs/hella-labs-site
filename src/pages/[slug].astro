@@ -1,0 +1,65 @@
+---
+// Blog post, served at /<slug>/ like the original Jekyll permalinks
+import { render } from "astro:content";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import PageShell from "@src/components/PageShell.astro";
+import ContentSection from "@src/components/page/ContentSection.astro";
+import PostHeader from "@src/components/blog/PostHeader.astro";
+import ShareButtons from "@src/components/blog/ShareButtons.astro";
+import PostNavigation from "@src/components/blog/PostNavigation.astro";
+import Comments from "@src/components/blog/Comments.astro";
+import RelatedPosts from "@src/components/blog/RelatedPosts.astro";
+import { getShareImage } from "@src/utils/images";
+import { getAdjacentPosts, getPosts, getRelatedPosts, postPath } from "@src/utils/posts";
+import { absoluteUrl, blogPostingJsonLd, breadcrumbJsonLd, clip, withBrand } from "@src/utils/seo";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
+}
+
+const { post, posts } = Astro.props;
+const { Content } = await render(post);
+const { title, description, image, imageAlt, date, tags } = post.data;
+const path = postPath(post);
+const pageUrl = absoluteUrl(path);
+const { older, newer } = getAdjacentPosts(post, posts);
+
+const jsonLd = [
+  blogPostingJsonLd({
+    title,
+    description: clip(description),
+    path,
+    image: (await getShareImage(image)).url,
+    date,
+    tags,
+  }),
+  breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog/" },
+    { name: title, path },
+  ]),
+];
+---
+
+<MainLayout
+  title={withBrand(title)}
+  description={description}
+  image={image}
+  imageAlt={imageAlt}
+  ogType="article"
+  article={{ publishedTime: date, tags }}
+  keywords={tags}
+  jsonLd={jsonLd}
+>
+  <PageShell currentPostId={post.id}>
+    <article>
+      <PostHeader post={post} />
+      <ContentSection content={Content} />
+    </article>
+    <ShareButtons title={title} description={description} pageUrl={pageUrl} />
+    <PostNavigation older={older} newer={newer} />
+    <Comments pageUrl={pageUrl} identifier={post.id} />
+    <RelatedPosts posts={getRelatedPosts(post, posts)} />
+  </PageShell>
+</MainLayout>

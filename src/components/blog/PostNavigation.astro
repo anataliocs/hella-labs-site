@@ -1,0 +1,27 @@
+---
+// Older / newer post cards under an article
+import PostThumbLink from "@src/components/blog/PostThumbLink.astro";
+import type { Post } from "@src/utils/posts";
+
+interface Props {
+  older?: Post;
+  newer?: Post;
+}
+
+const { older, newer } = Astro.props;
+const cardClass = "rounded-2xl border border-line bg-surface-muted p-6 md:w-1/2";
+---
+
+{(older || newer) && (
+  <nav class="mt-10 flex flex-col gap-4 sm:mt-12 md:flex-row" aria-label="More posts">
+    {older && <PostThumbLink post={older} label="Older post" class={cardClass} />}
+    {newer && (
+      <PostThumbLink
+        post={newer}
+        label="Newer post"
+        reverse
+        class:list={[cardClass, "md:ml-auto"]}
+      />
+    )}
+  </nav>
+)}

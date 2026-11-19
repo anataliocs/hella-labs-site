@@ -1,0 +1,46 @@
+---
+// Share on X / LinkedIn
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  title: string;
+  description: string;
+  // Absolute URL of the page being shared
+  pageUrl: string;
+}
+
+const { title, description, pageUrl } = Astro.props;
+const u = encodeURIComponent(pageUrl);
+
+const targets = [
+  {
+    name: "Share on X",
+    icon: "fa6-brands:x-twitter",
+    href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${u}`,
+  },
+  {
+    name: "Share on LinkedIn",
+    icon: "fa6-brands:linkedin-in",
+    href: `https://www.linkedin.com/shareArticle?mini=true&url=${u}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(description)}`,
+  },
+];
+---
+
+<div class="mt-10">
+  <p class="mb-5 text-center font-heading text-lg font-semibold text-heading">Share:</p>
+  <ul class="flex items-center justify-center gap-2">
+    {targets.map((t) => (
+      <li>
+        <a
+          href={t.href}
+          target="_blank"
+          rel="noopener nofollow"
+          aria-label={t.name}
+          class="flex size-12 items-center justify-center rounded-lg border border-line bg-surface-muted text-xl hover:border-transparent hover:bg-surface-alt"
+        >
+          <Icon name={t.icon} aria-hidden="true" />
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
