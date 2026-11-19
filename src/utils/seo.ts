@@ -84,6 +84,7 @@ export function blogPostingJsonLd(post: {
   path: string;
   image: string;
   date: Date;
+  updated?: Date;
   tags: string[];
 }): JsonLd {
   return {
@@ -93,7 +94,7 @@ export function blogPostingJsonLd(post: {
     description: post.description,
     image: post.image,
     datePublished: post.date.toISOString(),
-    dateModified: post.date.toISOString(),
+    dateModified: (post.updated ?? post.date).toISOString(),
     author: {
       "@type": "Person",
       name: siteData.author.name,

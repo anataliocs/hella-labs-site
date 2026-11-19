@@ -21,6 +21,9 @@ const blog = defineCollection({
       title: z.string(),
       description: z.string(),
       date: z.coerce.date(),
+      // Last significant revision; drives sitemap <lastmod>, dateModified and
+      // article:modified_time (defaults to `date`)
+      updated: z.coerce.date().optional(),
       image: image(),
       imageAlt: z.string(),
       tags: z.array(z.string()).default([]),

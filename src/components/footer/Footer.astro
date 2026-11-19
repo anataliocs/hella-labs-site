@@ -75,5 +75,19 @@ const navLinkClass =
       </a>
       .
     </p>
+    <nav aria-label="Site resources" class="pb-8">
+      <ul class="flex flex-wrap gap-x-6 gap-y-2 font-heading text-sm text-fg-muted lg:justify-center">
+        {siteData.footer.resourceLinks.map((link) => (
+          <li>
+            <a
+              class="underline decoration-transparent underline-offset-2 hover:text-heading hover:decoration-heading"
+              href={url(link.href)}
+            >
+              {link.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   </Container>
 </footer>

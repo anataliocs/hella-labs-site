@@ -45,6 +45,13 @@ export const siteData = {
       "Unleash the potential of your startup with Onsite, Remote and Offshore consulting and staff augmentation. We provide the expertise of Silicon Valley multiplied by the cost-effectiveness of Offshore resources.",
     copyrightName: "Hella Web3",
     builtBy: { name: "Chris Anatalio", href: "https://www.linkedin.com/in/anataliocs/" },
+    // Machine-readable files generated at build (astro-llms-md + @astrojs/sitemap)
+    resourceLinks: [
+      { title: "llms.txt", href: "/llms.txt" },
+      { title: "llms-full.txt", href: "/llms-full.txt" },
+      { title: "Sitemap index", href: "/sitemap-index.xml" },
+      { title: "Sitemap", href: "/sitemap-0.xml" },
+    ],
   },
 
   contact: {
@@ -62,12 +69,6 @@ export const siteData = {
     shortname: "dsq-count-scr",
     title: "Start the conversation",
     buttonText: "Show Comments",
-  },
-
-  analytics: {
-    // Google Analytics 4, gated behind Cookiebot consent (production builds only)
-    gaMeasurementId: "G-WCD2Q24SBK",
-    cookiebotId: "fe011b35-9177-4947-b0c2-e73b66c3b222",
   },
 
   blog: {

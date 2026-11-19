@@ -20,7 +20,7 @@ export async function getStaticPaths() {
 
 const { post, posts } = Astro.props;
 const { Content } = await render(post);
-const { title, description, image, imageAlt, date, tags } = post.data;
+const { title, description, image, imageAlt, date, updated, tags } = post.data;
 const path = postPath(post);
 const pageUrl = absoluteUrl(path);
 const { older, newer } = getAdjacentPosts(post, posts);
@@ -32,6 +32,7 @@ const jsonLd = [
     path,
     image: (await getShareImage(image)).url,
     date,
+    updated,
     tags,
   }),
   breadcrumbJsonLd([
@@ -48,7 +49,7 @@ const jsonLd = [
   image={image}
   imageAlt={imageAlt}
   ogType="article"
-  article={{ publishedTime: date, tags }}
+  article={{ publishedTime: date, modifiedTime: updated, tags }}
   keywords={tags}
   jsonLd={jsonLd}
 >
