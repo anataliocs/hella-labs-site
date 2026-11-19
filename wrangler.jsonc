@@ -17,7 +17,7 @@
   "send_email": [{ "name": "SEND_EMAIL" }],
   "vars": {
     "CONTACT_FROM": "website@hellalabs.dev",
-    "CONTACT_TO": "inbound@hellalabs.dev",
+    "CONTACT_TO": "anataliocs@gmail.com",
   },
   "observability": { "enabled": true },
 }
