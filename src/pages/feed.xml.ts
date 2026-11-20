@@ -16,13 +16,15 @@ export const GET: APIRoute = async ({ site }) => {
     title: siteData.title,
     description: siteData.description,
     site: siteURL,
-    xmlns: { atom: "http://www.w3.org/2005/Atom" },
+    xmlns: { atom: "http://www.w3.org/2005/Atom", dc: "http://purl.org/dc/elements/1.1/" },
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.date,
       link: url(postPath(post)),
       categories: post.data.tags,
+      // Name-only author (RSS <author> requires an email address)
+      customData: `<dc:creator>${siteData.author.name}</dc:creator>`,
     })),
     // WebSub discovery: subscribers find the hub and the canonical topic URL in the feed itself
     customData: [

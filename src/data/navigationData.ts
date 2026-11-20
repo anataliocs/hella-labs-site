@@ -15,7 +15,7 @@ export const mainNav: NavItem[] = [
       { title: "dApp Web Front-End", href: "/services/dapp-web-front-end/" },
       { title: "DevOps & Test Automation", href: "/services/devops-test-automation/" },
       { title: "Web3 Tooling & SDKs", href: "/services/web3-tooling-sdks/" },
-      { title: "Technical Articles", href: "/services/technical-articles/" },
+      { title: "DevRel & Technical Content", href: "/services/technical-articles/" },
       { title: "GTM Launch Package", href: "/services/gtm-launch-package/" },
     ],
   },

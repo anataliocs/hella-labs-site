@@ -28,8 +28,9 @@ const { class: className } = Astro.props;
 </dialog>
 
 <script>
-  // Copy-to-clipboard button on every code block
-  for (const pre of document.querySelectorAll<HTMLPreElement>("[data-prose] pre")) {
+  // Copy-to-clipboard button on every code block. Mermaid blocks are skipped: the diagram source
+  // is the <pre>'s text, so an appended button would be parsed as part of the diagram.
+  for (const pre of document.querySelectorAll<HTMLPreElement>("[data-prose] pre:not(.mermaid)")) {
     const button = document.createElement("button");
     button.type = "button";
     button.textContent = "Copy";
