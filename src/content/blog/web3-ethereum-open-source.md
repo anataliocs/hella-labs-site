@@ -147,7 +147,7 @@ it("lists the recorded payments", async () => {
 ```
 
 Check out the [npm repo](https://www.npmjs.com/package/@hellaweb3/wiremock-testcontainers-nodejs) for more info.
-Check out the [docs](https://hella-labs.github.io/wiremock-testcontainers-nodejs/) for more info.
+Check out the [docs](https://hellalabs.dev/wiremock-testcontainers-nodejs/) for more info.
 
 ---
 

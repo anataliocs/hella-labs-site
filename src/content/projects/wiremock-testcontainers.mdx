@@ -39,17 +39,17 @@ The **WireMock Testcontainers for Node.js** module brings professional-grade API
 
 ### Key Features
 
-- **[Fluent, Typed Builder](https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/guides/registering-stubs)** - Register stubs from directories, files, npm packages or inline objects – validated before Docker starts
-- **[Fast Test Isolation](https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/guides/test-isolation)** - One container per suite; `reset()` restores stubs, scenarios and journal in milliseconds
-- **[Request Verification](https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/guides/verifying-requests)** - Assert on what your code actually sent with `countRequests()` and `findRequests()`
-- **[WireMock Extensions](https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/extensions/java-extensions)** - Load compiled extension JARs with typed stub helpers – no JDK needed
-- **[No Docker? Develop Anyway](https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/guides/running-without-docker)** - Serve every container from a local WireMock JVM for development
+- **[Fluent, Typed Builder](https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/guides/registering-stubs)** - Register stubs from directories, files, npm packages or inline objects – validated before Docker starts
+- **[Fast Test Isolation](https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/guides/test-isolation)** - One container per suite; `reset()` restores stubs, scenarios and journal in milliseconds
+- **[Request Verification](https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/guides/verifying-requests)** - Assert on what your code actually sent with `countRequests()` and `findRequests()`
+- **[WireMock Extensions](https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/extensions/java-extensions)** - Load compiled extension JARs with typed stub helpers – no JDK needed
+- **[No Docker? Develop Anyway](https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/guides/running-without-docker)** - Serve every container from a local WireMock JVM for development
 - **Response Templating** - Dynamic responses using Handlebars templates
 - **Stateful Scenarios** - Model complex multi-step API interactions
 - **TypeScript First** - Built with TypeScript for superior type safety and IntelliSense
 
 <LinkBanner
-  href="https://hella-labs.github.io/wiremock-testcontainers-nodejs/"
+  href="https://hellalabs.dev/wiremock-testcontainers-nodejs/"
   label="View Full Documentation"
   icon="fa6-solid:book"
 >
@@ -118,7 +118,7 @@ it("lists the recorded payments", async () => {
 
 **Performance Tip:** Notice the `reset()` call in `afterEach` - this restores pristine stubs and
 empties the request journal without restarting the container, making your test suite dramatically
-faster. [Learn more about test isolation →](https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/guides/test-isolation)
+faster. [Learn more about test isolation →](https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/guides/test-isolation)
 
 </Callout>
 
@@ -156,7 +156,7 @@ await new WiremockContainer()
   .start();
 ```
 
-[**Explore stub registration options →**](https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/guides/registering-stubs)
+[**Explore stub registration options →**](https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/guides/registering-stubs)
 
 ### Request Verification
 
@@ -176,7 +176,7 @@ const requests = await wiremock.findRequests({
 });
 ```
 
-[**Learn about request verification →**](https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/guides/verifying-requests)
+[**Learn about request verification →**](https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/guides/verifying-requests)
 
 ### Real-World Use Cases
 
@@ -223,7 +223,7 @@ Teams integrating this module experience:
     bordered
     cta={{
       label: "View Docs →",
-      href: "https://hella-labs.github.io/wiremock-testcontainers-nodejs/",
+      href: "https://hellalabs.dev/wiremock-testcontainers-nodejs/",
     }}
   >
     Complete guides, tutorials, and API reference with tested examples that cannot drift from the
@@ -237,7 +237,7 @@ Teams integrating this module experience:
     bordered
     cta={{
       label: "API Docs →",
-      href: "https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/api",
+      href: "https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/api",
     }}
   >
     Detailed API documentation for all container methods, stub registration, and verification
@@ -291,7 +291,7 @@ Teams integrating this module experience:
     bordered
     cta={{
       label: "Troubleshooting →",
-      href: "https://hella-labs.github.io/wiremock-testcontainers-nodejs/docs/reference/troubleshooting",
+      href: "https://hellalabs.dev/wiremock-testcontainers-nodejs/docs/reference/troubleshooting",
     }}
   >
     Common issues, solutions, and tips for Docker, networking, and WireMock configuration.
