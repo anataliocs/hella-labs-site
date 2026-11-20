@@ -5,12 +5,18 @@ import { siteData } from "@src/data/siteData";
 import { url } from "@src/utils/path";
 import { getPosts, postPath } from "@src/utils/posts";
 
+// WebSub (PubSubHubbub) hub. CI pings it after each deploy so subscribers get pushed updates.
+const WEBSUB_HUB = "https://pubsubhubbub.appspot.com/";
+
 export const GET: APIRoute = async ({ site }) => {
   const posts = await getPosts();
+  const siteURL = site ?? new URL(import.meta.env.SITE);
+  const feedURL = new URL(url("/feed.xml"), siteURL).href;
   return rss({
     title: siteData.title,
     description: siteData.description,
-    site: site ?? import.meta.env.SITE,
+    site: siteURL,
+    xmlns: { atom: "http://www.w3.org/2005/Atom" },
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
@@ -18,6 +24,11 @@ export const GET: APIRoute = async ({ site }) => {
       link: url(postPath(post)),
       categories: post.data.tags,
     })),
-    customData: "<language>en-us</language>",
+    // WebSub discovery: subscribers find the hub and the canonical topic URL in the feed itself
+    customData: [
+      "<language>en-us</language>",
+      `<atom:link rel="hub" href="${WEBSUB_HUB}" />`,
+      `<atom:link rel="self" type="application/rss+xml" href="${feedURL}" />`,
+    ].join(""),
   });
 };

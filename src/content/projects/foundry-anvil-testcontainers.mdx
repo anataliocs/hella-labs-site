@@ -47,6 +47,14 @@ The **Foundry Anvil Testcontainers NodeJS Module** brings enterprise-grade test 
 - **Custom Network Configuration** - Configure block time, chain ID, and other network parameters
 - **Snapshot & Forking Support** - Test against mainnet forks or custom blockchain snapshots
 
+<LinkBanner
+  href="https://hellalabs.dev/foundryanvil-testcontainers-nodejs/"
+  label="View Full Documentation"
+  icon="fa6-solid:book"
+>
+  <p>Complete task guides, API reference, and working examples</p>
+</LinkBanner>
+
 ---
 
 ## Why This Matters
@@ -217,13 +225,95 @@ await anvil.cheats.setCode(contractAddress, mockBytecode).mine();
 // Perfect for testing integrations without dependencies
 ```
 
+### Real-World Use Cases
+
+<FeatureGrid>
+  <FeatureCard icon="fa6-solid:hand-holding-dollar" title="DeFi Protocol Testing" as="h4" bordered>
+    Fork mainnet and impersonate whales to test swaps, lending, and liquidations against real
+    on-chain liquidity without spending a single wei.
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-solid:shield-halved"
+    title="Security & Exploit Reproduction"
+    as="h4"
+    bordered
+  >
+    Recreate attack scenarios at a pinned block to verify patches and regression-test fixes before
+    they reach production.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:rotate" title="Time-Dependent Contracts" as="h4" bordered>
+    Fast-forward time to test vesting schedules, staking rewards, timelocks, and governance voting
+    periods in milliseconds.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:code-branch" title="dApp Backend Integration" as="h4" bordered>
+    Run your indexers, relayers, and backend services against a disposable chain in CI, with a
+    fresh, identical state for every suite.
+  </FeatureCard>
+</FeatureGrid>
+
 ---
 
-## Resources
+## Resources & Documentation
 
-- **GitHub Repository:** [hella-labs/foundryanvil-testcontainers-nodejs](https://github.com/hella-labs/foundryanvil-testcontainers-nodejs)
-- **NPM Package:** [@hellaweb3/foundryanvil-testcontainers-nodejs](https://www.npmjs.com/package/@hellaweb3/foundryanvil-testcontainers-nodejs)
-- **Documentation:** [Complete Task Guides & API Reference](https://hellalabs.dev/foundryanvil-testcontainers-nodejs/)
+<FeatureGrid>
+  <FeatureCard
+    icon="fa6-solid:book-open"
+    title="Full Documentation"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "View Docs →",
+      href: "https://hellalabs.dev/foundryanvil-testcontainers-nodejs/",
+    }}
+  >
+    Complete task guides, tutorials, and API reference for every container option and cheat.
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-brands:npm"
+    title="NPM Package"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "View on NPM →",
+      href: "https://www.npmjs.com/package/@hellaweb3/foundryanvil-testcontainers-nodejs",
+    }}
+  >
+    Install via npm or yarn. MIT licensed with full TypeScript support and Viem integration.
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-brands:github"
+    title="GitHub Repository"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "View on GitHub →",
+      href: "https://github.com/hella-labs/foundryanvil-testcontainers-nodejs",
+    }}
+  >
+    Source code, examples, and contribution guidelines. PRs welcome!
+  </FeatureCard>
+  <FeatureCard
+    icon="fa6-solid:circle-exclamation"
+    title="Issues & Support"
+    as="h4"
+    align="center"
+    bordered
+    cta={{
+      label: "Open an Issue →",
+      href: "https://github.com/hella-labs/foundryanvil-testcontainers-nodejs/issues",
+    }}
+  >
+    Report bugs, request features, or get help with Docker, forking, and Anvil configuration.
+  </FeatureCard>
+</FeatureGrid>
+
+**Additional Resources:**
+
+- [Foundry Book: Anvil](https://book.getfoundry.sh/anvil/) - Learn about Anvil's local node and cheatcode capabilities
+- [Testcontainers for Node.js](https://node.testcontainers.org/) - Understand the underlying container framework
 
 ---
 
