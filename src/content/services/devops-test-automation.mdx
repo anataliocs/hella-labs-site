@@ -1,0 +1,89 @@
+---
+title: DevOps & Test Automation
+cardTitle: DevOps+Automation
+description: A risk management framework for Web3 delivery. CI/CD pipelines and high-fidelity test automation that catch costly failures before they reach mainnet.
+image: ../../assets/images/services/devops-test-automation.jpg
+imageAlt: "Developer surrounded by holographic CI/CD pipeline, test suite and Docker container panels"
+icon: fa6-brands:docker
+type: Build
+order: 3
+cta:
+  title: Know your risk before you ship.
+  text: Start with a DevOps audit. We map your delivery risks, rank them by impact, and give you a concrete plan to automate them away.
+  label: Get a DevOps Audit
+---
+
+In Web3, a bad release isn't a rollback. It's an exploit, a drained treasury, or an immutable bug
+that stays on-chain for good. We treat **CI/CD and test automation as a risk management
+framework**: find where your protocol can fail, measure how likely and how costly each failure is,
+and put automated controls in front of every one of them.
+
+For a startup competing with entrenched players, that framework also works as a force multiplier.
+Your team ships faster because every merge is checked against the risks that matter.
+
+## The Risks We Manage
+
+<FeatureGrid>
+  <FeatureCard icon="fa6-solid:file-contract" title="Smart Contract Risk" as="h3" bordered>
+    Logic errors, broken invariants, and upgrade regressions that become permanent once deployed.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:network-wired" title="Integration Risk" as="h3" bordered>
+    RPC providers, oracles, indexers, and third-party APIs that fail, slow down, or change their
+    contracts under you.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:cubes" title="Environment Risk" as="h3" bordered>
+    Drift between laptops, CI, staging, and mainnet that produces flaky tests and "works on my
+    machine" releases.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:rocket" title="Release Risk" as="h3" bordered>
+    Manual deploys, unverified contracts, and missing gates between a merged PR and a production
+    transaction.
+  </FeatureCard>
+</FeatureGrid>
+
+## Our Framework
+
+1. **Identify:** We audit your contracts, dApp, backend services, and pipeline to map every point
+   where a change can break production.
+2. **Assess:** Each risk is ranked by likelihood and blast radius, so automation effort goes where
+   a failure would cost the most.
+3. **Control:** We build automated controls: isolated E2E suites on disposable chains, mainnet-fork
+   tests, mocked external dependencies, and gated CI/CD pipelines.
+4. **Monitor:** Controls run on every commit. Test reports, coverage, and pipeline metrics show
+   whether your risk exposure is going up or down.
+
+## Proven in Open Source
+
+We don't just recommend this tooling. We build and maintain it. Our open-source Testcontainers
+modules are the same controls we deploy for clients:
+
+- [**Foundry Anvil Testcontainers**](/open-source/foundry-anvil-testcontainers/) manages
+  **smart contract and environment risk**. It spins up isolated, reproducible Anvil nodes per test
+  suite, with mainnet forking, account impersonation, and time travel for DeFi, governance, and
+  exploit-reproduction scenarios.
+- [**WireMock Testcontainers**](/open-source/wiremock-testcontainers/) manages **integration
+  risk**. It replaces RPC providers and third-party APIs with containerized, verifiable mocks, so
+  you can test outages, timeouts, and malformed responses on demand.
+
+Together they let you run [on-chain chaos engineering](/on-chain-chaos-engineering-ethereum-wiremock-anvil/):
+deliberately injecting failures to prove your protocol degrades safely.
+
+## What We Deliver
+
+<FeatureGrid>
+  <FeatureCard icon="fa6-solid:shield-halved" title="DevOps Risk Audit" as="h3" bordered>
+    A prioritized risk register for your protocol and pipeline, with a roadmap of the controls that
+    cut the most exposure first.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:flask" title="E2E Test Automation" as="h3" bordered>
+    High-fidelity test suites for smart contracts and dApps, built on disposable chains and mocked
+    dependencies.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:code-branch" title="CI/CD Pipelines" as="h3" bordered>
+    GitHub Actions pipelines with quality gates, containerized test runs, and automated, verifiable
+    deployments.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:people-group" title="Team Enablement" as="h3" bordered>
+    Hands-on training and documentation so your engineers own the framework and keep extending it.
+  </FeatureCard>
+</FeatureGrid>
