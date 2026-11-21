@@ -12,7 +12,7 @@ export const mainNav: NavItem[] = [
     href: "/web3-consultant-service-offerings/",
     children: [
       { title: "Custom Discord Bot", href: "/services/custom-discord-bot/" },
-      { title: "dApp Web Front-End", href: "/services/dapp-web-front-end/" },
+      { title: "On-chain Web/Mobile Apps", href: "/services/dapp-web-front-end/" },
       { title: "DevOps & Test Automation", href: "/services/devops-test-automation/" },
       { title: "Web3 Tooling & SDKs", href: "/services/web3-tooling-sdks/" },
       { title: "DevRel & Technical Content", href: "/services/technical-articles/" },
