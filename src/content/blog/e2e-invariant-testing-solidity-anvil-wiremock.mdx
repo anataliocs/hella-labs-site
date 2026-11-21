@@ -11,16 +11,16 @@ featured: true
 
 ## Your Contract Is Correct. Your Protocol Isn't.
 
-Invariant testing is one of the best tools a Solidity team has. Instead of checking one input at a time, you describe something that must **always** be true (the pool is solvent, debts add up, the oracle price is sane) and let a fuzzer throw random sequences of calls at the system until something breaks. If you haven't written one yet, the [Solidity Testing Book chapter on invariant tests](https://www.soliditytestingbook.com/advanced/invariant-tests) is a good introduction to handlers, actors and bounded inputs in Foundry.
+Invariant testing is one of the best tools a Solidity team has. Describe something that must **always** be true (e.g. the pool is solvent, debts add up, the oracle price is sane) and let a fuzzer throw random sequences of calls at the system until something breaks. If you haven't written one yet, the [Solidity Testing Book chapter on invariant tests](https://www.soliditytestingbook.com/advanced/invariant-tests) is a good introduction to handlers, actors and bounded inputs in Foundry.
 
-Forge's invariant fuzzer has one hard limit: **it runs inside the EVM.** It can call your contracts in any order with any arguments. It cannot run:
+Forge's invariant fuzzer has one hard limit: **it runs inside the EVM.** It cannot run:
 
 - the TypeScript keeper that pushes prices on-chain every few minutes
-- the HTTP price API that keeper depends on
-- your RPC provider, with its `503`s, dropped sockets and slow responses
+- the REST price API that keeper depends on
+- a RPC provider, with its `503`s, dropped sockets and slow responses
 - viem or ethers encoding, nonce handling, timeouts and retry logic
 
-That's where many real incidents start. The contract does exactly what it was told, and the off-chain code told it something wrong.
+That's where many real incidents start. The contract executes as expected but the off-chain code told it something wrong.
 
 This article shows how to take the invariant-testing model **end to end**: random sequences of real transactions from multiple actors, real keeper runs, and injected network faults, all against a real Anvil node, with protocol invariants checked after every step. We'll use two open-source Hella Labs modules:
 
