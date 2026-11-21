@@ -11,8 +11,9 @@ pnpm lint              # ESLint (Astro, TypeScript, a11y rules)
 pnpm lint:fix          # ESLint with auto-fix
 pnpm format            # Prettier write
 pnpm format:check      # Prettier check
+pnpm test              # Vitest unit tests (src/**/*.test.ts, worker/**/*.test.ts)
 pnpm build             # Production static build to dist/
-pnpm validate          # check + lint + format:check + build
+pnpm validate          # check + lint + format:check + test + build
 ```
 
 ## Definition of Done

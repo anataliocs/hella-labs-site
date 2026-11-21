@@ -1,0 +1,67 @@
+# Manual Lighthouse audit (Actions → Lighthouse → Run workflow). Builds the chosen branch, serves
+# dist/ locally and audits it, so the scores reflect that commit rather than production. HTML
+# reports are uploaded as the `lighthouse-reports` artifact.
+name: Lighthouse
+
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        description: Device to emulate
+        type: choice
+        options: [mobile, desktop]
+        default: mobile
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    name: Lighthouse audit (${{ inputs.device }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.6.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Start preview server
+        run: |
+          pnpm preview --port 4321 &
+          for _ in $(seq 1 30); do curl -sf http://localhost:4321/ > /dev/null && exit 0; sleep 1; done
+          echo "Preview server did not start" && exit 1
+
+      - name: Lighthouse check
+        uses: foo-software/lighthouse-check-action@v12.0.1
+        with:
+          urls: http://localhost:4321/,http://localhost:4321/web3-consultant-service-offerings/,http://localhost:4321/contact/
+          device: ${{ inputs.device }}
+          outputDirectory: ${{ github.workspace }}/lighthouse-reports
+          verbose: true
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports-${{ inputs.device }}
+          path: lighthouse-reports
+          if-no-files-found: ignore

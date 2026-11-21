@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   validate:
-    name: Lint, format, check & build
+    name: Lint, format, check, test & build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,6 +43,9 @@ jobs:
 
       - name: Astro check
         run: pnpm check
+
+      - name: Unit tests
+        run: pnpm test
 
       - name: Build
         run: pnpm build
