@@ -2,6 +2,8 @@
 import heroImage from "@src/assets/images/101.jpg";
 import chris from "@src/assets/images/team/chris-anatalio.png";
 import anna from "@src/assets/images/team/anna-lopatina.jpg";
+import manilaEngineer from "@src/assets/images/team/manila-office-engineer.jpg";
+import manilaOffice from "@src/assets/images/team/manila-office.jpg";
 import logo from "@src/assets/images/brand/hella-logo-1.png";
 
 export const heroData = {
@@ -39,11 +41,19 @@ export const heroData = {
 };
 
 export const teamStripData = {
-  title: "Hella Teamwork - US expertise multiplied by Offshore Cost Effectiveness",
+  title: "Deep US-based expertise multiplied by global workforce efficiency",
   cta: { label: "Meet the Team", href: "/team/", icon: "fa6-solid:people-group" },
   images: [
     { src: chris, alt: "Chris Anatalio" },
     { src: anna, alt: "Anna Lopatina" },
+    {
+      src: manilaEngineer,
+      alt: "Illustrated Hella Labs global team engineer in front of the Manila skyline at dusk",
+    },
+    {
+      src: manilaOffice,
+      alt: "Neon Manila Office sign under a glowing Philippine flag, above a laptop and the city skyline",
+    },
     { src: logo, alt: "Hella Labs logo" },
   ],
 };

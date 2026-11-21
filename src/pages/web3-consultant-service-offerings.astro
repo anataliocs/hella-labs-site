@@ -4,7 +4,13 @@ import { getCollection } from "astro:content";
 import MainLayout from "@src/layouts/MainLayout.astro";
 import Container from "@src/components/Container.astro";
 import ServiceCard from "@src/components/services/ServiceCard.astro";
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import LocationPins from "@src/components/LocationPins.astro";
+import Button from "@src/components/Button.astro";
+import FeatureGrid from "@src/components/content/FeatureGrid.astro";
+import FeatureCard from "@src/components/content/FeatureCard.astro";
 import defaultImage from "@src/assets/images/hella-bg-1.jpg";
+import { globalTeamData } from "@src/data/globalTeamData";
 import { webPageJsonLd, withBrand } from "@src/utils/seo";
 
 const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
@@ -26,8 +32,8 @@ const description =
   <Container as="section" class="mb-15 text-center sm:mb-17.5">
     <h1 class="mb-4 text-4xl">Hella Labs Service Offerings</h1>
     <p class="mx-auto max-w-4xl font-heading text-xl font-bold text-fg-muted">
-      US Expertise + Offshore Cost Effectiveness: Curated to specifically address unique issues and
-      strengths present in emerging tech web3 startups
+      US-based Expertise + Global Workforce Efficiency: Curated to specifically address unique
+      issues and strengths present in emerging tech web3 startups
     </p>
     <hr class="my-12 h-px border-0 bg-line sm:my-16" />
     <ul class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -37,5 +43,32 @@ const description =
         </li>
       ))}
     </ul>
+    <hr class="my-12 h-px border-0 bg-line sm:my-16" />
+    <section aria-labelledby="global-team-heading">
+      <h2 id="global-team-heading" class="mb-4 text-3xl">
+        {globalTeamData.title}
+      </h2>
+      <p class="mx-auto max-w-3xl text-lg text-fg-muted">{globalTeamData.intro}</p>
+      <FeatureGrid class="text-left md:grid-cols-3">
+        {globalTeamData.benefits.map((benefit) => (
+          <FeatureCard title={benefit.title} icon={benefit.icon} bordered>
+            <p>{benefit.text}</p>
+          </FeatureCard>
+        ))}
+      </FeatureGrid>
+      <LocationPins class="mb-6 justify-center" />
+      <OptimizedImage
+        src={globalTeamData.image.src}
+        alt={globalTeamData.image.alt}
+        widths={[384, 576, 768, 1152]}
+        sizes="(min-width: 36rem) 36rem, 100vw"
+        class="mx-auto w-full max-w-xl rounded-lg shadow-md"
+      />
+      <div class="mt-8">
+        <Button href={globalTeamData.cta.href} variant="secondary" icon={globalTeamData.cta.icon}>
+          {globalTeamData.cta.label}
+        </Button>
+      </div>
+    </section>
   </Container>
 </MainLayout>

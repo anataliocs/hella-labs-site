@@ -69,6 +69,7 @@ export default defineConfig({
           "laptop-code",
           "lightbulb",
           "list",
+          "location-dot",
           "lock",
           "marker",
           "maximize",

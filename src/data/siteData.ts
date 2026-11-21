@@ -40,6 +40,8 @@ export const siteData = {
     href: "/team/",
   },
 
+  // Office locations, shown as map pins (LocationPins)
+  locations: ["NYC", "Manila"],
   footer: {
     description:
       "Unleash the potential of your startup with Onsite, Remote and Offshore consulting and staff augmentation. We provide the expertise of Silicon Valley multiplied by the cost-effectiveness of Offshore resources.",

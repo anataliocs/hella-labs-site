@@ -1,0 +1,20 @@
+---
+// Office locations as map-pin badges (services page, footer)
+import { Icon } from "astro-icon/components";
+import { siteData } from "@src/data/siteData";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<ul class:list={["flex flex-wrap gap-3", className]} aria-label="Office locations">
+  {siteData.locations.map((location) => (
+    <li class="inline-flex items-center gap-2 rounded-full border border-line bg-surface-alt px-4 py-1.5 font-heading text-sm font-bold text-heading">
+      <Icon name="fa6-solid:location-dot" class="size-4 text-primary" aria-hidden="true" />
+      {location}
+    </li>
+  ))}
+</ul>
