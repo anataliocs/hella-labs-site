@@ -66,6 +66,29 @@ export const siteData = {
     inquiryTypes: ["Consulting", "Fractional Engineering", "Questions", "OSS", "Events"],
     telegram: "https://t.me/hella_web3",
     directMessage: "https://t.me/anataliocs",
+    // Shown after a successful submission (inline on /contact/ and on /contact/thanks/)
+    nextSteps: {
+      title: "What happens next",
+      steps: [
+        { icon: "fa6-solid:clock", text: "We respond within 24 hours." },
+        {
+          icon: "fa6-solid:calendar-check",
+          text: "We reach out to schedule a free 1-hour consultation.",
+        },
+        {
+          icon: "fa6-solid:file-lines",
+          text: "We send you a report with recommendations and actionable next steps.",
+        },
+        {
+          icon: "fa6-solid:handshake",
+          text: "If we're aligned, we move forward to the contract step.",
+        },
+      ],
+      notes: [
+        "Rates vary based on the work. We spin up tightly integrated US/Manila teams to maintain a continuous development cadence.",
+        "Our global workforce allows us to offer very competitive rates.",
+      ],
+    },
   },
 
   // Comments load on demand when the reader clicks "Show Comments"

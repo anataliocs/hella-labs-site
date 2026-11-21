@@ -1,8 +1,10 @@
 ---
-// Contact form, posted to the Cloudflare Worker at /api/contact (worker/index.ts), which emails it.
+// Contact form, posted to the Cloudflare Worker at /api/contact (worker/index.ts), which validates
+// it and emails it (worker/formEmail.ts builds the HTML + plain-text message).
 // With JS, Alpine submits it via fetch and shows the result inline; without JS it's a normal POST
 // and the Worker redirects to /contact/thanks/.
 import Button from "@src/components/Button.astro";
+import NextSteps from "@src/components/contact/NextSteps.astro";
 import { siteData } from "@src/data/siteData";
 import { url } from "@src/utils/path";
 
@@ -44,7 +46,7 @@ const fieldClass =
   }"
   @submit.prevent="submit($el)"
 >
-  <fieldset class="space-y-5" :disabled="status === 'sending'">
+  <fieldset class="space-y-5" :disabled="status === 'sending'" x-show="status !== 'sent'">
     <div>
       <label class="sr-only" for="form-name">
         Name
@@ -122,4 +124,7 @@ const fieldClass =
     x-text="message"
     :class="status === 'error' ? 'text-red-600 dark:text-red-400' : 'text-heading'"
   ></p>
+  <div x-show="status === 'sent'" x-cloak>
+    <NextSteps />
+  </div>
 </form>

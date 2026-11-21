@@ -3,6 +3,7 @@
 import MainLayout from "@src/layouts/MainLayout.astro";
 import Container from "@src/components/Container.astro";
 import Button from "@src/components/Button.astro";
+import NextSteps from "@src/components/contact/NextSteps.astro";
 import { siteData } from "@src/data/siteData";
 import { withBrand } from "@src/utils/seo";
 ---
@@ -15,6 +16,7 @@ import { withBrand } from "@src/utils/seo";
   <Container class="text-center">
     <h1 class="mb-5">Message sent</h1>
     <p class="mb-8 text-fg-muted">{siteData.contact.successMessage}</p>
+    <NextSteps class="mx-auto mb-8 max-w-2xl" />
     <Button href="/">Back to homepage</Button>
   </Container>
 </MainLayout>

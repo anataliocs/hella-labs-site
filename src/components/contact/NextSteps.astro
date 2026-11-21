@@ -1,0 +1,39 @@
+---
+// Numbered "what happens next" list shown after a contact submission (form + thanks page)
+import { Icon } from "astro-icon/components";
+import { siteData } from "@src/data/siteData";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const { title, steps, notes } = siteData.contact.nextSteps;
+---
+
+<section
+  class:list={["rounded-xl border border-line bg-surface-alt p-6 text-left", className]}
+  aria-labelledby="next-steps-heading"
+>
+  <h2 id="next-steps-heading" class="mb-5 text-xl">
+    {title}
+  </h2>
+  <ol class="space-y-4">
+    {steps.map((step, index) => (
+      <li class="flex items-start gap-4">
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+          <Icon name={step.icon} class="size-4.5" aria-hidden="true" />
+        </span>
+        <p class="pt-2 text-base text-heading">
+          <span class="mr-1 font-heading font-bold text-primary">{index + 1}.</span>
+          {step.text}
+        </p>
+      </li>
+    ))}
+  </ol>
+  <div class="mt-6 space-y-2 border-t border-line pt-5 text-sm text-fg-muted">
+    {notes.map((note) => (
+      <p>{note}</p>
+    ))}
+  </div>
+</section>
