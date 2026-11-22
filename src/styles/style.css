@@ -247,14 +247,9 @@
 /* ---------------------------------------------------------------------------------------------
    Components
    --------------------------------------------------------------------------------------------- */
-@property --angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-@keyframes spin-angle {
+@keyframes btn-sheen-spin {
   to {
-    --angle: 360deg;
+    rotate: 360deg;
   }
 }
 
@@ -272,21 +267,24 @@
     box-shadow: var(--shadow-button);
     opacity: 0.95;
 
+    /* An oversized square spun with `rotate` (compositor-only), clipped by the button. Animating
+       the gradient angle instead would restyle and repaint the button on every frame. */
     &::after {
       content: "";
       position: absolute;
-      inset: 0;
+      top: 50%;
+      left: 50%;
       z-index: -1;
-      width: 115%;
-      height: 115%;
+      width: 200%;
+      aspect-ratio: 1;
+      translate: -50% -50%;
       opacity: 0.35;
       background: linear-gradient(
-        var(--angle),
         rgb(255 255 255 / 0.65),
         rgb(239 151 232 / 0.85),
         rgb(239 151 232 / 0.15)
       );
-      animation: spin-angle 3s linear infinite;
+      animation: btn-sheen-spin 3s linear infinite;
     }
 
     &:hover {
@@ -513,51 +511,79 @@
      own font so it fits any heading; the element should be as wide as its text (inline-block or
      w-fit) so the bar tracks the word rather than the full line.
      The text is painted left → right from --fx-from to --fx-to (both default to --ink, i.e. one
-     solid colour). Two layers, clipped to the glyphs: the full gradient at --fx-dim strength
-     (default 25%, the dim state) under a 300%-wide band that sweeps across lighting letters. The band's colour (--fx-hi)
-     is animated from --fx-from to --fx-to in step with the sweep so lit letters match the
-     gradient beneath them. */
+     solid colour) at --fx-dim strength (default 25%, the dim state). The lit band needs this
+     child, which repeats the text from data-text in generated content (so it isn't read twice):
+       <span class="fx-scanner-sweep" aria-hidden="true"><span data-text="…"></span></span>
+     Everything that moves is a transform, so the browser runs the effect on the compositor
+     instead of restyling and repainting the heading every frame. */
   .fx-scanner {
     position: relative;
     letter-spacing: 0.08em;
-    background:
-      linear-gradient(90deg, transparent 0 40%, var(--fx-hi) 50%, transparent 60% 100%) 0 0 / 300%
-        100%,
-      linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--fx-from, var(--ink)) var(--fx-dim, 25%), transparent),
-        color-mix(in srgb, var(--fx-to, var(--ink)) var(--fx-dim, 25%), transparent)
-      );
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--fx-from, var(--ink)) var(--fx-dim, 25%), transparent),
+      color-mix(in srgb, var(--fx-to, var(--ink)) var(--fx-dim, 25%), transparent)
+    );
     -webkit-background-clip: text;
     background-clip: text;
     /* Hide the glyph fill, not `color`: --ink defaults to currentColor, so `color: transparent`
        would make the gradient itself transparent */
     -webkit-text-fill-color: transparent;
-    animation:
-      fx-scan-glow 2.6s ease-in-out infinite alternate,
-      fx-scan-hue 2.6s ease-in-out infinite alternate;
 
+    /* The bar is a 3px stripe at the right edge of a full-width layer, so the sweep is a pure
+       transform (compositor-only) rather than an animated `left` that re-lays out every frame.
+       The layer starts shifted left (left overflow never adds scroll) and slides back into
+       place. drop-shadow follows the stripe's alpha, so only the bar glows. */
     &::after {
       content: "";
       position: absolute;
-      top: -6px;
-      bottom: -6px;
-      left: 0;
-      width: 3px;
-      background: var(--ink-2);
-      box-shadow: 0 0 14px var(--ink-2);
+      inset: -6px 0;
+      background: linear-gradient(270deg, var(--ink-2) 3px, transparent 3px);
+      filter: drop-shadow(0 0 7px var(--ink-2));
+      pointer-events: none;
       animation: fx-scan-bar 2.6s ease-in-out infinite alternate;
     }
 
-    /* No motion: show the text fully lit and drop the bar (a frozen sweep would leave it dimmed) */
+    /* No motion: show the text fully lit and drop the bar and band (a frozen sweep would leave
+       it dimmed) */
     @media (prefers-reduced-motion: reduce) {
-      animation: none;
       background: linear-gradient(90deg, var(--fx-from, var(--ink)), var(--fx-to, var(--ink)));
       -webkit-background-clip: text;
       background-clip: text;
 
-      &::after {
+      &::after,
+      .fx-scanner-sweep {
         display: none;
+      }
+    }
+  }
+  /* The lit band: a window 60% of the heading wide (soft edges via a static mask) slides across
+     while the fully lit copy of the text inside it slides the opposite way by the same distance,
+     so the lit letters stay on top of the dim ones. The outer span clips the window to the
+     heading so it never adds horizontal scroll. */
+  .fx-scanner-sweep {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    & > span {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 60%;
+      mask-image: linear-gradient(90deg, transparent, #000 50%, transparent);
+      animation: fx-scan-window 2.6s ease-in-out infinite alternate;
+
+      &::before {
+        content: attr(data-text);
+        position: absolute;
+        inset: 0 auto 0 0;
+        /* Back to the heading's full width (60% × 100/60), so the copy wraps like the original */
+        width: calc(100% / 0.6);
+        background: linear-gradient(90deg, var(--fx-from, var(--ink)), var(--fx-to, var(--ink)));
+        -webkit-background-clip: text;
+        background-clip: text;
+        animation: fx-scan-text 2.6s ease-in-out infinite alternate;
       }
     }
   }
@@ -774,36 +800,30 @@
   }
 }
 
-/* Registered so the highlight colour can animate (unregistered custom properties can't) */
-@property --fx-hi {
-  syntax: "<color>";
-  inherits: false;
-  initial-value: transparent;
-}
-@keyframes fx-scan-hue {
+/* Band centre travels from half a heading-width before the text to half a width past it
+   (window = 60% of the heading: -0.8W → 1.2W); the lit copy moves the exact opposite amount */
+@keyframes fx-scan-window {
   0% {
-    --fx-hi: var(--fx-from, var(--ink));
+    transform: translateX(calc(-0.8 / 0.6 * 100%));
   }
   100% {
-    --fx-hi: var(--fx-to, var(--ink));
+    transform: translateX(calc(1.2 / 0.6 * 100%));
   }
 }
-@keyframes fx-scan-glow {
+@keyframes fx-scan-text {
   0% {
-    background-position: 100% 0;
+    transform: translateX(80%);
   }
   100% {
-    background-position: 0% 0;
+    transform: translateX(-120%);
   }
 }
 @keyframes fx-scan-bar {
   0% {
-    left: 0;
-    transform: translateX(0);
+    transform: translateX(calc(3px - 100%));
   }
   100% {
-    left: 100%;
-    transform: translateX(-100%);
+    transform: translateX(0);
   }
 }
 

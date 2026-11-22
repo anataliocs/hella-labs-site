@@ -37,6 +37,9 @@ const { title, subtitle, description, image, pillars, primaryCta, secondaryCta, 
           <div class="mx-auto my-3 w-fit">
             <h1 class="fx-scanner fx-scanner-brand text-[2.875rem] leading-tight sm:text-hero sm:leading-[1.3]">
               {title}
+              <span class="fx-scanner-sweep" aria-hidden="true">
+                <span data-text={title} />
+              </span>
             </h1>
             <div class="h-0.5 bg-brand-gradient" aria-hidden="true"></div>
           </div>
