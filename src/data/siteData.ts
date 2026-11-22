@@ -53,8 +53,10 @@ export const siteData = {
       "Unleash the potential of your startup with Onsite, Remote and Offshore consulting and staff augmentation. We provide the expertise of Silicon Valley multiplied by the cost-effectiveness of Offshore resources.",
     copyrightName: "Hella Labs",
     builtBy: { name: "Chris Anatalio", href: "https://www.linkedin.com/in/anataliocs/" },
-    // Machine-readable files generated at build (astro-llms-md + @astrojs/sitemap)
+    // Bottom footer row: machine-readable files generated at build (astro-llms-md +
+    // @astrojs/sitemap) and the Lighthouse reports page, which is only linked from here
     resourceLinks: [
+      { title: "Lighthouse reports", href: "/lighthouse-reports/" },
       { title: "llms.txt", href: "/llms.txt" },
       { title: "llms-full.txt", href: "/llms-full.txt" },
       { title: "Sitemap index", href: "/sitemap-index.xml" },

@@ -86,4 +86,30 @@ const pages = defineCollection({
     }),
 });
 
-export const collections = { blog, services, projects, pages };
+// Lighthouse audits of the live site (/lighthouse-reports/). Each entry is a Lighthouse JSON
+// export saved next to its HTML report of the same name (e.g. lighthouse-mobile.{json,html}).
+// Only the summary fields are kept; the full detail lives in the embedded HTML report.
+const lighthouseScore = z.number().min(0).max(1).nullable();
+const reports = defineCollection({
+  loader: glob({ pattern: "*.json", base: "./src/assets/reports" }),
+  schema: z.object({
+    lighthouseVersion: z.string(),
+    fetchTime: z.coerce.date(),
+    finalDisplayedUrl: z.url(),
+    configSettings: z.object({
+      formFactor: z.enum(["mobile", "desktop"]),
+      throttlingMethod: z.string(),
+    }),
+    categories: z.record(z.string(), z.object({ title: z.string(), score: lighthouseScore })),
+    audits: z.record(
+      z.string(),
+      z.object({
+        title: z.string(),
+        score: lighthouseScore,
+        displayValue: z.string().optional(),
+      }),
+    ),
+  }),
+});
+
+export const collections = { blog, services, projects, pages, reports };
