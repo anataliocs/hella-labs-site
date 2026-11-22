@@ -23,6 +23,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "validate": "pnpm run check && pnpm run lint && pnpm run format:check && pnpm run test && pnpm run build"
   },
   "dependencies": {
@@ -45,6 +46,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/alpinejs": "^3.17.0",
+    "@vitest/coverage-v8": "5.1.1",
     "astro-llms-md": "^3.0.3",
     "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",

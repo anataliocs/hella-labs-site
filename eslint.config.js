@@ -7,7 +7,14 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig(
-  globalIgnores(["dist/", ".astro/", "node_modules/", "public/", "worker-configuration.d.ts"]),
+  globalIgnores([
+    "dist/",
+    ".astro/",
+    "coverage/",
+    "node_modules/",
+    "public/",
+    "worker-configuration.d.ts",
+  ]),
 
   js.configs.recommended,
   tseslint.configs.recommended,

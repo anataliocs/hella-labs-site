@@ -7,5 +7,12 @@ export default getViteConfig({
   test: {
     include: ["src/**/*.test.ts", "worker/**/*.test.ts"],
     environment: "node",
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.ts", "worker/**/*.ts"],
+      exclude: ["**/*.test.ts", "**/*.d.ts"],
+      reporter: ["text", "html", "lcov", "json-summary"],
+      reportsDirectory: "coverage",
+    },
   },
 });
