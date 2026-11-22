@@ -1,5 +1,8 @@
 # Hella Labs Website
 
+[![CI](https://github.com/anataliocs/hella-labs-site/actions/workflows/ci.yml/badge.svg)](https://github.com/anataliocs/hella-labs-site/actions/workflows/ci.yml)
+[![Lighthouse](https://img.shields.io/badge/Lighthouse-report-F44B21?logo=lighthouse&logoColor=white)](https://anataliocs.github.io/hella-labs-site/)
+
 Source for [hellalabs.dev](https://www.hellalabs.dev): Web3-native fractional engineering, DevRel
 and consulting for Fintech, Blockchain and Web3 startups, plus the Topic Zero blog.
 
