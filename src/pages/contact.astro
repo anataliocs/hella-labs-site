@@ -18,6 +18,13 @@ const imageAlt =
   "Woman gazing upward on a neon-lit city street, with holographic network diagrams floating beside her";
 const sentImageAlt =
   'The same woman on the neon-lit street, now outlined in glowing light beside a holographic "Preparing for launch" display';
+
+// Kilovolt title: one <b> per letter, grouped by word so lines wrap between words. --i runs
+// across the whole title (spaces skipped) to stagger the discharge flashes.
+let letterIndex = 0;
+const titleWords = title
+  .split(" ")
+  .map((word) => [...word].map((char) => ({ char, i: letterIndex++ })));
 ---
 
 <MainLayout
@@ -73,7 +80,18 @@ const sentImageAlt =
           <Icon name="fa6-solid:arrow-left" class="size-3.5" aria-hidden="true" /> Back to home
         </a>
         <header class="mb-8" x-show="!sent">
-          <h1 class="text-[2rem] sm:text-5xl">{title}</h1>
+          <h1 class="text-[2rem] sm:text-5xl">
+            <span class="sr-only">{title}</span>
+            <span class="fx-voltage flex-wrap gap-x-[0.6em]" aria-hidden="true">
+              {titleWords.map((letters) => (
+                <span class="inline-flex">
+                  {letters.map(({ char, i }) => (
+                    <b style={`--i:${i}`}>{char}</b>
+                  ))}
+                </span>
+              ))}
+            </span>
+          </h1>
           <p class="mt-3 text-base sm:text-lg">{description}</p>
         </header>
 

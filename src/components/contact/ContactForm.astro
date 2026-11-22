@@ -3,18 +3,29 @@
 // it and emails it (worker/formEmail.ts builds the HTML + plain-text message).
 // With JS, Alpine submits it via fetch and shows the result inline; without JS it's a normal POST
 // and the Worker redirects to /contact/thanks/.
+// Validation: the native attributes (required, maxlength, minlength, pattern) cover no-JS posts.
+// With JS, Alpine switches native bubbles off (novalidate) and shows inline errors instead, using
+// the same rules as the Worker (worker/contactRules.ts). The Worker re-checks everything.
 import { Icon } from "astro-icon/components";
 import Button from "@src/components/Button.astro";
 import NextSteps from "@src/components/contact/NextSteps.astro";
 import { siteData } from "@src/data/siteData";
 import { url } from "@src/utils/path";
+import { getCollection } from "astro:content";
+import { CONTACT_LIMITS, EMAIL_PATTERN, SERVICE_INQUIRY_TYPES } from "../../../worker/contactRules";
 
 const { formAction, buttonText, sendingText, successMessage, errorMessage, inquiryTypes } =
   siteData.contact;
 const fieldClass =
-  "w-full resize-y rounded-xl border-[1.4px] border-line-alt bg-surface-muted py-4 pr-5 pl-13 text-base text-heading outline-none transition placeholder:text-fg-muted focus:border-primary focus:bg-transparent focus:shadow-focus-glow focus:outline-2 focus:outline-offset-4 focus:outline-primary focus:placeholder:text-heading";
+  "w-full resize-y rounded-xl border-[1.4px] border-line-alt bg-surface-muted py-4 pr-5 pl-13 text-base text-heading outline-none transition placeholder:text-fg-muted focus:border-primary focus:bg-transparent focus:shadow-focus-glow focus:outline-2 focus:outline-offset-4 focus:outline-primary focus:placeholder:text-heading aria-invalid:border-red-600 dark:aria-invalid:border-red-400";
+// Service-offering checkboxes, shown for SERVICE_INQUIRY_TYPES; labelled with the short card title
+const services = (await getCollection("services"))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map(({ data }) => ({ label: data.cardTitle ?? data.title, icon: data.icon }));
+const errorClass = "mt-2 text-sm text-red-600 dark:text-red-400";
 // Icon embedded at the left of each field (fields have pl-13 to make room). Single-line fields
-// center it; the textarea pins it to the first line. The icon turns primary while its field has
+// center it on the field (icon + field share an inner relative box, so the error line below
+// doesn't shift it); the textarea pins it to the first line. The icon turns primary while its field has
 // focus (the wrapper is a `group`).
 const iconClass =
   "pointer-events-none absolute left-5 size-4.5 text-fg-muted transition-colors group-focus-within:text-primary";
@@ -29,10 +40,50 @@ const iconTop = `${iconClass} top-4.75`;
   data-sending={sendingText}
   data-success={successMessage}
   data-error={errorMessage}
+  data-service-inquiries={JSON.stringify(SERVICE_INQUIRY_TYPES)}
+  data-count-warn={Math.round(CONTACT_LIMITS.message * 0.9)}
   x-data="{
     status: 'idle',
     message: '',
+    // Inline error per field, keyed by the field's name
+    errors: { name: '', email: '', inquiry_type: '', text: '' },
+    chars: 0,
+    inquiry: '',
+    serviceInquiries: [],
+    init() {
+      this.$el.noValidate = true;
+      this.serviceInquiries = JSON.parse(this.$el.dataset.serviceInquiries);
+    },
+    get showServices() {
+      return this.serviceInquiries.includes(this.inquiry);
+    },
+    fieldError(el) {
+      const value = el.value.trim();
+      if (!value) return el.dataset.missing;
+      if (el.minLength > 0 && value.length < el.minLength) {
+        const left = el.minLength - value.length;
+        return `Please tell us a bit more (${left} more character${left === 1 ? '' : 's'}).`;
+      }
+      return el.validity.valid ? '' : el.dataset.invalid;
+    },
+    check(el) {
+      if (el.name in this.errors) this.errors[el.name] = this.fieldError(el);
+    },
+    // Validates every field and focuses the first invalid one; true when the form can be sent
+    checkAll(form) {
+      const fields = [...form.elements].filter((el) => el.name in this.errors);
+      fields.forEach((el) => this.check(el));
+      const invalid = fields.find((el) => this.errors[el.name]);
+      invalid?.focus();
+      return !invalid;
+    },
+    clear() {
+      Object.keys(this.errors).forEach((key) => (this.errors[key] = ''));
+      this.chars = 0;
+      this.inquiry = '';
+    },
     async submit(form) {
+      if (!this.checkAll(form)) return;
       this.status = 'sending';
       this.message = '';
       try {
@@ -44,6 +95,7 @@ const iconTop = `${iconClass} top-4.75`;
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.ok) throw new Error(data.error);
         form.reset();
+        this.clear();
         this.status = 'sent';
         this.message = form.dataset.success;
         // Lets the page react (contact.astro hides its intro once the message is sent)
@@ -55,53 +107,136 @@ const iconTop = `${iconClass} top-4.75`;
     },
   }"
   @submit.prevent="submit($el)"
-  @pageshow.window="if ($event.persisted) { status = 'idle'; message = ''; $el.reset(); }"
+  @pageshow.window="if ($event.persisted) { status = 'idle'; message = ''; $el.reset(); clear(); }"
 >
-  <fieldset class="space-y-5" :disabled="status === 'sending'" x-show="status !== 'sent'">
-    <div class="group relative">
+  <!-- Check a field when the visitor leaves it (skipping untouched empty ones), then re-check on
+       every keystroke once it shows an error so the message clears as soon as it's fixed -->
+  <fieldset
+    class="space-y-5"
+    :disabled="status === 'sending'"
+    x-show="status !== 'sent'"
+    @focusout="if ($event.target.value?.trim()) check($event.target)"
+    @input="if (errors[$event.target.name]) check($event.target)"
+  >
+    <div class="group">
       <label class="sr-only" for="form-name">
         Name
       </label>
-      <Icon name="fa6-solid:id-badge" class={iconCentered} aria-hidden="true" />
-      <input
-        class={fieldClass}
-        id="form-name"
-        type="text"
-        name="name"
-        placeholder="Name"
-        autocomplete="name"
-        maxlength="200"
-        required
-      />
+      <div class="relative">
+        <Icon name="fa6-solid:id-badge" class={iconCentered} aria-hidden="true" />
+        <input
+          class={fieldClass}
+          id="form-name"
+          type="text"
+          name="name"
+          placeholder="Name"
+          autocomplete="name"
+          maxlength={CONTACT_LIMITS.name}
+          required
+          data-missing="Please enter your name."
+          aria-describedby="form-name-error"
+          :aria-invalid="errors.name ? 'true' : 'false'"
+        />
+      </div>
+      <p
+        id="form-name-error"
+        class={errorClass}
+        x-show="errors.name"
+        x-text="errors.name"
+        x-cloak
+      ></p>
     </div>
-    <div class="group relative">
+    <div class="group">
       <label class="sr-only" for="form-email">
         Email
       </label>
-      <Icon name="fa6-solid:envelope" class={iconCentered} aria-hidden="true" />
-      <input
-        class={fieldClass}
-        id="form-email"
-        type="email"
-        name="email"
-        placeholder="Email"
-        autocomplete="email"
-        maxlength="254"
-        required
-      />
+      <div class="relative">
+        <Icon name="fa6-solid:envelope" class={iconCentered} aria-hidden="true" />
+        <input
+          class={fieldClass}
+          id="form-email"
+          type="email"
+          name="email"
+          placeholder="Email"
+          autocomplete="email"
+          maxlength={CONTACT_LIMITS.email}
+          pattern={EMAIL_PATTERN}
+          required
+          data-missing="Please enter your email."
+          data-invalid="Please enter a valid email, like name@example.com."
+          aria-describedby="form-email-error"
+          :aria-invalid="errors.email ? 'true' : 'false'"
+        />
+      </div>
+      <p
+        id="form-email-error"
+        class={errorClass}
+        x-show="errors.email"
+        x-text="errors.email"
+        x-cloak
+      ></p>
     </div>
-    <div class="group relative">
+    <div class="group">
       <label class="sr-only" for="form-inquiry">
         Inquiry Type
       </label>
-      <Icon name="fa6-solid:list-check" class={iconCentered} aria-hidden="true" />
-      <select class={fieldClass} id="form-inquiry" name="inquiry_type" required>
-        <option value="">Select Inquiry Type</option>
-        {inquiryTypes.map((type) => (
-          <option value={type}>{type}</option>
-        ))}
-      </select>
+      <div class="relative">
+        <Icon name="fa6-solid:list-check" class={iconCentered} aria-hidden="true" />
+        <select
+          class={fieldClass}
+          id="form-inquiry"
+          name="inquiry_type"
+          required
+          x-model="inquiry"
+          data-missing="Please choose an inquiry type."
+          aria-describedby="form-inquiry-error"
+          :aria-invalid="errors.inquiry_type ? 'true' : 'false'"
+        >
+          <option value="">Select Inquiry Type</option>
+          {inquiryTypes.map((type) => (
+            <option value={type}>{type}</option>
+          ))}
+        </select>
+      </div>
+      <p
+        id="form-inquiry-error"
+        class={errorClass}
+        x-show="errors.inquiry_type"
+        x-text="errors.inquiry_type"
+        x-cloak
+      ></p>
     </div>
+    <!-- Optional service picker for consulting-type inquiries. Disabled while hidden so its
+         checkboxes aren't submitted; the Worker also ignores services for other inquiry types. -->
+    <fieldset
+      class="space-y-3"
+      x-show="showServices"
+      x-transition.opacity
+      :disabled="!showServices"
+      x-cloak
+    >
+      <legend class="mb-3 text-base text-heading">
+        Which services are you interested in? <span class="text-fg-muted">(optional)</span>
+      </legend>
+      <div class="grid gap-3 sm:grid-cols-2">
+        {services.map(({ label, icon }) => (
+          <label class="group/service flex cursor-pointer items-center gap-3 rounded-xl border-[1.4px] border-line-alt bg-surface-muted px-4 py-3 text-sm text-heading transition hover:border-primary/60 has-checked:border-primary has-checked:bg-transparent has-focus-visible:outline-2 has-focus-visible:outline-offset-4 has-focus-visible:outline-primary">
+            <input
+              type="checkbox"
+              name="services"
+              value={label}
+              class="size-4 shrink-0 accent-primary"
+            />
+            <Icon
+              name={icon}
+              class="size-4 shrink-0 text-fg-muted transition-colors group-has-checked/service:text-primary"
+              aria-hidden="true"
+            />
+            <span>{label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
     <div class="group relative">
       <label class="sr-only" for="form-text">
         Message
@@ -113,9 +248,32 @@ const iconTop = `${iconClass} top-4.75`;
         name="text"
         rows="5"
         placeholder="What do you want to build today?"
-        maxlength="5000"
+        minlength={CONTACT_LIMITS.messageMin}
+        maxlength={CONTACT_LIMITS.message}
         required
+        data-missing="Please tell us what you want to build."
+        aria-describedby="form-text-error form-text-count"
+        :aria-invalid="errors.text ? 'true' : 'false'"
+        @input="chars = $el.value.length"
       ></textarea>
+      <div class="mt-2 flex items-start justify-between gap-4 text-sm">
+        <p
+          id="form-text-error"
+          class="text-red-600 dark:text-red-400"
+          x-show="errors.text"
+          x-text="errors.text"
+          x-cloak
+        ></p>
+        <!-- Live count; only announced via aria-describedby, not on every keystroke -->
+        <p
+          id="form-text-count"
+          class="ml-auto shrink-0 tabular-nums"
+          :class="chars > Number($root.dataset.countWarn) ? 'text-red-600 dark:text-red-400' : 'text-fg-muted'"
+        >
+          <span x-text="chars">0</span> / {CONTACT_LIMITS.message.toLocaleString("en-US")}
+          <span class="sr-only">characters, minimum {CONTACT_LIMITS.messageMin}</span>
+        </p>
+      </div>
     </div>
     <!-- Spam honeypot: hidden from people and assistive tech, but bots tend to fill it in -->
     <div class="hidden" aria-hidden="true">

@@ -7,6 +7,8 @@ export interface FormPayload {
   name: string;
   email: string;
   inquiry: string;
+  /** Service offerings the visitor ticked (only for some inquiry types) */
+  services?: string[];
   message: string;
   /** When the Worker received the submission; defaults to now */
   submittedAt?: Date;
@@ -26,6 +28,9 @@ export function buildFormEmail(payload: FormPayload): FormEmail {
     ["Name", payload.name],
     ["Email", payload.email],
     ["Inquiry Type", payload.inquiry],
+    ...(payload.services?.length
+      ? [["Services", payload.services.join(", ")] satisfies [string, string]]
+      : []),
     ["Submitted", submittedAt],
   ];
 

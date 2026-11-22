@@ -688,6 +688,81 @@
     --glow-to: color-mix(in srgb, var(--fx-to) 70%, transparent);
   }
 }
+@layer components {
+  /* Kilovolt: letters crackle with staggered electric discharge flashes. Wrap each letter in a
+     <b style="--i:N"> (N = letter index, drives the stagger). Font size can be overridden with a
+     text-* utility (utilities win over this layer). */
+  .fx-voltage {
+    font:
+      600 32px/1.1 var(--font-jetbrains-mono, "JetBrains Mono"),
+      monospace;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    display: inline-flex;
+
+    & b {
+      font-weight: inherit;
+      display: inline-block;
+      animation: fx-voltage 2.6s steps(1) infinite;
+      animation-delay: calc(var(--i) * 0.08s);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      & b {
+        animation: none;
+      }
+    }
+  }
+}
+@keyframes fx-voltage {
+  0%,
+  100% {
+    transform: none;
+    color: var(--ink);
+    text-shadow: none;
+    filter: brightness(1);
+  }
+  7% {
+    transform: translate(1px, -1px) skewX(-10deg);
+    color: #fff;
+    text-shadow:
+      0 0 4px #fff,
+      0 0 14px var(--ink-3),
+      2px 0 0 var(--ink-2),
+      -2px 0 0 var(--ink-3);
+    filter: brightness(1.85);
+  }
+  9% {
+    transform: translate(-1px, 1px) skewX(8deg);
+    color: var(--ink-3);
+    text-shadow:
+      0 0 10px var(--ink-3),
+      0 0 22px color-mix(in srgb, var(--ink-3) 70%, transparent);
+  }
+  11%,
+  48% {
+    transform: none;
+    color: var(--ink);
+    text-shadow: none;
+    filter: brightness(1);
+  }
+  61% {
+    transform: translate(0, -1px) skewX(4deg);
+    color: #fff;
+    text-shadow:
+      0 0 6px var(--ink-2),
+      0 0 18px var(--ink-2),
+      -1px 0 0 var(--ink-3);
+    filter: brightness(1.6);
+  }
+  63% {
+    transform: none;
+    color: var(--ink);
+    text-shadow: none;
+    filter: brightness(1);
+  }
+}
+
 @keyframes fx-blueprint {
   to {
     background-position:

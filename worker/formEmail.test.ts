@@ -53,6 +53,19 @@ describe("buildFormEmail", () => {
     expect(html).toContain("&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; &amp; more");
   });
 
+  it("lists ticked services after the inquiry type", () => {
+    const { text, html } = buildFormEmail({
+      ...payload,
+      services: ["Web3 Tooling & SDKs", "DevOps"],
+    });
+    expect(text).toContain("Inquiry Type: Consulting\nServices: Web3 Tooling & SDKs, DevOps\n");
+    expect(html).toContain("Web3 Tooling &amp; SDKs, DevOps");
+  });
+
+  it("omits the services row when none are ticked", () => {
+    expect(buildFormEmail({ ...payload, services: [] }).text).not.toContain("Services:");
+  });
+
   it("defaults the submitted time to now", () => {
     vi.useFakeTimers({ now: new Date("2030-01-01T00:00:00Z") });
     expect(buildFormEmail({ ...payload, submittedAt: undefined }).text).toContain(

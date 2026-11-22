@@ -135,7 +135,10 @@ const structuredData = [
       <script type="application/ld+json" set:html={JSON.stringify(data)} />
     ))}
 
-    <Font cssVariable="--font-poppins" preload={[{ weight: "700" }]} />
+    <!-- Preload the weights painted above the fold on every page, so they're ready before first
+         render instead of swapping in from the Arial fallback: 500 = header nav, 700 = headings.
+         Roboto Mono 400 is the body text. -->
+    <Font cssVariable="--font-poppins" preload={[{ weight: "500" }, { weight: "700" }]} />
     <Font cssVariable="--font-roboto-mono" preload={[{ weight: "400", style: "normal" }]} />
     <Font cssVariable="--font-jetbrains-mono" />
 

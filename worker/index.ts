@@ -5,10 +5,8 @@
 // `send_email` binding. Fetch callers (Accept: application/json) get JSON back; plain HTML form
 // posts (no JS) are redirected to /contact/thanks/. The email itself is built in formEmail.ts.
 
+import { CONTACT_LIMITS as LIMITS, EMAIL_RE, SERVICE_INQUIRY_TYPES } from "./contactRules";
 import { sendFormEmail, type FormPayload } from "./formEmail";
-
-const LIMITS = { name: 200, email: 254, inquiry: 100, message: 5000 } as const;
-const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 
 export default {
   async fetch(request, env): Promise<Response> {
@@ -44,10 +42,13 @@ async function handleContact(request: Request, env: Env): Promise<Response> {
   // Honeypot: real visitors never see or fill this field. Pretend it worked so bots move on.
   if (field(form, "company")) return succeed();
 
+  const inquiry = field(form, "inquiry_type");
   const submission: FormPayload = {
     name: field(form, "name"),
     email: field(form, "email"),
-    inquiry: field(form, "inquiry_type"),
+    inquiry,
+    // Only the inquiry types that show the checkboxes can carry services
+    services: SERVICE_INQUIRY_TYPES.includes(inquiry) ? multiField(form, "services") : [],
     message: field(form, "text"),
     submittedAt: new Date(),
   };
@@ -70,13 +71,30 @@ function field(form: FormData, key: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function validate({ name, email, inquiry, message }: FormPayload): string | null {
+/** Every non-empty value submitted under `key` (e.g. a checkbox group), trimmed and deduped */
+function multiField(form: FormData, key: string): string[] {
+  const values = form
+    .getAll(key)
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return [...new Set(values)];
+}
+
+function validate({ name, email, inquiry, services = [], message }: FormPayload): string | null {
   if (!name || !email || !inquiry || !message) return "Please fill in every field.";
   if (name.length > LIMITS.name || inquiry.length > LIMITS.inquiry) return "A field is too long.";
+  if (services.length > LIMITS.services || services.some((s) => s.length > LIMITS.inquiry)) {
+    return "A field is too long.";
+  }
   if (email.length > LIMITS.email || !EMAIL_RE.test(email)) return "Please enter a valid email.";
   if (message.length > LIMITS.message) return "Your message is too long.";
+  if (message.length < LIMITS.messageMin) {
+    return `Please tell us a bit more (at least ${LIMITS.messageMin} characters).`;
+  }
   // Single-line values end up in headers (subject, reply-to); reject line breaks outright
-  if (/[\r\n]/.test(name + email + inquiry)) return "Invalid characters in form fields.";
+  if (/[\r\n]/.test([name, email, inquiry, ...services].join("")))
+    return "Invalid characters in form fields.";
   return null;
 }
 
