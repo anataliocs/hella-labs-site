@@ -493,6 +493,111 @@
   }
 }
 
+/* ---------------------------------------------------------------------------------------------
+   Text effects (pure CSS, add the class to any heading)
+   --------------------------------------------------------------------------------------------- */
+@layer components {
+  /* Effect colour tokens; override on any ancestor to re-skin:
+     --ink main text colour, --ink-2 primary accent, --ink-3 secondary accent */
+  :root {
+    --ink: currentColor;
+    --ink-2: #ff4fd8;
+    --ink-3: #4ff8ff;
+  }
+
+  /* Redactor: a scanning bar sweeps the text, lighting letters as it passes. Keeps the element's
+     own font so it fits any heading; the element should be as wide as its text (inline-block or
+     w-fit) so the bar tracks the word rather than the full line.
+     The text is painted left → right from --fx-from to --fx-to (both default to --ink, i.e. one
+     solid colour). Two layers, clipped to the glyphs: the full gradient at --fx-dim strength
+     (default 25%, the dim state) under a 300%-wide band that sweeps across lighting letters. The band's colour (--fx-hi)
+     is animated from --fx-from to --fx-to in step with the sweep so lit letters match the
+     gradient beneath them. */
+  .fx-scanner {
+    position: relative;
+    letter-spacing: 0.08em;
+    background:
+      linear-gradient(90deg, transparent 0 40%, var(--fx-hi) 50%, transparent 60% 100%) 0 0 / 300%
+        100%,
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--fx-from, var(--ink)) var(--fx-dim, 25%), transparent),
+        color-mix(in srgb, var(--fx-to, var(--ink)) var(--fx-dim, 25%), transparent)
+      );
+    -webkit-background-clip: text;
+    background-clip: text;
+    /* Hide the glyph fill, not `color`: --ink defaults to currentColor, so `color: transparent`
+       would make the gradient itself transparent */
+    -webkit-text-fill-color: transparent;
+    animation:
+      fx-scan-glow 2.6s ease-in-out infinite alternate,
+      fx-scan-hue 2.6s ease-in-out infinite alternate;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      bottom: -6px;
+      left: 0;
+      width: 3px;
+      background: var(--ink-2);
+      box-shadow: 0 0 14px var(--ink-2);
+      animation: fx-scan-bar 2.6s ease-in-out infinite alternate;
+    }
+
+    /* No motion: show the text fully lit and drop the bar (a frozen sweep would leave it dimmed) */
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      background: linear-gradient(90deg, var(--fx-from, var(--ink)), var(--fx-to, var(--ink)));
+      -webkit-background-clip: text;
+      background-clip: text;
+
+      &::after {
+        display: none;
+      }
+    }
+  }
+  /* Modifier: paint the scanner with the brand pink → purple gradient instead of one colour */
+  .fx-scanner-brand {
+    --fx-from: var(--hl-gradient-from);
+    --fx-to: var(--hl-gradient-to);
+    /* Pink/purple read darker than a neutral ink at the same strength, so dim less */
+    --fx-dim: 60%;
+  }
+}
+/* Registered so the highlight colour can animate (unregistered custom properties can't) */
+@property --fx-hi {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@keyframes fx-scan-hue {
+  0% {
+    --fx-hi: var(--fx-from, var(--ink));
+  }
+  100% {
+    --fx-hi: var(--fx-to, var(--ink));
+  }
+}
+@keyframes fx-scan-glow {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+@keyframes fx-scan-bar {
+  0% {
+    left: 0;
+    transform: translateX(0);
+  }
+  100% {
+    left: 100%;
+    transform: translateX(-100%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
