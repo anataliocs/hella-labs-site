@@ -123,6 +123,8 @@
   --shadow-popover: 0 8px 40px -8px rgb(0 0 0 / 0.22);
   --shadow-lift: 0 20px 40px -20px rgb(0 0 0 / 0.6);
   --shadow-violet: 0 10px 30px rgb(102 126 234 / 0.3);
+  /* Soft primary halo for focused form fields; follows the theme's primary color */
+  --shadow-focus-glow: 0 0 14px 2px color-mix(in srgb, var(--color-primary) 35%, transparent);
 
   --animate-hue: hue 3s ease-in-out infinite;
   --animate-hue-slow: hue 5s linear infinite;

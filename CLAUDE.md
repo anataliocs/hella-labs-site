@@ -107,3 +107,13 @@ The lint step enforces a11y rules (`astro/jsx-a11y/*`). In particular:
 - Formatting is owned by Prettier (`.prettierrc.json`) and `.editorconfig`: 2-space indent, LF, 100-char lines.
 - Keep changes focused. Don't reformat or refactor unrelated files in a feature change.
 - Never edit generated output: `dist/` and `.astro/`.
+
+## IDE Integration (WebStorm MCP)
+
+When the WebStorm MCP server is connected (tools prefixed `mcp__webstorm__`), use it without asking:
+
+- Prefer IDE tools for code intelligence: `search_symbol`, `get_symbol_info`, `analyze_calls` for finding definitions and call sites, and `rename_refactoring` for renames (it updates every reference safely).
+- Run `get_file_problems` on files you've edited to catch IDE-reported errors early. It's a fast check, not a replacement for the Definition of Done.
+- Use `get_all_open_file_paths` to see what the user is working on when a request refers to "this file" or the current editor.
+- Plain file reads and edits can still use the standard tools.
+- If the WebStorm tools aren't available (the IDE is closed, or a teammate isn't using WebStorm), fall back to the standard tools; nothing here requires the IDE.

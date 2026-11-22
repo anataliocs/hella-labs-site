@@ -12,10 +12,12 @@ import { url } from "@src/utils/path";
 const { formAction, buttonText, sendingText, successMessage, errorMessage, inquiryTypes } =
   siteData.contact;
 const fieldClass =
-  "w-full resize-y rounded-xl border-[1.4px] border-line-alt bg-surface-muted py-4 pr-5 pl-13 text-base text-heading outline-none placeholder:text-fg-muted focus:bg-transparent focus:outline-2 focus:outline-offset-4 focus:outline-primary focus:placeholder:text-heading";
+  "w-full resize-y rounded-xl border-[1.4px] border-line-alt bg-surface-muted py-4 pr-5 pl-13 text-base text-heading outline-none transition placeholder:text-fg-muted focus:border-primary focus:bg-transparent focus:shadow-focus-glow focus:outline-2 focus:outline-offset-4 focus:outline-primary focus:placeholder:text-heading";
 // Icon embedded at the left of each field (fields have pl-13 to make room). Single-line fields
-// center it; the textarea pins it to the first line.
-const iconClass = "pointer-events-none absolute left-5 size-4.5 text-fg-muted";
+// center it; the textarea pins it to the first line. The icon turns primary while its field has
+// focus (the wrapper is a `group`).
+const iconClass =
+  "pointer-events-none absolute left-5 size-4.5 text-fg-muted transition-colors group-focus-within:text-primary";
 const iconCentered = `${iconClass} top-1/2 -translate-y-1/2`;
 const iconTop = `${iconClass} top-4.75`;
 ---
@@ -56,7 +58,7 @@ const iconTop = `${iconClass} top-4.75`;
   @pageshow.window="if ($event.persisted) { status = 'idle'; message = ''; $el.reset(); }"
 >
   <fieldset class="space-y-5" :disabled="status === 'sending'" x-show="status !== 'sent'">
-    <div class="relative">
+    <div class="group relative">
       <label class="sr-only" for="form-name">
         Name
       </label>
@@ -72,7 +74,7 @@ const iconTop = `${iconClass} top-4.75`;
         required
       />
     </div>
-    <div class="relative">
+    <div class="group relative">
       <label class="sr-only" for="form-email">
         Email
       </label>
@@ -88,7 +90,7 @@ const iconTop = `${iconClass} top-4.75`;
         required
       />
     </div>
-    <div class="relative">
+    <div class="group relative">
       <label class="sr-only" for="form-inquiry">
         Inquiry Type
       </label>
@@ -100,7 +102,7 @@ const iconTop = `${iconClass} top-4.75`;
         ))}
       </select>
     </div>
-    <div class="relative">
+    <div class="group relative">
       <label class="sr-only" for="form-text">
         Message
       </label>
