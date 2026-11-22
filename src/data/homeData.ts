@@ -1,5 +1,5 @@
 // Homepage hero + team strip (ported from the Jekyll hero/team settings)
-import heroImage from "@src/assets/images/101.jpg";
+import heroImage from "@src/assets/images/home-hero-image.jpg";
 import chris from "@src/assets/images/team/chris-anatalio.png";
 import anna from "@src/assets/images/team/anna-lopatina.jpg";
 import manilaEngineer from "@src/assets/images/team/manila-office-engineer.jpg";

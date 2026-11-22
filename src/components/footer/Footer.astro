@@ -5,6 +5,8 @@ import Logo from "@src/components/header/Logo.astro";
 import SocialLinks from "@src/components/SocialLinks.astro";
 import LocationPins from "@src/components/LocationPins.astro";
 import PostThumbLink from "@src/components/blog/PostThumbLink.astro";
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import footerBg from "@src/assets/images/footer-bg.jpg";
 import { siteData } from "@src/data/siteData";
 import { mainNav } from "@src/data/navigationData";
 import { url } from "@src/utils/path";
@@ -19,7 +21,22 @@ const navLinkClass =
   "font-heading text-nav leading-relaxed font-medium underline decoration-transparent decoration-[1.2px] underline-offset-2 hover:decoration-heading";
 ---
 
-<footer class="mt-15 border-t border-line bg-surface-muted sm:mt-20">
+<hr
+  class="mt-15 h-0.5 border-0 bg-linear-to-r from-gradient-from to-gradient-to sm:mt-20"
+  aria-hidden="true"
+/>
+<!-- Always dark-themed: light text tokens stay readable over the navy-tinted photo -->
+<footer class="dark relative isolate overflow-hidden bg-surface-muted">
+  <div class="absolute inset-0 -z-10" aria-hidden="true">
+    <OptimizedImage
+      src={footerBg}
+      alt=""
+      widths={[640, 1080, 1200]}
+      sizes="100vw"
+      class="size-full object-cover opacity-50"
+    />
+    <div class="absolute inset-0 bg-charcoal-navy/85"></div>
+  </div>
   <Container class="py-15">
     <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
       <div class="md:col-span-2 lg:col-span-4">
