@@ -1,6 +1,8 @@
 # Manual Lighthouse audit (Actions → Lighthouse → Run workflow). Builds the chosen branch, serves
 # dist/ locally and audits it, so the scores reflect that commit rather than production. HTML
-# reports are uploaded as the `lighthouse-reports` artifact.
+# reports are uploaded as the `lighthouse-reports-<device>` artifact, then published to GitHub
+# Pages: an index.html linking each report, plus results.json with the raw scores. Each run
+# replaces the previous Pages deployment. Requires Settings → Pages → Source: GitHub Actions.
 name: Lighthouse
 
 on:
@@ -54,12 +56,19 @@ jobs:
           echo "Preview server did not start" && exit 1
 
       - name: Lighthouse check
+        id: lighthouse
         uses: foo-software/lighthouse-check-action@v12.0.1
         with:
           urls: http://localhost:4321/,http://localhost:4321/web3-consultant-service-offerings/,http://localhost:4321/contact/
           device: ${{ inputs.device }}
           outputDirectory: ${{ github.workspace }}/lighthouse-reports
           verbose: true
+
+      - name: Save results JSON
+        if: always() && steps.lighthouse.outputs.lighthouseCheckResults != ''
+        env:
+          RESULTS: ${{ steps.lighthouse.outputs.lighthouseCheckResults }}
+        run: printf '%s' "$RESULTS" > lighthouse-reports/results.json
 
       - name: Upload Lighthouse reports
         if: always()
@@ -68,3 +77,95 @@ jobs:
           name: lighthouse-reports-${{ inputs.device }}
           path: lighthouse-reports
           if-no-files-found: ignore
+
+  deploy:
+    name: Publish reports to GitHub Pages
+    needs: lighthouse
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download Lighthouse reports
+        uses: actions/download-artifact@v8
+        with:
+          name: lighthouse-reports-${{ inputs.device }}
+          path: site
+
+      - name: Build index page
+        env:
+          DEVICE: ${{ inputs.device }}
+          REF: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          node --input-type=module <<'EOF'
+          import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+          import { basename } from "node:path";
+
+          const dir = "site";
+          const esc = (v) =>
+            String(v ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+          const results = existsSync(`${dir}/results.json`)
+            ? JSON.parse(readFileSync(`${dir}/results.json`, "utf8"))
+            : null;
+          const rows = Array.isArray(results?.data) ? results.data : [];
+          const htmlFiles = readdirSync(dir).filter((f) => f.endsWith(".html") && f !== "index.html");
+          const linked = new Set();
+          const categories = ["performance", "accessibility", "bestPractices", "seo"];
+          const score = (v) => (typeof v === "number" ? Math.round(v) : "–");
+
+          const body = rows
+            .map((r) => {
+              const file = r.localReport ? basename(r.localReport) : "";
+              if (file) linked.add(file);
+              const link = file ? `<a href="${esc(file)}">report</a>` : "";
+              const cells = categories.map((c) => `<td>${score(r.scores?.[c])}</td>`).join("");
+              return `<tr><td>${esc(r.url)}</td>${cells}<td>${link}</td></tr>`;
+            })
+            .join("\n");
+          const extra = htmlFiles
+            .filter((f) => !linked.has(f))
+            .map((f) => `<li><a href="${esc(f)}">${esc(f)}</a></li>`)
+            .join("\n");
+
+          const { DEVICE, REF, SHA, RUN_URL } = process.env;
+          writeFileSync(
+            `${dir}/index.html`,
+            `<!doctype html>
+          <html lang="en">
+          <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Lighthouse reports (${esc(DEVICE)})</title>
+          <style>
+          body{font-family:system-ui,sans-serif;max-width:60rem;margin:2rem auto;padding:0 1rem;line-height:1.5}
+          table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:.4rem .6rem;text-align:left}
+          </style>
+          </head>
+          <body>
+          <h1>Lighthouse reports (${esc(DEVICE)})</h1>
+          <p>Branch <code>${esc(REF)}</code> at <code>${esc(SHA.slice(0, 7))}</code> · <a href="${esc(RUN_URL)}">workflow run</a> · <a href="results.json">results.json</a></p>
+          ${rows.length ? `<table><thead><tr><th>URL</th><th>Performance</th><th>Accessibility</th><th>Best practices</th><th>SEO</th><th></th></tr></thead><tbody>\n${body}\n</tbody></table>` : ""}
+          ${extra ? `<h2>Other reports</h2><ul>\n${extra}\n</ul>` : ""}
+          </body>
+          </html>
+          `,
+          );
+          EOF
+          touch site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
