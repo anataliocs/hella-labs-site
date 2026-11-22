@@ -4,6 +4,7 @@
 //  icon    – centered glowing icon, title and gradient rule above a full-width image
 import type { ImageMetadata } from "astro";
 import { Icon } from "astro-icon/components";
+import GradientIcon from "@src/components/GradientIcon.astro";
 import OptimizedImage from "@src/components/OptimizedImage.astro";
 
 interface Props {
@@ -11,21 +12,37 @@ interface Props {
   image: ImageMetadata;
   imageAlt: string;
   icon?: string;
+  /** Render the title with the pure-CSS Blueprint text effect (`.fx-blueprint`) */
+  blueprint?: boolean;
 }
 
-const { title, image, imageAlt, icon } = Astro.props;
+const { title, image, imageAlt, icon, blueprint = false } = Astro.props;
 const sizes = "(min-width: 1364px) 860px, (min-width: 1024px) 63vw, 100vw";
 const widths = [640, 828, 1080, 1280];
 ---
 
 {icon ? (
   <header class="mt-4 mb-8 text-center sm:mt-12">
-    <Icon
-      name={icon}
-      class="mx-auto mb-4 size-16 text-violet-from motion-safe:animate-pulse-glow"
-      aria-hidden="true"
-    />
-    <h1 class="mt-4 mb-2 text-[2rem] sm:text-[2.5rem]">{title}</h1>
+    {blueprint ? (
+      <GradientIcon
+        name={icon}
+        class="fx-icon-brand mx-auto mb-4 size-16 motion-safe:animate-pulse-glow"
+      />
+    ) : (
+      <Icon
+        name={icon}
+        class="mx-auto mb-4 size-16 text-violet-from motion-safe:animate-pulse-glow"
+        aria-hidden="true"
+      />
+    )}
+    <h1
+      class:list={[
+        "mt-4 mb-2 text-[2rem] sm:text-[2.5rem]",
+        blueprint && "fx-blueprint fx-blueprint-brand mx-auto w-fit",
+      ]}
+    >
+      {title}
+    </h1>
     <div
       class="mx-auto my-6 h-0.75 w-25 bg-linear-to-r from-transparent via-violet-from to-transparent"
       aria-hidden="true"
@@ -51,6 +68,13 @@ const widths = [640, 828, 1080, 1280];
         priority
       />
     </div>
-    <h1 class="mb-5 text-[2rem] sm:mb-7 sm:text-[2.5rem]">{title}</h1>
+    <h1
+      class:list={[
+        "mb-5 text-[2rem] sm:mb-7 sm:text-[2.5rem]",
+        blueprint && "fx-blueprint fx-blueprint-brand w-fit",
+      ]}
+    >
+      {title}
+    </h1>
   </header>
 )}

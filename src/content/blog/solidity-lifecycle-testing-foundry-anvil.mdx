@@ -26,7 +26,7 @@ We will show how [Foundry Anvil Testcontainers](https://hellalabs.dev/foundryanv
 
 ## What Are Lifecycle Tests?
 
-**They are advanced end-to-end tests that validate the behavior of a smart contract throughout its lifecycle.**
+*Advanced end-to-end tests that validate the behavior of a smart contract throughout its lifecycle.*
 
 They ensure that contracts behave correctly over time, especially during state transition.
 Ultimately, we want to verify that contracts maintains integrity & correctness throughout all state changes.
@@ -39,9 +39,15 @@ This "life story" includes several phases:
 - **State transitions** - Contract transitions through operational states
 - **Emergency scenarios** - Circuit breakers, pauses, or liquidations occur in response to critical events
 
+
+
+### Lifecycle
+
+*Let's take a look at an example lifecycle.*
+
 **Consider a token vesting contract:**
 
-Lifecycle: Deployed → Init stage, where beneficiaries and schedules are set → Active phase where tokens vest, handles claims, and completes when all tokens are distributed
+**Deployed** → **Init Stage**(beneficiaries & schedules are set) → **Active Phase**(tokens vest, claims are handled → **Completion**(all tokens are distributed)
 
 Each of these phases must be tested to ensure the contract behaves correctly throughout its entire lifecycle.
 
@@ -80,7 +86,17 @@ Smart contracts follow predictable lifecycle patterns:
 
 ### Time-Based Progression
 
-Contracts that mature or evolve based on time, like vesting schedules, escrow services, or time-locked governance. These contracts transition through states based on temporal triggers. Testing requires simulating block timestamps and verifying behavior at key time points.
+Contracts mature and/or evolve over time.
+
+**Examples:**
+
+- Vesting schedules
+- Escrow services
+- Time-locked governance
+
+Contracts transition through states based on temporal triggers.
+
+Testing requires simulating block timestamps and verifying behavior at key time points.
 
 ### User-Driven Evolution
 

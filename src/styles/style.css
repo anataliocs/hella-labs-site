@@ -153,10 +153,12 @@
   }
   @keyframes pulse-glow {
     from {
-      filter: drop-shadow(0 0 6px #667eea) drop-shadow(0 0 14px #667eea);
+      filter: drop-shadow(0 0 6px var(--glow-from, #667eea))
+        drop-shadow(0 0 14px var(--glow-from, #667eea));
     }
     to {
-      filter: drop-shadow(0 0 10px #667eea) drop-shadow(0 0 20px #764ba2);
+      filter: drop-shadow(0 0 10px var(--glow-from, #667eea))
+        drop-shadow(0 0 20px var(--glow-to, #764ba2));
     }
   }
 }
@@ -565,6 +567,136 @@
     --fx-dim: 60%;
   }
 }
+
+@layer components {
+  /* Blueprint: technical outline letters over a moving drafting grid. The element should be as
+     wide as its text (inline-block or w-fit) so the frame hugs the word. Font size can be
+     overridden with a text-* utility (utilities win over this layer). */
+  .fx-blueprint {
+    font:
+      600 28px/1.15 var(--font-jetbrains-mono, "JetBrains Mono"),
+      monospace;
+    letter-spacing: 0.1em;
+    /* Hide the glyph fill, not `color`: --ink defaults to currentColor, so `color: transparent`
+       would also make the stroke's --ink mix transparent */
+    -webkit-text-fill-color: transparent;
+    padding: 0.28em 0.45em;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--ink-3) 80%, var(--ink));
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--ink-3) 22%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(0deg, color-mix(in srgb, var(--ink-3) 18%, transparent) 1px, transparent 1px),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--ink-3) 42%, transparent),
+        transparent 35% 65%,
+        color-mix(in srgb, var(--ink-3) 42%, transparent)
+      );
+    background-size:
+      12px 12px,
+      12px 12px,
+      240% 100%;
+    background-position:
+      0 0,
+      0 0,
+      100% 0;
+    border: 1px solid color-mix(in srgb, var(--ink-3) 42%, transparent);
+    box-shadow: inset 0 0 18px color-mix(in srgb, var(--ink-3) 18%, transparent);
+    animation: fx-blueprint 4s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Modifier: paint the blueprint with the brand pink → purple gradient. A text stroke only takes
+     one colour, so the outline is drawn by clipping a gradient to the glyphs (a transparent stroke
+     widens the clip) and filling the letters with the page colour (--fx-fill). That clip would
+     hide the drafting grid, so the grid moves to a ::before layer behind the text. */
+  .fx-blueprint-brand {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(90deg, var(--fx-from), var(--fx-to));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: var(--fx-fill, var(--color-surface));
+    -webkit-text-stroke: 2px transparent;
+    border: 1px solid transparent;
+    border-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--fx-from) 55%, transparent),
+        color-mix(in srgb, var(--fx-to) 55%, transparent)
+      )
+      1;
+    box-shadow: inset 0 0 18px color-mix(in srgb, var(--fx-to) 18%, transparent);
+    animation: none;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(
+          90deg,
+          color-mix(in srgb, var(--fx-from) 22%, transparent) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          0deg,
+          color-mix(in srgb, var(--fx-to) 22%, transparent) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          color-mix(in srgb, var(--fx-from) 42%, transparent),
+          transparent 35% 65%,
+          color-mix(in srgb, var(--fx-to) 42%, transparent)
+        );
+      background-size:
+        12px 12px,
+        12px 12px,
+        240% 100%;
+      background-position:
+        0 0,
+        0 0,
+        100% 0;
+      animation: fx-blueprint 4s linear infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+  /* Brand pink → purple tokens for the blueprint title and icon. Put the class on a shared
+     ancestor, or on GradientIcon's <svg>, so SVG gradient stops can read them too. */
+  :where(.fx-brand-tokens, .fx-blueprint-brand) {
+    --fx-from: var(--hl-gradient-from);
+    --fx-to: var(--hl-gradient-to);
+  }
+  /* The dark theme's deeper pink/purple are too dim for a thin outline on navy; lift them */
+  html.dark :where(.fx-brand-tokens, .fx-blueprint-brand) {
+    --fx-from: color-mix(in srgb, var(--hl-gradient-from) 70%, white);
+    --fx-to: color-mix(in srgb, var(--hl-gradient-to) 65%, white);
+  }
+  /* Tint an icon's pulse-glow with the brand gradient (pairs with GradientIcon) */
+  .fx-icon-brand {
+    --glow-from: color-mix(in srgb, var(--fx-from) 70%, transparent);
+    --glow-to: color-mix(in srgb, var(--fx-to) 70%, transparent);
+  }
+}
+@keyframes fx-blueprint {
+  to {
+    background-position:
+      24px 0,
+      0 24px,
+      -100% 0;
+  }
+}
+
 /* Registered so the highlight colour can animate (unregistered custom properties can't) */
 @property --fx-hi {
   syntax: "<color>";

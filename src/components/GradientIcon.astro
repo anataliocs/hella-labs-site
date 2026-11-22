@@ -1,0 +1,47 @@
+---
+// Font Awesome icon filled with the brand pink → purple gradient (--fx-from → --fx-to, see
+// .fx-brand-tokens in style.css). astro-icon renders icons as <symbol> + <use>, and the cloned
+// paths in a <use> shadow tree can't be re-filled from CSS, so this inlines the icon's own SVG
+// body with the gradient defined alongside it.
+import solid from "@iconify-json/fa6-solid/icons.json";
+import brands from "@iconify-json/fa6-brands/icons.json";
+
+interface IconSet {
+  width?: number;
+  height?: number;
+  icons: Record<string, { body: string; width?: number; height?: number }>;
+}
+
+interface Props {
+  // Iconify name, e.g. "fa6-solid:network-wired"
+  name: string;
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+const sets: Record<string, IconSet> = { "fa6-solid": solid, "fa6-brands": brands };
+const [prefix = "", iconName = ""] = name.split(":");
+const set = sets[prefix];
+const icon = set?.icons[iconName];
+if (!set || !icon) throw new Error(`GradientIcon: unknown icon "${name}"`);
+
+const width = icon.width ?? set.width ?? 16;
+const height = icon.height ?? set.height ?? 16;
+const gradientId = `fx-gradient-${prefix}-${iconName}`;
+const body = icon.body.replaceAll('fill="currentColor"', `fill="url(#${gradientId})"`);
+---
+
+<svg
+  viewBox={`0 0 ${width} ${height}`}
+  class:list={["fx-brand-tokens", className]}
+  aria-hidden="true"
+  data-icon={name}
+>
+  <defs>
+    <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" style="stop-color: var(--fx-from)"></stop>
+      <stop offset="1" style="stop-color: var(--fx-to)"></stop>
+    </linearGradient>
+  </defs>
+  <Fragment set:html={body} />
+</svg>
