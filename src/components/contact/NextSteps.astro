@@ -1,6 +1,7 @@
 ---
 // Numbered "what happens next" list shown after a contact submission (form + thanks page)
 import { Icon } from "astro-icon/components";
+import Button from "@src/components/Button.astro";
 import { siteData } from "@src/data/siteData";
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const { class: className } = Astro.props;
-const { title, steps, notes } = siteData.contact.nextSteps;
+const { title, steps, notes, ctaLabel, blogLink } = siteData.contact.nextSteps;
 ---
 
 <section
@@ -19,15 +20,12 @@ const { title, steps, notes } = siteData.contact.nextSteps;
     {title}
   </h2>
   <ol class="space-y-4">
-    {steps.map((step, index) => (
+    {steps.map((step) => (
       <li class="flex items-start gap-4">
         <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
           <Icon name={step.icon} class="size-4.5" aria-hidden="true" />
         </span>
-        <p class="pt-2 text-base text-heading">
-          <span class="mr-1 font-heading font-bold text-primary">{index + 1}.</span>
-          {step.text}
-        </p>
+        <p class="pt-2 text-base text-heading">{step.text}</p>
       </li>
     ))}
   </ol>
@@ -35,5 +33,13 @@ const { title, steps, notes } = siteData.contact.nextSteps;
     {notes.map((note) => (
       <p>{note}</p>
     ))}
+  </div>
+  <div class="mt-6 flex flex-wrap gap-3">
+    <Button href={siteData.contact.directMessage} variant="secondary" icon="fa6-brands:telegram">
+      {ctaLabel}
+    </Button>
+    <Button href={blogLink.href} variant="light" icon="fa6-solid:book-open">
+      {blogLink.label}
+    </Button>
   </div>
 </section>

@@ -8,6 +8,7 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import llmsIntegration from "astro-llms-md";
 import { createLastmodResolver } from "./src/utils/sitemap";
+import devContactApi from "./src/integrations/devContactApi";
 
 const lastmodFor = createLastmodResolver();
 
@@ -37,6 +38,8 @@ export default defineConfig({
   },
 
   integrations: [
+    // `astro dev` only: serves /api/contact with the worker code and a no-op email sender
+    devContactApi(),
     // Font Awesome 6 (the Hella brand icon set). Every icon name used in the site must be listed
     // here, or it won't render.
     icon({
@@ -57,10 +60,12 @@ export default defineConfig({
           "clock",
           "code",
           "code-branch",
+          "comment-dots",
           "credit-card",
           "cubes",
           "diagram-project",
           "dollar-sign",
+          "envelope",
           "file-lines",
           "file-contract",
           "flask",
@@ -70,9 +75,11 @@ export default defineConfig({
           "hand-holding-dollar",
           "handshake",
           "heart",
+          "id-badge",
           "laptop-code",
           "lightbulb",
           "list",
+          "list-check",
           "location-dot",
           "lock",
           "marker",
@@ -116,6 +123,7 @@ export default defineConfig({
           "npm",
           "rust",
           "sass",
+          "space-awesome",
           "stack-overflow",
           "telegram",
           "x-twitter",

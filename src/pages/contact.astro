@@ -6,6 +6,7 @@ import OptimizedImage from "@src/components/OptimizedImage.astro";
 import SocialLinks from "@src/components/SocialLinks.astro";
 import ContactForm from "@src/components/contact/ContactForm.astro";
 import contactImage from "@src/assets/images/thinking-girl.jpg";
+import sentImage from "@src/assets/images/thinking-girl-after-send.jpg";
 import { socialLinks, telegramLink } from "@src/data/socialData";
 import { url } from "@src/utils/path";
 import { webPageJsonLd, withBrand } from "@src/utils/seo";
@@ -15,6 +16,8 @@ const description =
   "Got a revolutionary idea? A groundbreaking technical concept? Let's transform it into reality. Whether it's blockchain infrastructure, fintech innovation, or cutting-edge Web3 solutions—we're here to architect, engineer, and scale your vision.";
 const imageAlt =
   "Woman gazing upward on a neon-lit city street, with holographic network diagrams floating beside her";
+const sentImageAlt =
+  'The same woman on the neon-lit street, now outlined in glowing light beside a holographic "Preparing for launch" display';
 ---
 
 <MainLayout
@@ -25,16 +28,36 @@ const imageAlt =
   jsonLd={webPageJsonLd({ title, description, path: "/contact/" })}
   bare
 >
-  <div class="flex min-h-dvh lg:h-full">
+  <!-- `sent` flips when ContactForm dispatches contact-sent (swaps the photo, hides the intro).
+       A back/forward-cache restore (pageshow + persisted) resets it, so leaving and returning
+       always shows a fresh contact page. -->
+  <div
+    class="flex min-h-dvh lg:h-full"
+    x-data="{ sent: false }"
+    @contact-sent.window="sent = true"
+    @pageshow.window="if ($event.persisted) sent = false"
+  >
     <div class="relative overflow-hidden bg-surface-alt max-lg:hidden lg:w-2/5 xl:w-1/2">
-      <OptimizedImage
-        src={contactImage}
-        alt={imageAlt}
-        widths={[640, 828, 1080, 1195]}
-        sizes="(min-width: 1280px) 50vw, 40vw"
-        class="absolute inset-0 size-full object-cover select-none"
-        priority
-      />
+      <div class="absolute inset-0" x-show="!sent">
+        <OptimizedImage
+          src={contactImage}
+          alt={imageAlt}
+          widths={[640, 828, 1080, 1195]}
+          sizes="(min-width: 1280px) 50vw, 40vw"
+          class="absolute inset-0 size-full object-cover select-none"
+          priority
+        />
+      </div>
+      <!-- Lazy-loaded and display:none until sent, so it costs nothing on first load -->
+      <div class="absolute inset-0" x-show="sent" x-cloak>
+        <OptimizedImage
+          src={sentImage}
+          alt={sentImageAlt}
+          widths={[640, 828, 1080, 1195]}
+          sizes="(min-width: 1280px) 50vw, 40vw"
+          class="absolute inset-0 size-full object-cover select-none"
+        />
+      </div>
       <p class="absolute bottom-5 left-5 rounded-lg bg-black/50 px-3 py-1.5 font-heading text-xs leading-snug text-white [&_a]:font-medium [&_a]:text-white [&_a]:underline [&_a]:decoration-transparent [&_a]:underline-offset-2 [&_a:hover]:decoration-white">
         Photo by <a href="https://www.lummi.ai/creator/pablostanley">Pablo Stanley</a> /{" "}
         <a href="https://www.lummi.ai/">Lummi</a>
@@ -49,7 +72,7 @@ const imageAlt =
         >
           <Icon name="fa6-solid:arrow-left" class="size-3.5" aria-hidden="true" /> Back to home
         </a>
-        <header class="mb-8">
+        <header class="mb-8" x-show="!sent">
           <h1 class="text-[2rem] sm:text-5xl">{title}</h1>
           <p class="mt-3 text-base sm:text-lg">{description}</p>
         </header>

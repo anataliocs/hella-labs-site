@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:worker": "astro build && wrangler dev",
-    "start": "astro dev stop && pnpm lint:fix && pnpm format && astro dev",
+    "start": "astro dev stop && pnpm lint:fix && pnpm format && astro dev --force",
     "build": "astro build",
     "preview": "astro preview",
     "deploy": "astro build && wrangler deploy",

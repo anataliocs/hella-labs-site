@@ -3,6 +3,7 @@
 // it and emails it (worker/formEmail.ts builds the HTML + plain-text message).
 // With JS, Alpine submits it via fetch and shows the result inline; without JS it's a normal POST
 // and the Worker redirects to /contact/thanks/.
+import { Icon } from "astro-icon/components";
 import Button from "@src/components/Button.astro";
 import NextSteps from "@src/components/contact/NextSteps.astro";
 import { siteData } from "@src/data/siteData";
@@ -11,7 +12,12 @@ import { url } from "@src/utils/path";
 const { formAction, buttonText, sendingText, successMessage, errorMessage, inquiryTypes } =
   siteData.contact;
 const fieldClass =
-  "w-full resize-y rounded-xl border-[1.4px] border-line-alt bg-surface-muted px-5 py-4 text-base text-heading outline-none placeholder:text-fg-muted focus:bg-transparent focus:outline-2 focus:outline-offset-4 focus:outline-primary focus:placeholder:text-heading";
+  "w-full resize-y rounded-xl border-[1.4px] border-line-alt bg-surface-muted py-4 pr-5 pl-13 text-base text-heading outline-none placeholder:text-fg-muted focus:bg-transparent focus:outline-2 focus:outline-offset-4 focus:outline-primary focus:placeholder:text-heading";
+// Icon embedded at the left of each field (fields have pl-13 to make room). Single-line fields
+// center it; the textarea pins it to the first line.
+const iconClass = "pointer-events-none absolute left-5 size-4.5 text-fg-muted";
+const iconCentered = `${iconClass} top-1/2 -translate-y-1/2`;
+const iconTop = `${iconClass} top-4.75`;
 ---
 
 <form
@@ -38,6 +44,8 @@ const fieldClass =
         form.reset();
         this.status = 'sent';
         this.message = form.dataset.success;
+        // Lets the page react (contact.astro hides its intro once the message is sent)
+        window.dispatchEvent(new CustomEvent('contact-sent'));
       } catch (err) {
         this.message = err.message || form.dataset.error;
         this.status = 'error';
@@ -45,12 +53,14 @@ const fieldClass =
     },
   }"
   @submit.prevent="submit($el)"
+  @pageshow.window="if ($event.persisted) { status = 'idle'; message = ''; $el.reset(); }"
 >
   <fieldset class="space-y-5" :disabled="status === 'sending'" x-show="status !== 'sent'">
-    <div>
+    <div class="relative">
       <label class="sr-only" for="form-name">
         Name
       </label>
+      <Icon name="fa6-solid:id-badge" class={iconCentered} aria-hidden="true" />
       <input
         class={fieldClass}
         id="form-name"
@@ -62,10 +72,11 @@ const fieldClass =
         required
       />
     </div>
-    <div>
+    <div class="relative">
       <label class="sr-only" for="form-email">
         Email
       </label>
+      <Icon name="fa6-solid:envelope" class={iconCentered} aria-hidden="true" />
       <input
         class={fieldClass}
         id="form-email"
@@ -77,10 +88,11 @@ const fieldClass =
         required
       />
     </div>
-    <div>
+    <div class="relative">
       <label class="sr-only" for="form-inquiry">
         Inquiry Type
       </label>
+      <Icon name="fa6-solid:list-check" class={iconCentered} aria-hidden="true" />
       <select class={fieldClass} id="form-inquiry" name="inquiry_type" required>
         <option value="">Select Inquiry Type</option>
         {inquiryTypes.map((type) => (
@@ -88,10 +100,11 @@ const fieldClass =
         ))}
       </select>
     </div>
-    <div>
+    <div class="relative">
       <label class="sr-only" for="form-text">
         Message
       </label>
+      <Icon name="fa6-solid:comment-dots" class={iconTop} aria-hidden="true" />
       <textarea
         class={fieldClass}
         id="form-text"
@@ -108,7 +121,7 @@ const fieldClass =
       <input id="form-company" type="text" name="company" tabindex="-1" autocomplete="off" />
     </div>
     <div>
-      <Button type="submit">
+      <Button type="submit" icon="fa6-brands:space-awesome">
         <span
           x-text="status === 'sending' ? $root.dataset.sending : $el.dataset.label"
           data-label={buttonText}

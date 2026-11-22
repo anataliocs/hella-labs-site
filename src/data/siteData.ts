@@ -15,6 +15,7 @@ export const siteData = {
   keywords: [
     "Web3",
     "Consulting",
+    "Fintech",
     "Engineering",
     "DevRel",
     "Digital Marketing",
@@ -22,6 +23,11 @@ export const siteData = {
     "Blockchain",
     "Crypto",
     "Cryptocurrency",
+    "Digital Assets",
+    "Tokenization",
+    "RWAs",
+    "Fractional Engineering",
+    "Fractional CTO",
   ],
   locale: "en_US",
   themeColor: "#ae00ee",
@@ -69,6 +75,9 @@ export const siteData = {
     // Shown after a successful submission (inline on /contact/ and on /contact/thanks/)
     nextSteps: {
       title: "What happens next",
+      // Button at the bottom of the block, linking to `directMessage` (Telegram DM)
+      ctaLabel: "Need answers sooner?",
+      blogLink: { label: "Check out our blog", href: "/blog/" },
       steps: [
         { icon: "fa6-solid:clock", text: "We respond within 24 hours." },
         {
