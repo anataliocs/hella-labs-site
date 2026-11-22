@@ -1,0 +1,76 @@
+---
+// Lighthouse reports (footer-only link): what Lighthouse measures, then a score summary and the
+// a link to the full HTML report for every run in src/assets/reports
+import { Icon } from "astro-icon/components";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import Container from "@src/components/Container.astro";
+import FeatureGrid from "@src/components/content/FeatureGrid.astro";
+import FeatureCard from "@src/components/content/FeatureCard.astro";
+import ReportSection from "@src/components/reports/ReportSection.astro";
+import { lighthouseData } from "@src/data/lighthouseData";
+import { getReports } from "@src/utils/reports";
+import { breadcrumbJsonLd, webPageJsonLd, withBrand } from "@src/utils/seo";
+
+const { title, description, intro, categories, scoreLegend } = lighthouseData;
+const path = "/lighthouse-reports/";
+const reports = await getReports();
+
+// Categories in the order Lighthouse reports them, taken from the first run
+const categoryIds = Object.keys(reports[0]?.data.categories ?? {});
+const categoryCards = categoryIds.flatMap((id) => {
+  const info = categories[id];
+  const name = reports[0]?.data.categories[id]?.title ?? id;
+  return info ? [{ id, name, ...info }] : [];
+});
+---
+
+<MainLayout
+  title={withBrand(title)}
+  description={description}
+  jsonLd={[
+    webPageJsonLd({ title, description, path }),
+    breadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: title, path },
+    ]),
+  ]}
+>
+  <Container class="max-w-250">
+    <header class="mt-4 mb-8 text-center sm:mt-12">
+      <Icon
+        name="fa6-solid:gauge-high"
+        class="mx-auto mb-4 size-16 text-violet-from"
+        aria-hidden="true"
+      />
+      <h1 class="mt-4 mb-2 text-[2rem] sm:text-[2.5rem]">{title}</h1>
+      <div
+        class="mx-auto my-6 h-0.75 w-25 bg-linear-to-r from-transparent via-violet-from to-transparent"
+        aria-hidden="true"
+      />
+    </header>
+
+    <div class="prose">
+      {intro.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+
+      <h2>What Lighthouse Measures</h2>
+      <FeatureGrid>
+        {categoryCards.map((category) => (
+          <FeatureCard icon={category.icon} title={category.name} as="h3" bordered>
+            <p>{category.summary}</p>
+          </FeatureCard>
+        ))}
+      </FeatureGrid>
+      <p>
+        {scoreLegend} These are lab measurements: every run uses the same emulated device and
+        network, so results are repeatable and comparable over time, whereas real visitors'
+        experience varies with their own hardware and connection.
+      </p>
+    </div>
+
+    {reports.map((report) => (
+      <ReportSection report={report} />
+    ))}
+  </Container>
+</MainLayout>

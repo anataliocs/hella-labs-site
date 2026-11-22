@@ -1,0 +1,50 @@
+---
+// Lighthouse-style circular score: a ring filled to the score, colored by rating band
+import { scoreRating } from "@src/utils/reports";
+
+interface Props {
+  // 0–100, or null when the category had nothing to score
+  score: number | null;
+  label: string;
+}
+
+const { score, label } = Astro.props;
+const rating = scoreRating(score);
+const ringColors = {
+  good: "text-success",
+  average: "text-amber-500",
+  poor: "text-red-500",
+  na: "text-fg-muted",
+} as const;
+// pathLength="100" lets the dash length be the score itself
+const dash = `${score ?? 0} 100`;
+---
+
+<figure class="flex w-24 flex-col items-center gap-2 text-center">
+  <div class="relative size-18">
+    <svg viewBox="0 0 36 36" class="size-full -rotate-90" aria-hidden="true">
+      <circle cx="18" cy="18" r="16" fill="none" stroke-width="3" class="stroke-line" />
+      <circle
+        cx="18"
+        cy="18"
+        r="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        pathLength="100"
+        stroke-dasharray={dash}
+        class={ringColors[rating]}
+      />
+    </svg>
+    <span class="absolute inset-0 flex items-center justify-center font-heading text-xl font-bold text-heading">
+      {score ?? "–"}
+    </span>
+  </div>
+  <figcaption class="font-heading text-sm leading-tight font-medium text-fg">
+    <span class="sr-only">
+      {label}: {score === null ? "not scored" : `${score} out of 100`}
+    </span>
+    <span aria-hidden="true">{label}</span>
+  </figcaption>
+</figure>

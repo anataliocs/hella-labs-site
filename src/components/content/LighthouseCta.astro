@@ -1,0 +1,30 @@
+---
+// Call-to-action pointing to the Lighthouse reports page, built on CtaSection. Title, text and
+// button default to lighthouseData.cta; override any of them per page. Slot content replaces the
+// default text.
+import CtaSection from "@src/components/content/CtaSection.astro";
+import { lighthouseData } from "@src/data/lighthouseData";
+
+interface Props {
+  title?: string;
+  text?: string;
+  label?: string;
+  variant?: "card" | "center" | "banner";
+  as?: "h2" | "h3";
+}
+
+const { cta } = lighthouseData;
+const {
+  title = cta.title,
+  text = cta.text,
+  label = cta.label,
+  variant = "card",
+  as = "h3",
+} = Astro.props;
+---
+
+<CtaSection title={title} button={{ label, href: cta.href }} variant={variant} as={as}>
+  <slot>
+    <p>{text}</p>
+  </slot>
+</CtaSection>
