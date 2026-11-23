@@ -1,6 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { techKeys } from "@src/data/techStackData";
 
 // Hex color like "#4643ec"
 
@@ -26,6 +27,8 @@ const blog = defineCollection({
       image: image(),
       imageAlt: z.string(),
       tags: z.array(z.string()).default([]),
+      // Language/technology tiles shown under the byline (keys from src/data/techStackData.ts)
+      techStack: z.array(z.enum(techKeys)).default([]),
       // Listed in the sidebar "Featured posts" widget
       featured: z.boolean().default(false),
     }),

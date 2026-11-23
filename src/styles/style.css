@@ -826,6 +826,130 @@
   }
 }
 
+@layer components {
+  /* Label-Maker: raised glyphs emboss onto a feeding strip of ridged tape. Wrap each letter in a
+     <b style="--i:N"> (N = letter index, drives the stagger). Font size and padding can be
+     overridden with text-* / p-* utilities (utilities win over this layer). Positioning
+     utilities (translate-*) are safe too: the animation only drives `transform`. */
+  .fx-labelmaker {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    padding: 15px 22px;
+    font:
+      900 27px/1 "Courier New",
+      monospace;
+    letter-spacing: 0.1em;
+    white-space: pre;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 2px, #08070f22 2px 3px),
+      color-mix(in srgb, var(--ink-2) 55%, #21142b);
+    border-top: 2px solid color-mix(in srgb, var(--ink-2) 65%, var(--ink));
+    border-bottom: 3px solid #21142b;
+    box-shadow: 0 5px 7px #08070f66;
+    transform: rotate(-4deg);
+    animation: fx-label-feed 5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+
+    & b {
+      font-weight: inherit;
+      color: var(--ink);
+      text-shadow:
+        -1px -1px 0 #08070faa,
+        1px 1px 0 #ffffff55,
+        0 2px 2px #08070f88;
+      animation: fx-label-emboss 5s steps(1, end) infinite;
+      animation-delay: calc(var(--i) * 0.13s);
+    }
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: -2px;
+      bottom: -3px;
+      width: 7px;
+      background: repeating-linear-gradient(135deg, #21142b 0 3px, var(--ink-2) 3px 5px);
+      pointer-events: none;
+    }
+    &::before {
+      left: -3px;
+      clip-path: polygon(
+        0 0,
+        100% 0,
+        50% 16%,
+        100% 33%,
+        50% 50%,
+        100% 66%,
+        50% 83%,
+        100% 100%,
+        0 100%
+      );
+    }
+    &::after {
+      right: -3px;
+      clip-path: polygon(100% 0, 0 0, 50% 16%, 0 33%, 50% 50%, 0 66%, 50% 83%, 0 100%, 100% 100%);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &,
+      & b {
+        animation: none;
+      }
+    }
+  }
+  /* Brand tape: the neon pink → purple of the blog tag pills under the ridges, in the blog
+     heading font. Uses the deeper tag stops (not the light theme's #f70077) so the white
+     glyphs keep WCAG AA in both themes. */
+  .fx-labelmaker-brand {
+    --ink: #fff;
+    --ink-2: #d60067;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 2px, #08070f22 2px 3px),
+      linear-gradient(135deg, #d60067, #8311c0);
+    border-top-color: color-mix(in srgb, #d60067 65%, #fff);
+  }
+}
+@keyframes fx-label-feed {
+  0%,
+  6% {
+    clip-path: inset(-8px 100% -12px -8px);
+    transform: translateX(-12px) rotate(-4deg);
+  }
+  34%,
+  80% {
+    clip-path: inset(-8px -8px -12px -8px);
+    transform: translateX(0) rotate(-4deg);
+  }
+  95%,
+  100% {
+    clip-path: inset(-8px -8px -12px -8px);
+    transform: translateX(12px) rotate(-4deg);
+    opacity: 0;
+  }
+  6%,
+  80% {
+    opacity: 1;
+  }
+}
+@keyframes fx-label-emboss {
+  0%,
+  12% {
+    color: transparent;
+    text-shadow: none;
+  }
+  20%,
+  100% {
+    color: var(--ink);
+    text-shadow:
+      -1px -1px 0 #08070faa,
+      1px 1px 0 #ffffff55,
+      0 2px 2px #08070f88;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

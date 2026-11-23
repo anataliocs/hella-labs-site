@@ -1,8 +1,9 @@
 ---
-// Post hero: cover image, tags, title and author/date/reading-time byline
+// Post hero: cover image, tags, title, author/date/reading-time byline and tech stack tiles
 import { Image } from "astro:assets";
 import OptimizedImage from "@src/components/OptimizedImage.astro";
 import TagList from "@src/components/blog/TagList.astro";
+import TechStack from "@src/components/blog/TechStack.astro";
 import { siteData } from "@src/data/siteData";
 import { url } from "@src/utils/path";
 import { formatDate, readingTime, type Post } from "@src/utils/posts";
@@ -12,7 +13,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, image, imageAlt, tags, date } = post.data;
+const { title, image, imageAlt, tags, date, techStack } = post.data;
 const { author } = siteData;
 ---
 
@@ -59,4 +60,6 @@ const { author } = siteData;
       </div>
     </div>
   </div>
+
+  <TechStack items={techStack} class="mt-8" />
 </header>

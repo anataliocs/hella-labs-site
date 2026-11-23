@@ -34,6 +34,7 @@
     "@astrojs/sitemap": "^3.7.5",
     "@iconify-json/fa6-brands": "^1.2.6",
     "@iconify-json/fa6-solid": "^1.2.4",
+    "@iconify-json/simple-icons": "^1.2.103",
     "@tailwindcss/vite": "^4.3.5",
     "alpinejs": "^3.17.5",
     "astro": "^7.2.1",
