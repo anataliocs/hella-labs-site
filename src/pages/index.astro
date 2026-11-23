@@ -1,5 +1,5 @@
 ---
-// Homepage: hero, team strip, the first page of the blog feed and the digital asset flywheel
+// Homepage: hero, digital asset flywheel, team strip and the first page of the blog feed
 import MainLayout from "@src/layouts/MainLayout.astro";
 import Hero from "@src/components/home/Hero.astro";
 import TeamStrip from "@src/components/home/TeamStrip.astro";
@@ -20,6 +20,13 @@ const hasMore = posts.length > pageSize;
   description={siteData.description}
 >
   <Hero />
+  <Container class="mb-15 sm:mb-20">
+    <Flywheel />
+    <hr
+      class="mt-15 h-0.5 border-0 bg-linear-to-r from-gradient-from to-gradient-to sm:mt-20"
+      aria-hidden="true"
+    />
+  </Container>
   <TeamStrip />
   <PageShell>
     <PostFeed
@@ -28,7 +35,4 @@ const hasMore = posts.length > pageSize;
       nextUrl={hasMore ? "/page/2/" : undefined}
     />
   </PageShell>
-  <Container class="mt-15 sm:mt-20">
-    <Flywheel />
-  </Container>
 </MainLayout>

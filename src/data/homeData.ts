@@ -98,8 +98,8 @@ export const flywheelData = {
       text: "Autonomous agents leverage deep, instant stablecoin liquidity to pay for APIs, data, and compute per-request via HTTP 402.",
     },
     {
-      title: "Yield & Liquidity",
-      icon: "fa6-solid:chart-line",
+      title: "Liquidity Demand",
+      icon: "fa6-solid:water",
       text: "Continuous machine-to-machine transaction volume drives massive demand for stablecoin reserves.",
     },
     {
