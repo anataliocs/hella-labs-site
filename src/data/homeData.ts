@@ -1,4 +1,4 @@
-// Homepage hero, team strip and digital asset flywheel (ported from the Jekyll hero/team settings)
+// Homepage hero, team strip, digital asset flywheel and the CTA under the blog feed (ported from the Jekyll hero/team settings)
 import heroImage from "@src/assets/images/home-hero-image.jpg";
 import chris from "@src/assets/images/team/chris-anatalio.png";
 import anna from "@src/assets/images/team/anna-lopatina.jpg";
@@ -109,4 +109,12 @@ export const flywheelData = {
     },
   ] satisfies FlywheelStage[],
   tagline: "Hella Labs accelerating towards the on-chain future",
+};
+
+// Call-to-action under the homepage blog feed
+export const homeCtaData = {
+  title: "Ready to build on-chain?",
+  text: "Book a free 30-minute call. Tell us what you're building and we'll map out how fractional engineering, DevRel, or a custom integration can get you to launch faster.",
+  button: { label: "Book a Free Call", href: "/contact/" },
+  link: { label: "Or explore our services", href: "/web3-consultant-service-offerings/" },
 };
