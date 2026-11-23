@@ -16,10 +16,10 @@ export const mainNav: NavItem[] = [
     title: "Services",
     href: "/web3-consultant-service-offerings/",
     children: [
-      { title: "Custom Discord Bot", href: "/services/custom-discord-bot/" },
       { title: "On-chain Web/Mobile Apps", href: "/services/dapp-web-front-end/" },
       { title: "DevOps & Test Automation", href: "/services/devops-test-automation/" },
       { title: "Web3 Tooling & SDKs", href: "/services/web3-tooling-sdks/" },
+      { title: "Custom Discord Bot", href: "/services/custom-discord-bot/" },
       { title: "DevRel & Technical Content", href: "/services/technical-articles/" },
       { title: "GTM Launch Package", href: "/services/gtm-launch-package/" },
     ],
