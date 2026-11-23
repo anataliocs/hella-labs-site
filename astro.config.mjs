@@ -35,6 +35,11 @@ export default defineConfig({
   // and the page would flash the light theme; deferring the whole sheet would flash unstyled HTML.
   build: { format: "directory", inlineStylesheets: "always" },
 
+  // Prefetch a page's HTML when its link is hovered/focused, so the click is served from cache.
+  // Used instead of Cloudflare Speed Brain: works in all browsers and can be tuned per link with
+  // data-astro-prefetch ("viewport", "load", "false").
+  prefetch: { prefetchAll: true, defaultStrategy: "hover" },
+
   // Global image defaults so <Image>/<Picture> (including MDX images) share responsive breakpoints
   image: {
     breakpoints: [640, 828, 1080, 1280, 1600, 1920],
