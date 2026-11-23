@@ -68,6 +68,20 @@ modules are the same controls we deploy for clients:
 Together they let you run [on-chain chaos engineering](/on-chain-chaos-engineering-ethereum-wiremock-anvil/):
 deliberately injecting failures to prove your protocol degrades safely.
 
+### Quality You Can Verify
+
+We hold our own code to the standard we set for clients. Every commit to our open-source modules
+runs in CI against real containers, and coverage is published publicly on Codecov, not claimed in
+a slide deck. The same pinned images and disposable environments mean a test that passes on one
+machine passes on every machine, so results are **reproducible by anyone**: your team, your
+auditors, or ours.
+
+<CoverageSunburst repo="hella-labs/foundryanvil-testcontainers-nodejs" token="WU523RPLO1">
+  **Foundry Anvil Testcontainers coverage.** Each ring drills from the whole project into
+  directories and files; color shows how well each slice is tested. [See the full
+  report](/open-source/foundry-anvil-testcontainers/).
+</CoverageSunburst>
+
 ## What We Deliver
 
 <FeatureGrid>

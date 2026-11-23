@@ -5,6 +5,7 @@ import Callout from "@src/components/content/Callout.astro";
 import CheckList from "@src/components/content/CheckList.astro";
 import CodePen from "@src/components/content/CodePen.astro";
 import ConnectLinks from "@src/components/content/ConnectLinks.astro";
+import CoverageSunburst from "@src/components/content/CoverageSunburst.astro";
 import CtaSection from "@src/components/content/CtaSection.astro";
 import FeatureCard from "@src/components/content/FeatureCard.astro";
 import FeatureGrid from "@src/components/content/FeatureGrid.astro";
@@ -21,6 +22,7 @@ export const mdxComponents = {
   CheckList,
   CodePen,
   ConnectLinks,
+  CoverageSunburst,
   CtaSection,
   FeatureCard,
   FeatureGrid,

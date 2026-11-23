@@ -1,0 +1,23 @@
+---
+// Codecov sunburst graph for a GitHub repo, linked to its Codecov dashboard, with a caption slot
+interface Props {
+  /** GitHub `owner/repo` slug, e.g. "hella-labs/foundryanvil-testcontainers-nodejs" */
+  repo: string;
+  /** Codecov public graph token for the repo */
+  token: string;
+  alt?: string;
+}
+
+const { repo, token, alt = "Codecov sunburst graph of test coverage by file" } = Astro.props;
+const dashboard = `https://codecov.io/gh/${repo}`;
+const src = `${dashboard}/graphs/sunburst.svg?token=${encodeURIComponent(token)}`;
+---
+
+<figure class="my-8 flex flex-col items-center gap-6 rounded-lg border border-line bg-surface-alt p-6 sm:flex-row sm:items-start">
+  <a href={dashboard} class="shrink-0 border-0" aria-label={`View ${repo} coverage on Codecov`}>
+    <img src={src} alt={alt} width="200" height="200" loading="lazy" class="size-48 rounded-none" />
+  </a>
+  <figcaption class="mt-0 text-left font-mono text-base text-fg [&>:last-child]:mb-0">
+    <slot />
+  </figcaption>
+</figure>
