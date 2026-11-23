@@ -15,7 +15,7 @@ const [latestPost] = await getPosts();
 const resolveNav = (href: string) =>
   href === latestPostHref && latestPost ? postPath(latestPost) : href;
 const linkClass =
-  "block rounded-lg px-4 py-2 font-heading text-nav leading-6 font-medium tracking-normal hover:bg-surface-alt aria-[current=page]:bg-surface-alt max-lg:px-3 max-lg:py-1.5 max-lg:leading-snug";
+  "flex items-center gap-2 rounded-lg px-4 py-2 font-heading text-nav leading-6 font-medium tracking-normal hover:bg-surface-alt aria-[current=page]:bg-surface-alt max-lg:px-3 max-lg:py-1.5 max-lg:leading-snug";
 ---
 
 <header class="sticky top-0 z-30 mb-12 border-b border-line bg-surface-glass backdrop-blur-md backdrop-saturate-180 sm:mb-15">
@@ -41,11 +41,12 @@ const linkClass =
           return (
             <li class:list={["relative", item.children && "group"]}>
               <a href={url(item.href)} class={linkClass} aria-current={active ? "page" : undefined}>
+                <Icon name={item.icon} class="size-3.5 shrink-0 opacity-70" aria-hidden="true" />
                 {item.title}
                 {item.children && (
                   <Icon
                     name="fa6-solid:chevron-down"
-                    class="ml-1 inline size-2.5 opacity-70 max-lg:hidden"
+                    class="size-2.5 opacity-70 max-lg:hidden"
                     aria-hidden="true"
                   />
                 )}
@@ -66,6 +67,11 @@ const linkClass =
                             : undefined
                         }
                       >
+                        <Icon
+                          name={child.icon}
+                          class="size-4 shrink-0 text-primary"
+                          aria-hidden="true"
+                        />
                         {child.title}
                       </a>
                     </li>
