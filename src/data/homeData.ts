@@ -1,10 +1,11 @@
-// Homepage hero + team strip (ported from the Jekyll hero/team settings)
+// Homepage hero, team strip and digital asset flywheel (ported from the Jekyll hero/team settings)
 import heroImage from "@src/assets/images/home-hero-image.jpg";
 import chris from "@src/assets/images/team/chris-anatalio.png";
 import anna from "@src/assets/images/team/anna-lopatina.jpg";
 import manilaEngineer from "@src/assets/images/team/manila-office-engineer.jpg";
 import manilaOffice from "@src/assets/images/team/manila-office.jpg";
 import logo from "@src/assets/images/brand/hella-logo-1.png";
+import flywheelImage from "@src/assets/images/new-blockchain-flywheel.jpg";
 
 export const heroData = {
   title: "Hella Labs",
@@ -60,4 +61,52 @@ export const teamStripData = {
     },
     { src: logo, alt: "Hella Labs logo" },
   ],
+};
+
+export interface FlywheelStage {
+  title: string;
+  icon: string;
+  text: string;
+}
+
+// The emerging digital asset flywheel: stages run clockwise around the wheel in the image
+export const flywheelData = {
+  title: "The Emerging Digital Asset Flywheel",
+  image: {
+    src: flywheelImage,
+    alt: "Pixel-art monitor showing a five-stage loop: RWA & Tokenization, Back-Office Rails, $33T Stablecoins, x402 AI Agents, and Yield & Liquidity, with arrows cycling back to the start",
+  },
+  stages: [
+    {
+      title: "RWA & Tokenization",
+      icon: "fa6-solid:building-columns",
+      text: "Institutions bring trillions in real-world assets (T-bills, credit, funds) on-chain as programmable collateral.",
+    },
+    {
+      title: "Back-Office Rails",
+      icon: "fa6-solid:gears",
+      text: "Custodians, clearinghouses, and corporate ERPs integrate directly with blockchains for automated, real-time settlement.",
+    },
+    {
+      title: "$33T Stablecoins",
+      icon: "fa6-solid:coins",
+      text: "Frictionless back-office plumbing scales stablecoins into the 24/7 global settlement layer for B2B and cross-border payments.",
+    },
+    {
+      title: "x402 AI Agents",
+      icon: "fa6-solid:robot",
+      text: "Autonomous agents leverage deep, instant stablecoin liquidity to pay for APIs, data, and compute per-request via HTTP 402.",
+    },
+    {
+      title: "Yield & Liquidity",
+      icon: "fa6-solid:chart-line",
+      text: "Continuous machine-to-machine transaction volume drives massive demand for stablecoin reserves.",
+    },
+    {
+      title: "Idle Float",
+      icon: "fa6-solid:vault",
+      text: "The idle float backing stablecoin volume drives demand for tokenized T-bills incentivizing institutions to tokenize even more assets.",
+    },
+  ] satisfies FlywheelStage[],
+  tagline: "Hella Labs accelerating towards the on-chain future",
 };

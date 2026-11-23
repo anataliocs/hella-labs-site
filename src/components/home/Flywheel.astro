@@ -1,0 +1,140 @@
+---
+// The emerging digital asset flywheel: the wheel illustration, its stages winding back and forth
+// underneath (1 → 2 → 3, then 4 ← 5 ← 6 on lg; one column with down arrows below lg), the loop
+// back to stage 1 (an up arrow when the last stage lands under it, otherwise a "back to stage 1"
+// cell), and a closing tagline. Defaults to the homepage copy in homeData;
+// pass props to reuse it with other stages elsewhere.
+import type { ImageMetadata } from "astro";
+import { Icon } from "astro-icon/components";
+import GradientIcon from "@src/components/GradientIcon.astro";
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import SectionHeading from "@src/components/SectionHeading.astro";
+import { flywheelData, type FlywheelStage } from "@src/data/homeData";
+
+interface Props {
+  title?: string;
+  image?: { src: ImageMetadata; alt: string };
+  stages?: FlywheelStage[];
+  tagline?: string;
+  class?: string;
+}
+
+const {
+  title = flywheelData.title,
+  image = flywheelData.image,
+  stages = flywheelData.stages,
+  tagline = flywheelData.tagline,
+  class: className,
+} = Astro.props;
+
+const COLUMNS = 3;
+type Direction = "right" | "left" | "down" | "up";
+
+// Grid cell for the i-th slot on lg: even rows run left → right, odd rows right → left
+const cell = (i: number) => {
+  const row = Math.floor(i / COLUMNS);
+  const offset = i % COLUMNS;
+  return { row: row + 1, col: row % 2 === 0 ? offset + 1 : COLUMNS - offset };
+};
+
+// Which way the arrow from slot i points on lg: along its row, or down at the row's end
+const direction = (i: number): Direction => {
+  if (i % COLUMNS === COLUMNS - 1) return "down";
+  return Math.floor(i / COLUMNS) % 2 === 0 ? "right" : "left";
+};
+
+const arrowIcon: Record<Direction, string> = {
+  right: "fa6-solid:arrow-right",
+  left: "fa6-solid:arrow-left",
+  down: "fa6-solid:arrow-down",
+  up: "fa6-solid:arrow-up",
+};
+
+// Arrow sits in the gap after its card (gap-12 = 3rem, so it's centered 1.5rem out)
+const arrowPosition: Record<Direction, string> = {
+  right:
+    "lg:top-1/2 lg:bottom-auto lg:left-auto lg:-right-6 lg:translate-x-1/2 lg:-translate-y-1/2",
+  left: "lg:top-1/2 lg:bottom-auto lg:-left-6 lg:-translate-x-1/2 lg:-translate-y-1/2",
+  down: "lg:-bottom-6 lg:left-1/2 lg:-translate-x-1/2 lg:translate-y-1/2",
+  up: "lg:-top-6 lg:bottom-auto lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2",
+};
+
+// When the last stage ends up in the first column, an up arrow closes the loop straight into the
+// column holding stage 1; otherwise a "back to stage 1" cell fills the next slot
+const last = stages.length - 1;
+const closesLoop = last >= COLUMNS && cell(last).col === 1;
+const loop = cell(stages.length);
+const arrowClass = "size-5 text-primary";
+---
+
+<section class={className}>
+  <SectionHeading title={title} />
+
+  <OptimizedImage
+    src={image.src}
+    alt={image.alt}
+    widths={[640, 960, 1318]}
+    sizes="(min-width: 1364px) 1300px, 100vw"
+    class="h-auto w-full rounded-2xl border border-line"
+  />
+
+  <ol class="mt-12 grid gap-12 lg:grid-cols-3">
+    {stages.map((stage, i) => {
+      const { row, col } = cell(i);
+      const isLast = i === last;
+      const dir = isLast && closesLoop ? "up" : direction(i);
+      return (
+        <li
+          class="relative flex flex-col rounded-2xl border border-line p-5 lg:col-start-(--col) lg:row-start-(--row)"
+          style={`--row: ${row}; --col: ${col}`}
+        >
+          <h3 class="flex items-center gap-3 text-lg">
+            <span
+              class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-gradient font-heading text-sm font-semibold text-white"
+              aria-hidden="true"
+            >
+              {i + 1}
+            </span>
+            <GradientIcon name={stage.icon} class="size-5 shrink-0" />
+            {stage.title}
+          </h3>
+          <p class="mt-3 text-fg-muted">{stage.text}</p>
+
+          <span
+            class:list={[
+              "absolute -bottom-6 left-1/2 flex -translate-x-1/2 translate-y-1/2",
+              arrowPosition[dir],
+            ]}
+            aria-hidden="true"
+          >
+            {!(isLast && closesLoop) && (
+              <Icon name={arrowIcon.down} class:list={[arrowClass, "lg:hidden"]} />
+            )}
+            <Icon name={arrowIcon[dir]} class:list={[arrowClass, "max-lg:hidden"]} />
+          </span>
+        </li>
+      );
+    })}
+
+    {!closesLoop && (
+      <li
+        class="flex items-center justify-center gap-3 rounded-2xl border border-dashed border-line p-5 text-fg-muted lg:col-start-(--col) lg:row-start-(--row)"
+        style={`--row: ${loop.row}; --col: ${loop.col}`}
+      >
+        <Icon name="fa6-solid:rotate" class="size-5 shrink-0 text-primary" aria-hidden="true" />
+        Then back to stage 1, and the cycle repeats.
+      </li>
+    )}
+  </ol>
+
+  {closesLoop && (
+    <p class="mt-4 flex items-center justify-center gap-2 text-sm text-fg-muted lg:hidden">
+      <Icon name="fa6-solid:rotate" class="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+      Then back to stage 1, and the cycle repeats.
+    </p>
+  )}
+
+  <p class="mt-12 text-center font-heading text-2xl font-semibold sm:text-[2rem]">
+    <span class="text-gradient">{tagline}</span>
+  </p>
+</section>
