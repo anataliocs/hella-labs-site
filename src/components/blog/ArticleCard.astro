@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { post, flexible = false, headingLevel: Heading = "h3", class: className } = Astro.props;
-const { title, description, image, tags, tagsColor, date } = post.data;
+const { title, description, image, tags, date } = post.data;
 const href = url(postPath(post));
 ---
 
@@ -46,9 +46,7 @@ const href = url(postPath(post));
     </a>
 
     <div class="min-w-0">
-      {tags.length > 0 && (
-        <TagList tags={tags.map((name) => ({ name, color: tagsColor }))} class="mb-3" />
-      )}
+      {tags.length > 0 && <TagList tags={tags} class="mb-3" />}
       <Heading class="mb-3 text-xl leading-relaxed font-semibold">
         <a
           href={href}

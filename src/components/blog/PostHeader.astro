@@ -12,7 +12,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, image, imageAlt, tags, tagsColor, date } = post.data;
+const { title, image, imageAlt, tags, date } = post.data;
 const { author } = siteData;
 ---
 
@@ -28,13 +28,7 @@ const { author } = siteData;
     />
   </div>
 
-  {tags.length > 0 && (
-    <TagList
-      tags={tags.map((name) => ({ name, color: tagsColor }))}
-      size="md"
-      class="mb-4 sm:mb-5"
-    />
-  )}
+  {tags.length > 0 && <TagList tags={tags} size="md" class="mb-4 sm:mb-5" />}
 
   <h1 class="mb-5 text-[2rem] sm:mb-7 sm:text-[2.5rem]">{title}</h1>
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { tagGradients } from "@src/data/tagColorsData";
 import {
   formatDate,
   getAdjacentPosts,
@@ -18,7 +19,7 @@ function post(id: string, date: string, tags: string[], extra: Partial<Post["dat
   return {
     id,
     body: "",
-    data: { date: new Date(date), tags, tagsColor: `color-${id}`, featured: false, ...extra },
+    data: { date: new Date(date), tags, featured: false, ...extra },
   } as unknown as Post;
 }
 
@@ -47,12 +48,18 @@ describe("formatting", () => {
 });
 
 describe("tags", () => {
-  it("counts tags, sorts by name and takes the color from the newest post", () => {
+  it("counts tags, sorts by name and assigns gradients in order", () => {
     expect(getTags(posts)).toEqual([
-      { name: "Solidity", slug: "solidity", count: 1, color: "color-c" },
-      { name: "Testing", slug: "testing", count: 2, color: "color-c" },
-      { name: "Web3", slug: "web3", count: 1, color: "color-a" },
+      { name: "Solidity", slug: "solidity", count: 1, gradient: tagGradients[0] },
+      { name: "Testing", slug: "testing", count: 2, gradient: tagGradients[1] },
+      { name: "Web3", slug: "web3", count: 1, gradient: tagGradients[2] },
     ]);
+  });
+
+  it("cycles through the palette when there are more tags than gradients", () => {
+    const names = Array.from({ length: tagGradients.length + 1 }, (_, i) => `Tag ${i + 10}`);
+    const tags = getTags([post("x", "2025-01-01T00:00:00Z", names)]);
+    expect(tags.at(-1)?.gradient).toBe(tagGradients[0]);
   });
 
   it("filters posts by tag slug", () => {

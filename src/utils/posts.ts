@@ -1,5 +1,6 @@
 // Blog post queries and helpers: sorting, reading time, tags, related/featured posts.
 import { getCollection, type CollectionEntry } from "astro:content";
+import { tagGradients, type TagGradient } from "@src/data/tagColorsData";
 import { tagSlug } from "@src/utils/text";
 
 export { tagSlug };
@@ -10,8 +11,8 @@ export interface Tag {
   name: string;
   slug: string;
   count: number;
-  // Pill color, taken from the first (newest) post using the tag
-  color: string;
+  // Pill gradient, assigned round-robin in alphabetical order so neighbouring topics never match
+  gradient: TagGradient;
 }
 
 // All posts, newest first
@@ -41,18 +42,20 @@ export function tagPath(tag: string): string {
   return `/tags/${tagSlug(tag)}/`;
 }
 
-// Every tag across `posts` (expects newest-first order), sorted alphabetically
+// Every tag across `posts`, sorted alphabetically, each with its pill gradient
 export function getTags(posts: Post[]): Tag[] {
-  const tags = new Map<string, Tag>();
+  const tags = new Map<string, Omit<Tag, "gradient">>();
   for (const post of posts) {
     for (const name of post.data.tags) {
       const slug = tagSlug(name);
       const tag = tags.get(slug);
       if (tag) tag.count++;
-      else tags.set(slug, { name, slug, count: 1, color: post.data.tagsColor });
+      else tags.set(slug, { name, slug, count: 1 });
     }
   }
-  return [...tags.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return [...tags.values()]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((tag, i) => ({ ...tag, gradient: tagGradients[i % tagGradients.length] }));
 }
 
 export function postsWithTag(posts: Post[], slug: string): Post[] {

@@ -40,7 +40,11 @@ const tags = getTags(posts);
   {tags.length > 0 && (
     <section>
       <SectionHeading title="Topics" size="sm" />
-      <TagList tags={tags} size="md" class="rounded-2xl border border-line p-6" />
+      <TagList
+        tags={tags.map((tag) => tag.name)}
+        size="md"
+        class="rounded-2xl border border-line p-6"
+      />
     </section>
   )}
 </aside>

@@ -3,7 +3,6 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 // Hex color like "#4643ec"
-const hexColor = z.string().regex(/^#[0-9a-f]{6}$/i, "Expected a hex color like #4643ec");
 
 // Call to action box rendered at the end of service pages
 const cta = z.object({
@@ -27,8 +26,6 @@ const blog = defineCollection({
       image: image(),
       imageAlt: z.string(),
       tags: z.array(z.string()).default([]),
-      // Background of this post's tag pills
-      tagsColor: hexColor.default("#4643ec"),
       // Listed in the sidebar "Featured posts" widget
       featured: z.boolean().default(false),
     }),
