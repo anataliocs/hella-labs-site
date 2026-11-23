@@ -1,7 +1,5 @@
 name: WebSub ping
 
-# Runs after CI finishes on main. Deploys happen outside CI (`pnpm deploy`), so this waits until
-# the live feed matches the feed built from the same commit, then notifies the WebSub hub.
 on:
   workflow_run:
     workflows: [CI]
@@ -43,6 +41,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Restore optimized image cache
+        uses: actions/cache@v6
+        with:
+          path: node_modules/.astro/assets
+          key: astro-images-${{ runner.os }}-${{ hashFiles('src/assets/images/**', 'astro.config.mjs', 'pnpm-lock.yaml') }}
+          restore-keys: astro-images-${{ runner.os }}-
 
       - name: Build
         run: pnpm build

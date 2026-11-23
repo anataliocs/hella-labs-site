@@ -1,8 +1,3 @@
-# Manual Lighthouse audit (Actions → Lighthouse → Run workflow). Builds the chosen branch, serves
-# dist/ locally and audits it, so the scores reflect that commit rather than production. HTML
-# reports are uploaded as the `lighthouse-reports-<device>` artifact, then published to GitHub
-# Pages: an index.html linking each report, plus results.json with the raw scores. Each run
-# replaces the previous Pages deployment. Requires Settings → Pages → Source: GitHub Actions.
 name: Lighthouse
 
 on:
@@ -42,6 +37,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Restore optimized image cache
+        uses: actions/cache@v6
+        with:
+          path: node_modules/.astro/assets
+          key: astro-images-${{ runner.os }}-${{ hashFiles('src/assets/images/**', 'astro.config.mjs', 'pnpm-lock.yaml') }}
+          restore-keys: astro-images-${{ runner.os }}-
 
       - name: Build
         run: pnpm build

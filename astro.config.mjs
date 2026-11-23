@@ -13,6 +13,15 @@ import devContactApi from "./src/integrations/devContactApi";
 
 const lastmodFor = createLastmodResolver();
 
+// Strips comments and extra whitespace. The Mermaid theme CSS is inlined into astro-mermaid's
+// loader script, which every page downloads, so its comments shouldn't ship.
+const minifyCss = (/** @type {string} */ css) =>
+  css
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\s*([{};:,>])\s*/g, "$1")
+    .trim();
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://www.hellalabs.dev",
@@ -20,7 +29,11 @@ export default defineConfig({
   // Every page URL ends in "/" (pages build to <route>/index.html). url() in src/utils/path.ts
   // adds the slash to internal links, so canonicals, sitemap and links all agree.
   trailingSlash: "always",
-  build: { format: "directory" },
+  // Inline the CSS into each page's <head> so first paint doesn't wait on a render-blocking
+  // stylesheet request. A "critical CSS + load the rest async" split isn't used: the dark theme
+  // (the default) hangs off a .dark class that JS adds, so extraction tools would drop those rules
+  // and the page would flash the light theme; deferring the whole sheet would flash unstyled HTML.
+  build: { format: "directory", inlineStylesheets: "always" },
 
   // Global image defaults so <Image>/<Picture> (including MDX images) share responsive breakpoints
   image: {
@@ -168,8 +181,12 @@ export default defineConfig({
       autoTheme: true,
       mermaidConfig: {
         fontFamily: "var(--font-poppins), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        themeCSS: readFileSync(new URL("./src/styles/mermaid-theme.css", import.meta.url), "utf8"),
+        themeCSS: minifyCss(
+          readFileSync(new URL("./src/styles/mermaid-theme.css", import.meta.url), "utf8"),
+        ),
       },
+      // The loader script ships on every page: keep its console logging out of production
+      enableLog: false,
     }),
     mdx(),
     // Writes sitemap-index.xml + sitemap-0.xml at build. The 404 page is excluded.

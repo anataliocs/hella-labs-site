@@ -8,6 +8,13 @@ import OptimizedImage from "@src/components/OptimizedImage.astro";
 import { heroData } from "@src/data/homeData";
 
 const { title, subtitle, description, image, pillars, primaryCta, secondaryCta, stack } = heroData;
+
+const heroImageSizes = [
+  "(min-width: 1024px) calc((min(100vw, 1364px) - 160px) / 2)",
+  "(min-width: 768px) calc(min(100vw, 840px) - 128px)",
+  "(min-width: 640px) 512px",
+  "min(calc(100vw - 88px), 392px)",
+].join(", ");
 ---
 
 <section class="mb-15 sm:mb-17.5">
@@ -18,8 +25,8 @@ const { title, subtitle, description, image, pillars, primaryCta, secondaryCta, 
           <OptimizedImage
             src={image.src}
             alt={image.alt}
-            widths={[640, 828, 1080, 1195]}
-            sizes="(min-width: 1364px) 634px, (min-width: 1024px) 46vw, 100vw"
+            widths={[480, 640, 720, 828, 960, 1080, 1195]}
+            sizes={heroImageSizes}
             class="absolute inset-0 size-full object-cover"
             priority
           />
@@ -65,7 +72,7 @@ const { title, subtitle, description, image, pillars, primaryCta, secondaryCta, 
               icon={secondaryCta.icon}
               variant="secondary"
               rel="nofollow"
-              label="Send us a direct message on Telegram"
+              label={secondaryCta.ariaLabel}
             >
               {secondaryCta.label}
             </Button>

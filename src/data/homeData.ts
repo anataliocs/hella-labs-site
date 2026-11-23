@@ -22,8 +22,12 @@ export const heroData = {
     { label: "Scale", icon: "fa6-solid:maximize" },
   ],
   primaryCta: { label: "Let's Go", href: "/contact/", icon: "fa6-solid:rocket" },
-  secondaryCta: { label: "DM", href: "https://t.me/anataliocs", icon: "fa6-brands:telegram" },
-  // Stack we work with, shown as glowing brand icons under the buttons
+  secondaryCta: {
+    label: "DM",
+    ariaLabel: "DM us on Telegram",
+    href: "https://t.me/anataliocs",
+    icon: "fa6-brands:telegram",
+  },
   stack: [
     { name: "Ethereum", icon: "fa6-brands:ethereum" },
     { name: "Node.js", icon: "fa6-brands:node-js" },
