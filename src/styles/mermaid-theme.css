@@ -1,0 +1,159 @@
+/* ---------------------------------------------------------------------------------------------
+   Brand theme for Mermaid diagrams (```mermaid blocks in MDX).
+
+   astro.config.mjs passes this file to Mermaid as `themeCSS`, so Mermaid scopes every rule to the
+   diagram's own #id and appends it after the built-in theme: these rules win over the theme
+   defaults, while per-diagram `style`, `classDef` and `linkStyle` overrides (inline styles or
+   !important) still win over these. Colors are the site's --hl-* tokens, so diagrams follow the
+   light/dark toggle without waiting for Mermaid to re-render.
+
+   Keep it to plain CSS (no nesting): Mermaid parses it with stylis.
+   --------------------------------------------------------------------------------------------- */
+
+/* Shared text */
+.label,
+.nodeLabel,
+.cluster-label,
+.label text,
+span {
+  color: var(--hl-heading);
+  fill: var(--hl-heading);
+}
+
+/* Nodes and states: tinted brand fill, primary outline */
+.node rect,
+.node circle,
+.node ellipse,
+.node polygon,
+.node path,
+.statediagram-state rect.basic,
+g.stateGroup rect,
+.actor {
+  fill: color-mix(in srgb, var(--hl-primary) 14%, var(--hl-bg));
+  stroke: var(--hl-primary);
+  stroke-width: 1.5px;
+}
+.node rect,
+.actor {
+  rx: 8px;
+  ry: 8px;
+}
+text.actor > tspan {
+  fill: var(--hl-heading);
+  font-weight: 600;
+}
+
+/* Subgraphs: quiet dashed panel with a small uppercase title */
+.cluster rect,
+.statediagram-cluster rect {
+  fill: var(--hl-bg);
+  stroke: var(--hl-border-alt);
+  stroke-width: 1px;
+  stroke-dasharray: 6 4;
+  rx: 10px;
+  ry: 10px;
+}
+/* Only .cluster-label: a bare `.cluster span` would also catch edge labels inside the subgraph */
+.cluster-label span,
+.cluster-label text {
+  color: var(--hl-text-muted);
+  fill: var(--hl-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Edges, transitions and sequence messages */
+.flowchart-link,
+.edgePaths .path,
+.transition,
+.messageLine0,
+.messageLine1 {
+  stroke: var(--hl-text-muted);
+}
+.marker,
+.arrowMarkerPath,
+.arrowheadPath,
+[id$="-barbEnd"],
+[id$="-arrowhead"] path,
+[id$="-crosshead"] path {
+  fill: var(--hl-text-muted);
+  stroke: var(--hl-text-muted);
+}
+
+/* Edge labels sit on the panel background, so lines don't run through the text */
+.edgeLabel,
+.edgeLabel p,
+.labelBkg {
+  background-color: var(--hl-bg-muted);
+  color: var(--hl-text);
+}
+.edgeLabel rect,
+.edgeLabel .label rect {
+  fill: var(--hl-bg-muted);
+  opacity: 1;
+}
+.edgeLabel .label text,
+.messageText {
+  fill: var(--hl-text);
+}
+
+/* State diagram start/end markers */
+.node circle.state-start,
+.node .fork-join {
+  fill: var(--hl-primary);
+  stroke: var(--hl-primary);
+}
+.node circle.state-end {
+  fill: var(--hl-primary);
+  stroke: var(--hl-bg);
+}
+.end-state-inner {
+  fill: var(--hl-bg);
+}
+
+/* Sequence diagrams */
+.actor-line {
+  stroke: var(--hl-border-alt);
+  stroke-dasharray: 4 4;
+}
+.note,
+rect.note[data-look],
+.state-note,
+.statediagram-note rect {
+  fill: var(--hl-callout-important);
+  stroke: var(--hl-gradient-to);
+}
+.noteText,
+.noteText > tspan,
+.statediagram-note .nodeLabel {
+  color: var(--hl-heading);
+  fill: var(--hl-heading);
+}
+.sequenceNumber {
+  fill: #fff;
+  font-weight: 700;
+}
+[id$="-sequencenumber"] {
+  fill: var(--hl-primary);
+}
+.activation0,
+.activation1,
+.activation2 {
+  fill: var(--hl-bg-alt);
+  stroke: var(--hl-primary);
+}
+.labelBox {
+  fill: var(--hl-bg-alt);
+  stroke: var(--hl-gradient-to);
+}
+.labelText,
+.labelText > tspan,
+.loopText,
+.loopText > tspan {
+  fill: var(--hl-heading);
+}
+.loopLine {
+  stroke: var(--hl-gradient-to);
+}

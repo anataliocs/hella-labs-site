@@ -2,6 +2,7 @@
 import { defineConfig, fontProviders } from "astro/config";
 import mdx from "@astrojs/mdx";
 import mermaid from "astro-mermaid";
+import { readFileSync } from "node:fs";
 import { satteri } from "@astrojs/markdown-satteri";
 import icon from "astro-icon";
 import tailwindcss from "@tailwindcss/vite";
@@ -160,7 +161,16 @@ export default defineConfig({
     }),
     // Renders ```mermaid code blocks client-side; must come before mdx(). The diagram theme follows
     // data-theme on <html> (kept in sync with the .dark class by MainLayout and ThemeToggle).
-    mermaid({ theme: "dark", autoTheme: true }),
+    // mermaid-theme.css layers the brand colors (site tokens) over it; the diagram container
+    // itself is styled in style.css.
+    mermaid({
+      theme: "dark",
+      autoTheme: true,
+      mermaidConfig: {
+        fontFamily: "var(--font-poppins), 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        themeCSS: readFileSync(new URL("./src/styles/mermaid-theme.css", import.meta.url), "utf8"),
+      },
+    }),
     mdx(),
     // Writes sitemap-index.xml + sitemap-0.xml at build. The 404 page is excluded.
     sitemap({
