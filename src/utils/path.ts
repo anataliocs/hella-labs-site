@@ -15,10 +15,10 @@ export function url(path = "/"): string {
 
 // Checks if the current pathname matches a nav link's href, including nested routes
 // e.g. href="/open-source" is active for both "/open-source/" and "/open-source/wiremock/"
-export function isActivePath(pathname: string, href: string): boolean {
+export function isActivePath(pathname: string, href: string, exact = false): boolean {
   const target = url(href).replace(/\/+$/, "") || "/";
   const current = pathname.replace(/\/+$/, "") || "/";
-  if (target === "/") return current === "/";
+  if (exact || target === "/") return current === target;
   return current === target || current.startsWith(`${target}/`);
 }
 

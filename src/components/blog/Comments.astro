@@ -15,7 +15,8 @@ const { enabled, shortname, title, buttonText } = siteData.disqus;
 
 {enabled && (
   <section
-    class="my-10 border-y border-line py-10 text-center sm:my-12 sm:py-12"
+    id="comments"
+    class="my-10 scroll-mt-28 border-y border-line py-10 text-center sm:my-12 sm:py-12"
     data-comments
     data-shortname={shortname}
     data-url={pageUrl}

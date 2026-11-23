@@ -1,8 +1,13 @@
 // Main navigation (header dropdowns + footer link columns)
 
+// Placeholder href for "the newest post", resolved by the header (see Header.astro)
+export const latestPostHref = "/blog/latest/";
+
 export interface NavItem {
   title: string;
   href: string;
+  // Only active on this exact path, not its sub-pages (e.g. "All posts" vs /blog/series/)
+  exact?: boolean;
   children?: NavItem[];
 }
 
@@ -29,7 +34,17 @@ export const mainNav: NavItem[] = [
   },
   { title: "Team", href: "/team/" },
   { title: "Contact", href: "/contact/" },
-  { title: "Blog", href: "/blog/" },
+  {
+    title: "Blog",
+    href: "/blog/",
+    children: [
+      { title: "All Posts", href: "/blog/", exact: true },
+      // The header swaps this for the newest post's own URL at build time, so clicking it is a
+      // normal page load; /blog/latest/ stays as a redirect for shared links.
+      { title: "Latest Post", href: latestPostHref },
+      { title: "Series", href: "/blog/series/" },
+    ],
+  },
 ];
 
 // Header call-to-action (rocket button)

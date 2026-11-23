@@ -31,6 +31,11 @@ describe("isActivePath", () => {
     expect(isActivePath("/", "/")).toBe(true);
     expect(isActivePath("/team/", "/")).toBe(false);
   });
+
+  it("ignores nested routes when exact", () => {
+    expect(isActivePath("/blog/", "/blog/", true)).toBe(true);
+    expect(isActivePath("/blog/series/", "/blog/", true)).toBe(false);
+  });
 });
 
 describe("isExternal / resolveHref", () => {

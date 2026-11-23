@@ -1,6 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { seriesIds } from "@src/data/seriesData";
 import { techKeys } from "@src/data/techStackData";
 
 // Hex color like "#4643ec"
@@ -29,8 +30,8 @@ const blog = defineCollection({
       tags: z.array(z.string()).default([]),
       // Language/technology tiles shown under the byline (keys from src/data/techStackData.ts)
       techStack: z.array(z.enum(techKeys)).default([]),
-      // Multi-part series: posts sharing a `name` are linked in order of `part` (SeriesNav)
-      series: z.object({ name: z.string(), part: z.number().int().positive() }).optional(),
+      // Multi-part series (ids and names in src/data/seriesData.ts), linked in order of `part`
+      series: z.object({ id: z.enum(seriesIds), part: z.number().int().positive() }).optional(),
       // Listed in the sidebar "Featured posts" widget
       featured: z.boolean().default(false),
     }),

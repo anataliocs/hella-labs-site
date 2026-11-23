@@ -1,5 +1,6 @@
 // Blog post queries and helpers: sorting, reading time, tags, related/featured posts.
 import { getCollection, type CollectionEntry } from "astro:content";
+import { blogSeries, type BlogSeries, type SeriesId } from "@src/data/seriesData";
 import { tagGradients, type TagGradient } from "@src/data/tagColorsData";
 import { tagSlug } from "@src/utils/text";
 
@@ -62,13 +63,32 @@ export function postsWithTag(posts: Post[], slug: string): Post[] {
   return posts.filter((post) => post.data.tags.some((t) => tagSlug(t) === slug));
 }
 
+export interface Series extends BlogSeries {
+  id: SeriesId;
+  // Every part, in part order
+  posts: Post[];
+}
+
+function byPart(a: Post, b: Post): number {
+  return (a.data.series?.part ?? 0) - (b.data.series?.part ?? 0);
+}
+
 // Every part of the series `post` belongs to, in part order (empty when it isn't in one)
 export function getSeriesPosts(post: Post, posts: Post[]): Post[] {
-  const name = post.data.series?.name;
-  if (!name) return [];
-  return posts
-    .filter((p) => p.data.series?.name === name)
-    .sort((a, b) => (a.data.series?.part ?? 0) - (b.data.series?.part ?? 0));
+  const id = post.data.series?.id;
+  if (!id) return [];
+  return posts.filter((p) => p.data.series?.id === id).sort(byPart);
+}
+
+// Every series with at least one post, the one updated most recently first. `posts` must be
+// newest first (getPosts()), so the first post seen for a series is its latest part.
+export function getAllSeries(posts: Post[]): Series[] {
+  const ids = [...new Set(posts.flatMap((p) => (p.data.series ? [p.data.series.id] : [])))];
+  return ids.map((id) => ({
+    id,
+    ...blogSeries[id],
+    posts: posts.filter((p) => p.data.series?.id === id).sort(byPart),
+  }));
 }
 
 // Posts sharing at least one tag with `post`, most shared tags first

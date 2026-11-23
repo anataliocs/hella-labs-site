@@ -2,6 +2,7 @@
 // "Part N of M" box linking every post in a multi-part series (frontmatter `series`), shown
 // between the post header and the article body. Renders nothing for posts outside a series.
 import { Icon } from "astro-icon/components";
+import { blogSeries } from "@src/data/seriesData";
 import { url } from "@src/utils/path";
 import { postPath, type Post } from "@src/utils/posts";
 
@@ -13,18 +14,26 @@ interface Props {
 
 const { post, parts } = Astro.props;
 const series = post.data.series;
+const name = series && blogSeries[series.id].name;
 ---
 
 {series && parts.length > 1 && (
   <nav
     class="mb-8 rounded-2xl border border-line bg-surface-muted p-5 sm:p-6"
-    aria-label={`${series.name} series`}
+    aria-label={`${name} series`}
   >
     <p class="mb-1 flex items-center gap-2 font-heading text-xs font-semibold tracking-wide text-primary uppercase">
       <Icon name="fa6-solid:list" aria-hidden="true" />
       Series · Part {series.part} of {parts.length}
     </p>
-    <p class="mb-4 font-heading text-lg font-semibold text-heading">{series.name}</p>
+    <p class="mb-4 font-heading text-lg font-semibold">
+      <a
+        href={url(`/blog/series/#${series.id}`)}
+        class="text-heading underline-offset-2 hover:underline"
+      >
+        {name}
+      </a>
+    </p>
     <ol class="space-y-2">
       {parts.map((part) => {
         const current = part.id === post.id;

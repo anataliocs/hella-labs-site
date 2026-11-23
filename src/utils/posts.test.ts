@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { blogSeries, type SeriesId } from "@src/data/seriesData";
 import { tagGradients } from "@src/data/tagColorsData";
 import {
   formatDate,
   getAdjacentPosts,
+  getAllSeries,
   getFeaturedPosts,
   getRelatedPosts,
   getSeriesPosts,
@@ -83,15 +85,30 @@ describe("post lists", () => {
     expect(older?.id).toBe("a");
   });
 
-  it("lists a post's series in part order, and nothing outside a series", () => {
-    const series = (part: number) => ({ series: { name: "Streams", part } });
+  describe("series", () => {
+    const realTime: SeriesId = "real-time-onchain-data-nestjs";
+    const other = "other" as SeriesId;
+    // Newest first, like getPosts()
     const parts = [
-      post("p2", "2025-09-02T00:00:00Z", [], series(2)),
-      post("other", "2025-09-03T00:00:00Z", [], { series: { name: "Other", part: 1 } }),
-      post("p1", "2025-09-01T00:00:00Z", [], series(1)),
+      post("other-1", "2025-09-04T00:00:00Z", [], { series: { id: other, part: 1 } }),
+      post("p2", "2025-09-02T00:00:00Z", [], { series: { id: realTime, part: 2 } }),
+      post("p1", "2025-09-01T00:00:00Z", [], { series: { id: realTime, part: 1 } }),
+      post("solo", "2025-08-01T00:00:00Z", []),
     ];
-    expect(getSeriesPosts(parts[0], parts).map((p) => p.id)).toEqual(["p1", "p2"]);
-    expect(getSeriesPosts(posts[0], posts)).toEqual([]);
+
+    it("lists a post's series in part order, and nothing outside a series", () => {
+      expect(getSeriesPosts(parts[1], parts).map((p) => p.id)).toEqual(["p1", "p2"]);
+      expect(getSeriesPosts(parts[3], parts)).toEqual([]);
+    });
+
+    it("groups every series, most recently updated first, with its data", () => {
+      const all = getAllSeries(parts);
+      expect(all.map((s) => [s.id, s.posts.map((p) => p.id)])).toEqual([
+        [other, ["other-1"]],
+        [realTime, ["p1", "p2"]],
+      ]);
+      expect(all[1].name).toBe(blogSeries[realTime].name);
+    });
   });
 
   it("groups posts by year and month", () => {

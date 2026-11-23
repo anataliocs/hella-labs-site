@@ -5,10 +5,15 @@ import { Icon } from "astro-icon/components";
 import Logo from "@src/components/header/Logo.astro";
 import ThemeToggle from "@src/components/header/ThemeToggle.astro";
 import Button from "@src/components/Button.astro";
-import { mainNav, navCta } from "@src/data/navigationData";
+import { latestPostHref, mainNav, navCta } from "@src/data/navigationData";
 import { isActivePath, url } from "@src/utils/path";
+import { getPosts, postPath } from "@src/utils/posts";
 
 const pathname = Astro.url.pathname;
+// Link "Latest Post" straight to the newest article instead of through the /blog/latest/ redirect
+const [latestPost] = await getPosts();
+const resolveNav = (href: string) =>
+  href === latestPostHref && latestPost ? postPath(latestPost) : href;
 const linkClass =
   "block rounded-lg px-4 py-2 font-heading text-nav leading-6 font-medium tracking-normal hover:bg-surface-alt aria-[current=page]:bg-surface-alt max-lg:px-3 max-lg:py-1.5 max-lg:leading-snug";
 ---
@@ -53,9 +58,13 @@ const linkClass =
                   {item.children.map((child) => (
                     <li class="mb-1 last:mb-0">
                       <a
-                        href={url(child.href)}
+                        href={url(resolveNav(child.href))}
                         class={linkClass}
-                        aria-current={isActivePath(pathname, child.href) ? "page" : undefined}
+                        aria-current={
+                          isActivePath(pathname, resolveNav(child.href), child.exact)
+                            ? "page"
+                            : undefined
+                        }
                       >
                         {child.title}
                       </a>

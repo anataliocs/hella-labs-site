@@ -164,7 +164,12 @@ export default defineConfig({
     sitemap({
       filter: (page) => {
         const { pathname } = new URL(page);
-        return !pathname.startsWith("/404") && pathname !== "/contact/thanks/";
+        return (
+          !pathname.startsWith("/404") &&
+          pathname !== "/contact/thanks/" &&
+          // Redirect to the newest post, not a page of its own
+          pathname !== "/blog/latest/"
+        );
       },
       serialize: (item) => ({ ...item, lastmod: lastmodFor(item.url)?.toISOString() }),
     }),
@@ -172,7 +177,7 @@ export default defineConfig({
       name: "Hella Labs",
       description:
         "Hella Labs provides Web3-native fractional engineering, DevRel and consulting for Fintech, Blockchain and Web3 startups, and maintains open-source Ethereum test automation tools such as Foundry Anvil Testcontainers and WireMock Testcontainers for Node.js.",
-      exclude: ["/404", "/contact/thanks"],
+      exclude: ["/404", "/contact/thanks", "/blog/latest"],
       titleSelector: "title",
       contentSelector: "main",
       excludeSelectors: ["form"],

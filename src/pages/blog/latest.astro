@@ -1,0 +1,67 @@
+---
+// Stable "/blog/latest/" link for sharing: sends the reader straight to the newest post, so the
+// target updates on every deploy. (The header nav links to the post directly and skips this.) Hand-written instead of Astro.redirect(), whose static output
+// waits 2 seconds before redirecting. Kept out of the sitemap and llms.txt (astro.config.mjs).
+import { getPosts, postPath } from "@src/utils/posts";
+import { absoluteUrl } from "@src/utils/seo";
+import { url } from "@src/utils/path";
+
+const [latest] = await getPosts();
+const path = latest ? postPath(latest) : "/blog/";
+const href = url(path);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0;url=${href}`} />
+    <link rel="canonical" href={absoluteUrl(path)} />
+    <title>Latest post | Hella Labs</title>
+    <!-- Site background (dark by default, light if chosen) so the redirect never flashes white;
+         the fallback link only fades in if the redirect is slow -->
+    <style is:inline>
+      html {
+        color-scheme: dark;
+        background: #0f172a;
+        color: #94a3b8;
+        font:
+          14px/1.5 system-ui,
+          sans-serif;
+      }
+      html.light {
+        color-scheme: light;
+        background: #fff;
+        color: #475569;
+      }
+      p {
+        margin: 40vh 0 0;
+        text-align: center;
+        opacity: 0;
+        animation: show 0.2s 1s forwards;
+      }
+      a {
+        color: inherit;
+      }
+      @keyframes show {
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
+    <script is:inline>
+      try {
+        if (localStorage.getItem("theme") === "light") document.documentElement.className = "light";
+      } catch {
+        // Storage blocked: keep the dark default
+      }
+    </script>
+  </head>
+  <body>
+    <p>
+      Redirecting to the <a href={href}>latest post</a>…
+    </p>
+  </body>
+</html>
