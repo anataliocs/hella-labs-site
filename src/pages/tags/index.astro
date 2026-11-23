@@ -28,7 +28,10 @@ const tags = getTags(await getPosts());
             class="flex items-center justify-between rounded-xl border border-line bg-surface-muted px-5 py-4 font-heading font-semibold hover:border-primary"
           >
             <span class="flex items-center gap-3">
-              <span class="size-3 rounded-full bg-(--tag)" style={`--tag: ${tag.color}`} />
+              <span
+                class="size-3 rounded-full bg-linear-135 from-(--tag-from) to-(--tag-to)"
+                style={`--tag-from: ${tag.gradient.from}; --tag-to: ${tag.gradient.to}`}
+              />
               {tag.name}
             </span>
             <span class="text-sm font-medium text-fg-muted">

@@ -1,32 +1,38 @@
 ---
-// Colored tag pills linking to /tags/<tag>/. Color comes from the post's `tagsColor`.
+// Gradient tag pills linking to /tags/<tag>/. Colors come from the tag's gradient in getTags(), so
+// a topic looks the same on every card, post header, the sidebar and the Topics page.
+import { tagGradients } from "@src/data/tagColorsData";
 import { url } from "@src/utils/path";
-import { tagPath } from "@src/utils/posts";
+import { getPosts, getTags, tagPath, tagSlug } from "@src/utils/posts";
 
 interface Props {
-  tags: { name: string; color: string }[];
+  tags: string[];
   size?: "sm" | "md";
   class?: string;
 }
 
 const { tags, size = "sm", class: className } = Astro.props;
+const gradients = new Map(getTags(await getPosts()).map((tag) => [tag.slug, tag.gradient]));
 ---
 
 <ul class:list={["flex flex-wrap items-center gap-2", className]}>
-  {tags.map((tag) => (
-    <li>
-      <a
-        href={url(tagPath(tag.name))}
-        class:list={[
-          "block rounded bg-(--tag) font-heading leading-tight text-white hover:text-white hover:opacity-90",
-          size === "sm"
-            ? "px-2 py-1 text-xs font-medium"
-            : "rounded-lg px-3 py-2 text-sm font-semibold",
-        ]}
-        style={`--tag: ${tag.color}`}
-      >
-        {tag.name}
-      </a>
-    </li>
-  ))}
+  {tags.map((name) => {
+    const { from, to } = gradients.get(tagSlug(name)) ?? tagGradients[0];
+    return (
+      <li>
+        <a
+          href={url(tagPath(name))}
+          class:list={[
+            "block rounded bg-linear-135 from-(--tag-from) to-(--tag-to) font-heading leading-tight text-white transition-[transform,box-shadow] hover:-translate-y-0.5 hover:text-white hover:shadow-[0_4px_14px_-4px_var(--tag-from)]",
+            size === "sm"
+              ? "px-2 py-1 text-xs font-medium"
+              : "rounded-lg px-3 py-2 text-sm font-semibold",
+          ]}
+          style={`--tag-from: ${from}; --tag-to: ${to}`}
+        >
+          {name}
+        </a>
+      </li>
+    );
+  })}
 </ul>

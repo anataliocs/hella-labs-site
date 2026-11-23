@@ -101,8 +101,7 @@
      (#60b0ba with white text is only 2.5:1). */
   --color-secondary: #60b0ba;
   --color-secondary-strong: #367a82;
-  /* Default tag pill color and the indigo → violet gradient used by article CTA banners */
-  --color-tag: #4643ec;
+  /* Indigo → violet gradient used by article CTA banners */
   --color-violet-from: #667eea;
   --color-violet-to: #764ba2;
   --color-success: #10b981;
