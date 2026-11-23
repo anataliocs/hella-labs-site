@@ -29,6 +29,8 @@ const blog = defineCollection({
       tags: z.array(z.string()).default([]),
       // Language/technology tiles shown under the byline (keys from src/data/techStackData.ts)
       techStack: z.array(z.enum(techKeys)).default([]),
+      // Multi-part series: posts sharing a `name` are linked in order of `part` (SeriesNav)
+      series: z.object({ name: z.string(), part: z.number().int().positive() }).optional(),
       // Listed in the sidebar "Featured posts" widget
       featured: z.boolean().default(false),
     }),

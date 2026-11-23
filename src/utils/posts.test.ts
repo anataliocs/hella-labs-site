@@ -5,6 +5,7 @@ import {
   getAdjacentPosts,
   getFeaturedPosts,
   getRelatedPosts,
+  getSeriesPosts,
   getTags,
   groupByYearAndMonth,
   postPath,
@@ -80,6 +81,17 @@ describe("post lists", () => {
     const { newer, older } = getAdjacentPosts(posts[1], posts);
     expect(newer?.id).toBe("c");
     expect(older?.id).toBe("a");
+  });
+
+  it("lists a post's series in part order, and nothing outside a series", () => {
+    const series = (part: number) => ({ series: { name: "Streams", part } });
+    const parts = [
+      post("p2", "2025-09-02T00:00:00Z", [], series(2)),
+      post("other", "2025-09-03T00:00:00Z", [], { series: { name: "Other", part: 1 } }),
+      post("p1", "2025-09-01T00:00:00Z", [], series(1)),
+    ];
+    expect(getSeriesPosts(parts[0], parts).map((p) => p.id)).toEqual(["p1", "p2"]);
+    expect(getSeriesPosts(posts[0], posts)).toEqual([]);
   });
 
   it("groups posts by year and month", () => {

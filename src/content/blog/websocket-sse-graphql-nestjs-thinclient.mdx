@@ -7,6 +7,9 @@ imageAlt: "Illustrated developer coding on a laptop beside a window overlooking 
 tags: ["Nestjs", "Ethereum", "EthersJS", "RxJS", "WebSockets"]
 techStack: ["typescript", "nestjs", "rxjs", "ethers", "ethereum", "graphql", "websockets"]
 featured: true
+series:
+  name: "Real-Time Ethereum Data with Nest.js"
+  part: 1
 ---
 
 ## On-Chain Ethereum Data via WebSockets with Ethers.js, RxJS and Nest.js
@@ -27,6 +30,10 @@ exposing [Websockets](https://docs.nestjs.com/websockets/gateways), [REST API](h
 [Server Sent Events](https://docs.nestjs.com/techniques/server-sent-events)
 and [GraphQL](https://docs.nestjs.com/graphql/quick-start)
 for multiple chains such as Ethereum, Solana and Bitcoin in a single service.
+
+This is **Part 1** of a series. Here we stream blocks over WebSockets;
+[Part 2](/sse-graphql-ethereum-nestjs-thinclient/) re-uses the same service layer to expose
+Server-Sent Events and a GraphQL API.
 
 The approach detailed here is modular and re-usable, and we will be re-using the same components in future articles to
 demonstrate
@@ -679,6 +686,13 @@ While there is no one right answer for every application, we hope you learned so
 
 The modular, reactive approach demonstrated here provides a clear example of a unique way of writing dApps that can
 scale efficiently with a snappy, responsive UX.
+
+<Callout type="tip">
+
+**Next in the series:** [Part 2: On-Chain Ethereum Data via Server-Sent Events and GraphQL](/sse-graphql-ethereum-nestjs-thinclient/)
+re-uses the exact same `EthersService` to add an SSE stream and a GraphQL API, with no new SDK code.
+
+</Callout>
 
 _Thanks again for reading and be sure to post your comments below!_
 

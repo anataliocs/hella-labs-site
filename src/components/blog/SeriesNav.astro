@@ -1,0 +1,58 @@
+---
+// "Part N of M" box linking every post in a multi-part series (frontmatter `series`), shown
+// between the post header and the article body. Renders nothing for posts outside a series.
+import { Icon } from "astro-icon/components";
+import { url } from "@src/utils/path";
+import { postPath, type Post } from "@src/utils/posts";
+
+interface Props {
+  post: Post;
+  // Every part of the series in order, from getSeriesPosts()
+  parts: Post[];
+}
+
+const { post, parts } = Astro.props;
+const series = post.data.series;
+---
+
+{series && parts.length > 1 && (
+  <nav
+    class="mb-8 rounded-2xl border border-line bg-surface-muted p-5 sm:p-6"
+    aria-label={`${series.name} series`}
+  >
+    <p class="mb-1 flex items-center gap-2 font-heading text-xs font-semibold tracking-wide text-primary uppercase">
+      <Icon name="fa6-solid:list" aria-hidden="true" />
+      Series · Part {series.part} of {parts.length}
+    </p>
+    <p class="mb-4 font-heading text-lg font-semibold text-heading">{series.name}</p>
+    <ol class="space-y-2">
+      {parts.map((part) => {
+        const current = part.id === post.id;
+        return (
+          <li class="flex gap-3">
+            <span
+              class:list={[
+                "flex size-6 shrink-0 items-center justify-center rounded-full font-heading text-xs font-semibold",
+                current
+                  ? "bg-linear-135 from-gradient-from to-gradient-to text-white"
+                  : "border border-line text-fg-muted",
+              ]}
+              aria-hidden="true"
+            >
+              {part.data.series?.part}
+            </span>
+            {current ? (
+              <span class="font-medium text-heading" aria-current="page">
+                {part.data.title} <span class="text-fg-muted">(you are here)</span>
+              </span>
+            ) : (
+              <a href={url(postPath(part))} class="text-heading underline-offset-2 hover:underline">
+                {part.data.title}
+              </a>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </nav>
+)}

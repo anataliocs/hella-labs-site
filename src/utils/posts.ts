@@ -62,6 +62,15 @@ export function postsWithTag(posts: Post[], slug: string): Post[] {
   return posts.filter((post) => post.data.tags.some((t) => tagSlug(t) === slug));
 }
 
+// Every part of the series `post` belongs to, in part order (empty when it isn't in one)
+export function getSeriesPosts(post: Post, posts: Post[]): Post[] {
+  const name = post.data.series?.name;
+  if (!name) return [];
+  return posts
+    .filter((p) => p.data.series?.name === name)
+    .sort((a, b) => (a.data.series?.part ?? 0) - (b.data.series?.part ?? 0));
+}
+
 // Posts sharing at least one tag with `post`, most shared tags first
 export function getRelatedPosts(post: Post, posts: Post[], max = 3): Post[] {
   const own = new Set(post.data.tags.map(tagSlug));

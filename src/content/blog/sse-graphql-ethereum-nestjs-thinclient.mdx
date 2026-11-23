@@ -1,0 +1,762 @@
+---
+title: "On-Chain Ethereum Data via Server-Sent Events and GraphQL with Ethers.js, RxJS and Nest.js"
+description: "Re-use one Nest.js service layer to stream finalized Ethereum blocks over Server-Sent Events and serve block queries over GraphQL, with ultra-thin vanilla JS clients and RxJS Observables."
+date: 2026-11-23T10:00:00+03:00
+image: ../../assets/images/blog/coding-sunset.jpeg
+imageAlt: "Illustrated developer coding on a laptop beside a window overlooking a city at sunset"
+tags: ["Nestjs", "Ethereum", "EthersJS", "RxJS", "Server-Sent Events", "GraphQL"]
+techStack: ["typescript", "nestjs", "rxjs", "ethers", "ethereum", "graphql", "anvil", "docker"]
+featured: true
+series:
+  name: "Real-Time Ethereum Data with Nest.js"
+  part: 2
+---
+
+## On-Chain Ethereum Data via Server-Sent Events and GraphQL
+
+In [Part 1](/websocket-sse-graphql-nestjs-thinclient/) we built a [Nest.js](https://nestjs.com/) backend that wraps
+[Ethers.js](https://docs.ethers.org/) in a reusable module and streams finalized Ethereum blocks to an ultra-thin
+browser client over [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API).
+
+This time we keep **every line of that SDK and service code** and put two new front doors on it:
+
+- **[Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)**:
+  a one-way, plain-HTTP stream of finalized blocks, consumed in the browser with the built-in `EventSource`
+- **[GraphQL](https://graphql.org/)**: a typed query API that lets the client ask for exactly the block fields it needs
+
+Both are a single small Nest.js class each. That's the payoff of the layered design from Part 1: the transport is
+a thin adapter, and the business logic lives in one place.
+
+<Callout type="note">
+
+New to the series? Part 1 walks through the **EthersSdk** module, its configuration and the **EthersService** in
+detail. This article only recaps the pieces SSE and GraphQL touch, so it's worth a skim first.
+
+</Callout>
+
+### Why Server-Sent Events
+
+WebSockets are a two-way channel. Most dApp dashboards don't need that: the server pushes new blocks, prices or
+events, and the client just listens. SSE is built for exactly this one-way flow:
+
+- **Plain HTTP**: a long-lived `GET` with `Content-Type: text/event-stream`. Proxies, load balancers, auth headers
+  and CORS all behave the way they do for any other request.
+- **Built into the browser**: `EventSource` needs no library and no handshake protocol.
+- **Automatic reconnection**: the browser reconnects on its own if the connection drops, and can send the last
+  event `id` it saw so the server can resume.
+- **Subscribing is connecting**: there's no subscribe message to send; each endpoint _is_ a topic.
+
+<Callout type="warning">
+
+Over HTTP/1.1, browsers allow only **6 open connections per domain**, and every `EventSource` holds one open. Serve
+your API over HTTP/2 (which multiplexes streams over one connection) or keep the number of concurrent streams per
+page small.
+
+</Callout>
+
+### Why GraphQL
+
+Streams are great for "tell me when something changes". For "give me this specific block", a query API is a
+better fit. GraphQL adds a few things over a plain REST endpoint:
+
+- **Clients pick their fields**: a mobile widget can ask for just `hash`, a dashboard for everything.
+- **One endpoint, one typed schema**: every query and type is discoverable and validated before it reaches your code.
+- **Code-first with Nest.js**: decorate TypeScript classes and Nest generates the schema for you.
+
+---
+
+## Recap: One Service Layer, Many Transports
+
+You can follow along with the [GitHub Repo](https://github.com/anataliocs/nestjs-typeorm-full-example).
+
+<Callout type="tip">
+
+Open this repo in a [GitHub Codespace Devcontainer](https://codespaces.new/anataliocs/nestjs-typeorm-full-example) to
+follow along!
+
+</Callout>
+
+From Part 1, the `EthersSdkService` holds the Ethers.js `JsonRpcProvider`, and the `EthersService` turns raw SDK
+results into small DTOs. The **same** `_getFinalizedBlocksJson()` function feeds the WebSocket gateway, the REST
+controller and, in this article, the SSE controller.
+
+**ethers.service.ts excerpt**
+
+```typescript
+@Injectable()
+export class EthersService {
+  constructor(private readonly ethersSdkService: EthersSdkService) {}
+
+  readonly _getFinalizedBlocksJson: () => Promise<FinalizedBlock> =
+    async (): Promise<FinalizedBlock> => {
+      const blockOrNull = await this.ethersSdkService.getFinalizedBlock();
+      if (blockOrNull === null) {
+        return {} as FinalizedBlock;
+      }
+
+      return {
+        blockNumber: blockOrNull.number,
+        date: blockOrNull.date ?? "",
+        hash: blockOrNull.hash ?? "",
+      } as FinalizedBlock;
+    };
+
+  // ...
+}
+```
+
+Each transport only differs in the **envelope** the data is wrapped in:
+
+| Transport  | Nest.js entry point         | Envelope                    | Client            |
+| ---------- | --------------------------- | --------------------------- | ----------------- |
+| WebSockets | `@WebSocketGateway` gateway | `WsResponse<T>`             | `WebSocket`       |
+| SSE        | `@Sse()` controller method  | `MessageEvent<T>`           | `EventSource`     |
+| GraphQL    | `@Resolver` with `@Query`   | GraphQL `@ObjectType` model | `fetch` + a query |
+
+---
+
+## Server-Sent Events with Nest.js
+
+**Full example:**
+[ethers.sse.controller.ts](https://github.com/anataliocs/nestjs-typeorm-full-example/blob/main/src/ethers/ethers.sse.controller.ts)
+
+### Message Utilities buildMessageEvent Function
+
+Where Part 1 used `buildWsResponse()`, SSE uses its sibling `buildMessageEvent()`. It awaits the passed-in SDK
+wrapper and wraps the result in a [Nest.js `MessageEvent`](https://docs.nestjs.com/techniques/server-sent-events),
+whose fields map to the `data:`, `id:` and `retry:` lines of the SSE wire format.
+
+**message-utils.ts excerpt**
+
+```typescript
+export async function buildMessageEvent<DataType>(
+  n: number,
+  sdkFunction: () => Promise<DataType>,
+): Promise<MessageEvent<DataType>> {
+  return {
+    type: "message",
+    id: n,
+    data: await sdkFunction(),
+    retry: 0,
+  } as unknown as MessageEvent<DataType>;
+}
+```
+
+The `id` is the tick count from the RxJS interval, so every event gets an increasing id.
+
+### Ethers Service subscribeToFinalizedBlocksForSse Function
+
+The service exposes a factory for the SSE controller, mirroring `finalizedBlocksStreamForWebsocket()` from Part 1.
+It returns a function that takes the interval tick `n` and converts the `Promise<MessageEvent<FinalizedBlock>>`
+into an **Observable** with `from()`.
+
+**ethers.service.ts excerpt**
+
+```typescript
+export class EthersService {
+  // ...
+  subscribeToFinalizedBlocksForSse(): (n: number) => Observable<MessageEvent<FinalizedBlock>> {
+    return (n: number): Observable<MessageEvent<FinalizedBlock>> =>
+      from(buildMessageEvent<FinalizedBlock>(n, this._getFinalizedBlocksJson));
+  }
+
+  // ...
+}
+```
+
+### SSE Controller
+
+The controller is where SSE gets interesting, mostly because there's so little of it. A method decorated with
+`@Sse()` returns an `Observable<MessageEvent>`, and Nest.js does the rest: it sets the `text/event-stream` headers,
+keeps the connection open and writes each emitted value as an SSE event.
+
+**ethers.sse.controller.ts**
+
+```typescript
+@Controller("/ethers/sse")
+class EthersSseController {
+  constructor(private readonly ethersService: EthersService) {}
+
+  @Sse("/block-number")
+  newBlocks(): Observable<MessageEvent<BlockNumber>> {
+    return interval(5000)
+      .pipe(mergeMap(this.ethersService.subscribeToNewBlocksForSse()))
+      .pipe(distinct(({ data }) => data.blockNumber));
+  }
+
+  @Sse("/finalized-blocks")
+  finalizedBlocks(): Observable<MessageEvent<FinalizedBlock>> {
+    return interval(5000)
+      .pipe(mergeMap(this.ethersService.subscribeToFinalizedBlocksForSse()))
+      .pipe(distinct(({ data }) => data.blockNumber));
+  }
+}
+```
+
+The pipeline is the same one the WebSocket gateway uses:
+
+- `interval(5000)` ticks every 5 seconds
+- `mergeMap()` calls the service on each tick and flattens the resulting Observable into the stream
+- `distinct()` drops events whose block number has already been sent, so the client only sees new blocks
+
+Compare this with Part 1's gateway: there's no `@SubscribeMessage`, no topic `switch` and no DTO validation.
+**Each URL is a topic**, and connecting to it is the subscription.
+
+<Callout type="important">
+
+**Two production notes for long-lived streams:**
+
+- `distinct()` remembers **every** key it has ever seen, so a stream left open for days keeps a growing set of block
+  numbers in memory. Block numbers only go up, so `distinctUntilChanged((a, b) => a.data.blockNumber === b.data.blockNumber)`
+  gives the same result in constant memory.
+- Each connected client gets its **own** interval and its own RPC calls. With many clients, build the stream once
+  and `share()` it so every subscriber reads from a single poll of your RPC provider.
+
+</Callout>
+
+### Try It with cURL
+
+Because SSE is plain HTTP, you don't need a client to test it. `-N` turns off cURL's buffering so events print
+as they arrive.
+
+**sse-curl.sh excerpt**
+
+```bash
+curl -s -N -H "Accept: text/event-stream" "http://127.0.0.1:3000/ethers/sse/finalized-blocks/"
+```
+
+Each event arrives as `id:` and `data:` lines followed by a blank line, with `data` holding the JSON-serialized
+`FinalizedBlock`.
+
+---
+
+## SSE Front-end Client
+
+As in Part 1, the thin client is a single `.html` file plus a small `.js` file, styled with
+[Pico CSS](https://picocss.com/) and no build step.
+
+### SSE Front-end Client - HTML
+
+**finalized-blocks.html excerpt**
+
+```html
+<div>
+  <article>
+    <strong>Emitted Events - Finalized Blocks</strong>
+    <p>
+      <ins id="connection-status"></ins>
+    </p>
+    <progress id="progress-bar"></progress>
+    <article id="messages"></article>
+  </article>
+  <button id="close-connection-button">Close Stream</button>
+</div>
+```
+
+Notice what's missing compared to the WebSocket page: there's no **Subscribe** button. The stream starts as soon as
+the page opens the `EventSource`.
+
+### SSE Front-end Client - Javascript
+
+**Full example:**
+[sseFinalizedBlock.js](https://github.com/anataliocs/nestjs-typeorm-full-example/blob/main/client/src/sse/ethers/js/sseFinalizedBlock.js)
+
+An `SSEConnect` object is created with the SSE endpoint and the same `createLinkEth` Etherscan link builder used by
+the WebSocket client. A click listener on `#close-connection-button` closes the stream.
+
+**sseFinalizedBlock.js**
+
+```javascript
+const eventSource = new SSEConnect(
+  "http://127.0.0.1:3000/ethers/sse/finalized-blocks/",
+  createLinkEth,
+);
+
+// Close SSE connection
+document.querySelector("#close-connection-button").addEventListener("click", () => {
+  console.log("Closing SSE connection...");
+  eventSource.closeEventSource();
+});
+```
+
+### Front-end Client - SSEConnect Class
+
+**Full example:**
+[sseConnect.js](https://github.com/anataliocs/nestjs-typeorm-full-example/blob/main/client/src/sse/common/sseConnect.js)
+
+**SSEConnect** is the SSE counterpart of Part 1's **WsConnect**. Its constructor opens the stream with the standard
+[EventSource API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource).
+
+**sseConnect.js excerpt**
+
+```javascript
+export class SSEConnect {
+  constructor(url, linkFunction) {
+    this.eventSource = new EventSource(url, {
+      withCredentials: false,
+    });
+    this.linkFunction = linkFunction;
+    this.setEventHandlers();
+  }
+
+  // ...
+}
+```
+
+`setEventHandlers()` renders each event the same way `WsConnect` does: the raw JSON plus an Etherscan link.
+One difference: an SSE event's `data` **is** the payload, so there's no `.data` envelope to unwrap as there was
+with `WsResponse`.
+
+**sseConnect.js excerpt**
+
+```javascript
+export class SSEConnect {
+  // ...
+  setEventHandlers() {
+    this.eventSource.onmessage = (msg) => {
+      const data = JSON.parse(msg.data);
+      const message = document.createElement("div");
+      message.appendChild(document.createTextNode(msg.data));
+      message.appendChild(document.createElement("br"));
+      const link = this.linkFunction(data);
+      message.appendChild(link);
+      message.appendChild(document.createElement("hr"));
+      document.querySelector("#messages").appendChild(message);
+    };
+
+    this.eventSource.onopen = () => {
+      if (this.eventSource.readyState === 1) {
+        document
+          .querySelector("#connection-status")
+          .appendChild(document.createTextNode("Connected!"));
+      }
+    };
+
+    // ...
+  }
+
+  // ...
+}
+```
+
+`closeEventSource()` resets the UI and closes the stream. Once closed, the browser will **not** reconnect.
+
+**sseConnect.js excerpt**
+
+```javascript
+export class SSEConnect {
+  // ...
+  closeEventSource() {
+    document.querySelector("#connection-status").innerHTML = "";
+    document.querySelector("#progress-bar").value = 0;
+    this.eventSource.close();
+  }
+}
+```
+
+---
+
+## GraphQL with Nest.js
+
+**Full example:**
+[ethers-graphql.resolver.ts](https://github.com/anataliocs/nestjs-typeorm-full-example/blob/main/src/ethers/ethers-graphql.resolver.ts)
+
+### GraphQL Module Configuration
+
+Nest.js supports [code-first GraphQL](https://docs.nestjs.com/graphql/quick-start#code-first) with the Apollo
+driver. `autoSchemaFile` generates the GraphQL schema from your decorated TypeScript classes on startup, and
+`playground: true` serves an interactive query editor at `/graphql` during development.
+
+**app.module.ts excerpt**
+
+```typescript
+GraphQLModule.forRoot<ApolloDriverConfig>({
+  driver: ApolloDriver,
+  // 'autoSchemaFile' generates the schema file automatically
+  autoSchemaFile: "src/schema.gql",
+  // 'playground: true' enables the GraphiQL interface for testing (useful in development)
+  playground: true,
+  definitions: {
+    path: join(process.cwd(), "src/graphql.ts"),
+  },
+});
+```
+
+### Block GraphQL Model
+
+**Full example:**
+[block.ts](https://github.com/anataliocs/nestjs-typeorm-full-example/blob/main/src/ethers/models/block.ts)
+
+The `Block` class is decorated with `@ObjectType()`, and each `@Field()` becomes a field in the generated schema.
+`blockNumber` is exposed as a GraphQL `ID`.
+
+**models/block.ts**
+
+```typescript
+@ObjectType({ description: "EVM Block" })
+export class Block {
+  @Field((type) => ID)
+  blockNumber?: number;
+
+  @Field()
+  creationDate: Date;
+
+  @Field()
+  hash?: string;
+
+  @Field()
+  nonce?: string;
+
+  @Field()
+  transactionCount?: number;
+}
+```
+
+### Ethers Service getBlockByNumberForGraphQL Function
+
+The service gets one more SDK wrapper, this time calling `getBlock(blockNumber)` from Part 1's `EthersSdkService`
+and mapping the Ethers.js `Block` onto the GraphQL model. `getBlockByNumberForGraphQL()` wraps it in an
+**Observable**, just like every other transport.
+
+**ethers.service.ts excerpt**
+
+```typescript
+export class EthersService {
+  // ...
+  readonly _getBlockByNumberGraphQL = async (blockNumber: number) => {
+    const blockOrNull = await this.ethersSdkService.getBlock(blockNumber);
+    return blockOrNull === null
+      ? ({} as Block)
+      : ({
+          creationDate: blockOrNull.date ?? "",
+          blockNumber: blockOrNull.number,
+          hash: blockOrNull.hash ?? "",
+          transactionCount: blockOrNull.length ?? 0,
+          nonce: blockOrNull.nonce ?? "",
+        } as Block);
+  };
+
+  getBlockByNumberForGraphQL(blockNumber: number): Observable<Block> {
+    return from(this._getBlockByNumberGraphQL(blockNumber));
+  }
+
+  // ...
+}
+```
+
+In Ethers.js v6, a `Block`'s `length` is the number of transactions it contains, which is what feeds
+`transactionCount`.
+
+### GraphQL Resolver
+
+The resolver is the GraphQL equivalent of a controller. `@Resolver()` ties it to the `Block` type, and `@Query()`
+exposes `getBlockByNumber` as a root query whose `blockNumber` argument comes from `@Args()`.
+
+**ethers-graphql.resolver.ts**
+
+```typescript
+@Resolver((of) => Block)
+export class EthersGraphqlResolver {
+  constructor(private readonly ethersService: EthersService) {}
+
+  @Query((returns) => Block)
+  getBlockByNumber(@Args("blockNumber") blockNumber: number): Observable<Block> {
+    return this.ethersService.getBlockByNumberForGraphQL(blockNumber);
+  }
+}
+```
+
+Nest.js resolvers can return an **Observable**: Nest waits for it to complete and sends its last value as the
+result. `from(promise)` emits once and completes, so the service layer stays reactive end to end, even for a single
+request/response query.
+
+<Callout type="note">
+
+The TypeScript `number` on `blockNumber` becomes a GraphQL `Float!` argument in the generated schema, which is why
+the client query below declares `$blockNumber: Float!`. Use `@Args("blockNumber", { type: () => Int })` if you'd
+rather expose an `Int`.
+
+</Callout>
+
+### Try It with cURL
+
+GraphQL is a `POST` of a JSON body with a `query` string. Ask for only the fields you need:
+
+**graphql-curl.sh excerpt**
+
+```bash
+curl 'http://127.0.0.1:3000/graphql' \
+  -H 'Content-Type: application/json' \
+  --data-binary '{"query":"{ getBlockByNumber(blockNumber: 24068107) { blockNumber hash transactionCount } }"}'
+```
+
+Or open `http://127.0.0.1:3000/graphql` in a browser and explore the schema in the playground.
+
+---
+
+## GraphQL Front-end Client
+
+### GraphQL Front-end Client - HTML
+
+**Full example:**
+[graphql-block-query.html](https://github.com/anataliocs/nestjs-typeorm-full-example/blob/main/client/src/graphql/ethers/graphql-block-query.html)
+
+The page has a block number input, a button to run the query, and the familiar `#messages` area for results.
+
+**graphql-block-query.html excerpt**
+
+```html
+<div>
+  <article>
+    <strong>GraphQL Query - Get Block by Number</strong>
+    <p>
+      <label for="blockNumber">Block Number:</label>
+      <input type="number" id="blockNumber" name="blockNumber" value="21500000" min="0" />
+    </p>
+    <article id="messages"></article>
+  </article>
+  <button id="get-block-by-number-button" title="Query block by number">Query Block</button>
+</div>
+```
+
+### GraphQL Front-end Client - Javascript
+
+**Full example:**
+[getBlockByNumber.js](https://github.com/anataliocs/nestjs-typeorm-full-example/blob/main/client/src/graphql/ethers/js/getBlockByNumber.js)
+
+`getBlockByNumber()` reads and validates the input, then sends a named query with a `$blockNumber` variable. Passing
+the value as a **variable** instead of pasting it into the query string keeps the query static, cacheable and safe
+from injection.
+
+**getBlockByNumber.js excerpt**
+
+```javascript
+export async function getBlockByNumber() {
+  const blockNumber = parseInt(document.getElementById("blockNumber").value);
+
+  if (!blockNumber || blockNumber < 0) {
+    alert("Please enter a valid block number");
+    return;
+  }
+
+  const query = `
+        query GetBlockByNumber($blockNumber: Float!) {
+          getBlockByNumber(blockNumber: $blockNumber) {
+            blockNumber
+            creationDate
+            hash
+            nonce
+            transactionCount
+          }
+        }
+      `;
+
+  try {
+    const response = await graphQLRequest(query, blockNumber);
+
+    if (response.errors) {
+      displayGraphQLErrors(response.errors);
+      return;
+    }
+
+    const block = response.data.getBlockByNumber;
+    displayResults(block, createLinkEth(block));
+  } catch (error) {
+    displayGraphQLErrors(error.message);
+  }
+}
+```
+
+GraphQL reports most problems (an unknown field, a bad argument type) in an `errors` array on a normal
+`200` response rather than with an HTTP error status, so the client checks `response.errors` before reading `data`.
+
+### Front-end Client - graphQLRequest Function
+
+**Full example:**
+[graphqlClient.js](https://github.com/anataliocs/nestjs-typeorm-full-example/blob/main/client/src/graphql/common/graphqlClient.js)
+
+No GraphQL client library needed: a GraphQL request is a `fetch()` that POSTs the query and its variables as JSON.
+
+**graphqlClient.js excerpt**
+
+```javascript
+export async function graphQLRequest(query, blockNumber) {
+  const res = await fetch("http://127.0.0.1:3000/graphql", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: query,
+      variables: { blockNumber: blockNumber },
+    }),
+  });
+
+  return res.json();
+}
+```
+
+---
+
+## WebSockets vs. SSE vs. GraphQL: Which One When?
+
+All three now sit on the same `EthersService`, so you can offer every one of them and let each client pick:
+
+| Need                                                        | Best fit                                |
+| ----------------------------------------------------------- | --------------------------------------- |
+| Server pushes updates; client only listens                  | **SSE**                                 |
+| Client and server both send messages, or change topics live | **WebSockets**                          |
+| Client asks for specific data, picking the fields it needs  | **GraphQL** queries                     |
+| Typed, field-selected data **and** live updates             | GraphQL subscriptions (over WebSockets) |
+| Strict proxies or firewalls that block WebSocket upgrades   | **SSE** (it's just HTTP)                |
+
+---
+
+## E2E Test Automation with Foundry Anvil Testcontainers
+
+Both new endpoints read from an Ethereum node, so the most useful tests run them against a real one.
+[Foundry Anvil Testcontainers](/open-source/foundry-anvil-testcontainers/) starts a disposable
+[Anvil](https://getfoundry.sh/anvil/overview) node in Docker for each test file, so the tests are fast,
+deterministic and need no RPC provider or API key.
+
+Here we mine a few blocks on a fresh chain, then check that the GraphQL query returns the same block Anvil reports
+and that the SSE stream emits the current block number.
+
+**ethers.e2e-spec.ts (example)**
+
+```typescript
+import {
+  AnvilContainer,
+  AnvilOptions,
+  type StartedAnvilContainer,
+} from "@hellaweb3/foundryanvil-testcontainers-nodejs";
+import { ApolloDriver, type ApolloDriverConfig } from "@nestjs/apollo";
+import type { INestApplication } from "@nestjs/common";
+import { GraphQLModule } from "@nestjs/graphql";
+import { Test } from "@nestjs/testing";
+import { firstValueFrom } from "rxjs";
+import request from "supertest";
+
+describe("Ethers SSE + GraphQL E2E", () => {
+  let anvil: StartedAnvilContainer;
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    anvil = await new AnvilContainer(new AnvilOptions().logs.quiet()).start();
+    await anvil.mine(5); // blocks 1..5 on a fresh chain
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [
+        EthersSdkModule.registerAsync({
+          useFactory: () => ({ network: "anvil", rpcServerUrl: anvil.rpcUrl, apiKey: "" }),
+        }),
+        GraphQLModule.forRoot<ApolloDriverConfig>({ driver: ApolloDriver, autoSchemaFile: true }),
+      ],
+      controllers: [EthersSseController],
+      providers: [EthersService, EthersGraphqlResolver],
+    }).compile();
+
+    app = moduleRef.createNestApplication();
+    await app.init();
+  }, 120_000);
+
+  afterAll(async () => {
+    await app?.close();
+    await anvil?.stop();
+  });
+
+  it("queries a block by number over GraphQL", async () => {
+    const expected = await anvil.testClient.getBlock({ blockNumber: 3n });
+
+    const res = await request(app.getHttpServer())
+      .post("/graphql")
+      .send({ query: "{ getBlockByNumber(blockNumber: 3) { blockNumber hash } }" });
+
+    expect(res.body.errors).toBeUndefined();
+    expect(res.body.data.getBlockByNumber).toEqual({ blockNumber: "3", hash: expected.hash });
+  });
+
+  it("emits the latest block number over SSE", async () => {
+    const sse = app.get(EthersSseController);
+
+    // The first event arrives on the first 5 s interval tick
+    const event = await firstValueFrom(sse.newBlocks());
+
+    expect(event.data.blockNumber).toBe(5);
+  }, 15_000);
+});
+```
+
+<Callout type="tip">
+
+`EthersSdkService` builds the RPC URL as `rpcServerUrl + apiKey`, so pass `apiKey: ""` for a local node. Leaving it
+out would append the string `undefined` to Anvil's URL.
+
+</Callout>
+
+A few things worth noticing:
+
+- **GraphQL `ID`s are strings on the wire**, so `blockNumber` comes back as `"3"`, not `3`.
+- The SSE test subscribes to the controller's **Observable** directly. That tests the RxJS pipeline without parsing
+  the `text/event-stream` format; cover the HTTP layer separately with a cURL smoke test if you need to.
+- Anvil can also **fast-forward time, reorg the chain or fork mainnet**, which is how you'd test the
+  `distinct()` de-duplication or how your stream behaves during a reorg.
+
+See [End-to-End Invariant Testing for Solidity](/e2e-invariant-testing-solidity-anvil-wiremock/) for a deeper dive,
+and [On-Chain Chaos Engineering](/on-chain-chaos-engineering-ethereum-wiremock-anvil/) to inject RPC outages into
+exactly this kind of streaming backend.
+
+---
+
+## Conclusion
+
+Thanks for reading!
+
+We took the Ethers.js module and service from [Part 1](/websocket-sse-graphql-nestjs-thinclient/) and, without
+touching them, exposed the same on-chain data two new ways: an SSE stream for push updates and a GraphQL API for
+typed, field-selected queries. Each transport was one small Nest.js class plus an ultra-thin vanilla JS client.
+
+### Some Key Takeaways to Consider
+
+**Benefits:**
+
+- **Reuse**: `_getFinalizedBlocksJson()` now powers REST, WebSockets and SSE, and the GraphQL wrapper sits right
+  beside it in the same service
+- **SSE Simplicity**: plain HTTP, a built-in browser client, automatic reconnection, and no subscribe protocol
+- **GraphQL Precision**: clients request exactly the fields they need from a typed, self-documenting schema
+- **Thin Clients**: no framework or client library on the front end, just `EventSource` and `fetch()`
+
+**Concepts:**
+
+- **Transport as an Adapter**: the controller, gateway or resolver only chooses the envelope; the service owns the
+  logic
+- **Reactive End to End**: Nest.js accepts Observables from SSE controllers, gateways and resolvers alike
+- **Long-lived Streams Need Care**: bound memory with `distinctUntilChanged()` and `share()` a single upstream poll
+  across clients
+
+Next in the series, we'll re-use the same pattern for [Solana](https://www.solanakit.com/) and
+[Bitcoin](https://github.com/bitcoinjs/bitcoinjs-lib), whose modules already live alongside the Ethers.js module in
+the [example repo](https://github.com/anataliocs/nestjs-typeorm-full-example).
+
+_Thanks again for reading and be sure to post your comments below!_
+
+---
+
+<CtaSection
+  variant="banner"
+  as="h2"
+  title="Need Real-Time On-Chain Data in Your dApp?"
+  button={{ label: "Talk to Hella Labs", href: "/contact/" }}
+  link={{ label: "Explore All Service Offerings →", href: "/web3-consultant-service-offerings/" }}
+>
+  <p>
+    Whether you're streaming blocks to a trading dashboard, indexing contract events, or serving
+    typed on-chain data to web, mobile and analytics clients,{" "}
+    <strong>the right transport and a well-tested backend</strong> make the difference between a
+    snappy dApp and a sluggish one.
+  </p>
+  <p>
+    We design and build Nest.js and Web3 backends, real-time APIs and the E2E test automation that
+    keeps them reliable when your RPC provider isn't.
+  </p>
+</CtaSection>
