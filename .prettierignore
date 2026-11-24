@@ -7,3 +7,4 @@ pnpm-lock.yaml
 worker-configuration.d.ts
 # Lighthouse exports, kept exactly as generated
 src/assets/reports/
+exports/
