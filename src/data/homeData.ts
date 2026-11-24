@@ -4,7 +4,7 @@ import chris from "@src/assets/images/team/chris-anatalio.png";
 import anna from "@src/assets/images/team/anna-lopatina.jpg";
 import manilaEngineer from "@src/assets/images/team/manila-office-engineer.jpg";
 import manilaOffice from "@src/assets/images/team/manila-office.jpg";
-import logo from "@src/assets/images/brand/hella-logo-1.png";
+import logo from "@src/assets/images/brand/hella-logo-1.jpg";
 import flywheelImage from "@src/assets/images/new-blockchain-flywheel.jpg";
 
 export const heroData = {

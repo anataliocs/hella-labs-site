@@ -1,7 +1,7 @@
 // Site-wide settings (ported from the Jekyll _config.yml + _data/settings.yml)
 import defaultImage from "@src/assets/images/hella-bg-1.jpg";
 import authorAvatar from "@src/assets/images/team/chris-anatalio.png";
-import logoLight from "@src/assets/images/brand/hella-logo-4.png";
+import logoLight from "@src/assets/images/brand/hella-logo-4.jpg";
 import logoDark from "@src/assets/images/brand/hella-logo-3.jpg";
 
 export const siteData = {
