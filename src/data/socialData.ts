@@ -8,7 +8,7 @@ export interface SocialLink {
 }
 
 const profiles: SocialLink[] = [
-  { name: "X (Twitter)", href: "http://twitter.hellalabs.dev/", icon: "fa6-brands:x-twitter" },
+  { name: "X (Twitter)", href: "https://x.com/Hella_Web3", icon: "fa6-brands:x-twitter" },
   { name: "GitHub", href: "https://github.com/hella-labs", icon: "fa6-brands:github" },
   {
     name: "LinkedIn",

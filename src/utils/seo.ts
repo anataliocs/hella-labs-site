@@ -1,6 +1,6 @@
 // SEO helpers: absolute URLs, title/description builders and JSON-LD.
 import { siteData } from "@src/data/siteData";
-import { socialLinks } from "@src/data/socialData";
+import { footerSocialLinks, telegramLink } from "@src/data/socialData";
 import { url } from "@src/utils/path";
 
 type JsonLd = Record<string, unknown>;
@@ -24,7 +24,10 @@ export function withBrand(title: string): string {
 
 const organizationId = `${absoluteUrl("/")}#organization`;
 const websiteId = `${absoluteUrl("/")}#website`;
-const sameAs = socialLinks.map((s) => s.href).filter((href) => href.startsWith("http"));
+// Every external profile linked in the footer, plus Telegram (the RSS feed is on-site, so it's skipped)
+const sameAs = [...footerSocialLinks, telegramLink]
+  .map((s) => s.href)
+  .filter((href) => href.startsWith("http"));
 
 // Organization + WebSite, output on every page so other nodes can reference them by @id
 export function siteJsonLd(logoUrl: string): JsonLd {
