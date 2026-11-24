@@ -1,0 +1,54 @@
+---
+// Videos: talks and demos embedded from the Hella Labs YouTube channel
+import MainLayout from "@src/layouts/MainLayout.astro";
+import PageShell from "@src/components/PageShell.astro";
+import PageHeader from "@src/components/page/PageHeader.astro";
+import YouTube from "@src/components/content/YouTube.astro";
+import { videos, youtubeChannelUrl } from "@src/data/videoData";
+import image from "@src/assets/images/videos-page-hero.jpg";
+import { webPageJsonLd, withBrand } from "@src/utils/seo";
+
+const title = "Videos";
+const description =
+  "Watch Hella Labs talks and demos on Web3 testing, chaos engineering, Foundry Anvil and Testcontainers, straight from our YouTube channel.";
+const imageAlt =
+  'Pixel-art desk at sunset with a monitor playing the Hella Labs video "On-Chain Chaos Engineering"';
+---
+
+<MainLayout
+  title={withBrand(title)}
+  description={description}
+  image={image}
+  imageAlt={imageAlt}
+  jsonLd={webPageJsonLd({ title, description, path: "/videos/" })}
+>
+  <PageShell>
+    <article>
+      <PageHeader
+        title={title}
+        image={image}
+        imageAlt={imageAlt}
+        icon="fa6-brands:youtube"
+        imageFirst
+      />
+
+      <p class="mb-12 text-lg">
+        Talks, walkthroughs and demos from the team. Subscribe on{" "}
+        <a href={youtubeChannelUrl} class="text-primary underline underline-offset-2">
+          YouTube
+        </a>{" "}
+        to catch new uploads.
+      </p>
+
+      {videos.map((video) => (
+        <section class="mt-14 first:mt-0" aria-labelledby={`video-${video.id}`}>
+          <h2 id={`video-${video.id}`} class="mb-2 text-2xl sm:text-3xl">
+            {video.title}
+          </h2>
+          <p class="mb-6 text-fg-muted">{video.description}</p>
+          <YouTube id={video.id} title={video.title} />
+        </section>
+      ))}
+    </article>
+  </PageShell>
+</MainLayout>

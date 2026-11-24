@@ -2,6 +2,7 @@
 // Header for long-form pages.
 //  default – cover image (4:3) above a left-aligned title
 //  icon    – centered glowing icon, title and gradient rule above a full-width image
+//            (or below it, with `imageFirst`)
 import type { ImageMetadata } from "astro";
 import { Icon } from "astro-icon/components";
 import GradientIcon from "@src/components/GradientIcon.astro";
@@ -14,15 +15,27 @@ interface Props {
   icon?: string;
   /** Render the title with the pure-CSS Blueprint text effect (`.fx-blueprint`) */
   blueprint?: boolean;
+  /** Icon style only: show the image above the icon and title instead of below */
+  imageFirst?: boolean;
 }
 
-const { title, image, imageAlt, icon, blueprint = false } = Astro.props;
+const { title, image, imageAlt, icon, blueprint = false, imageFirst = false } = Astro.props;
 const sizes = "(min-width: 1364px) 860px, (min-width: 1024px) 63vw, 100vw";
 const widths = [640, 828, 1080, 1280];
 ---
 
 {icon ? (
   <header class="mt-4 mb-8 text-center sm:mt-12">
+    {imageFirst && (
+      <OptimizedImage
+        src={image}
+        alt={imageAlt}
+        widths={widths}
+        sizes={sizes}
+        class="mb-10 w-full rounded-lg shadow-md"
+        priority
+      />
+    )}
     {blueprint ? (
       <GradientIcon
         name={icon}
@@ -47,14 +60,16 @@ const widths = [640, 828, 1080, 1280];
       class="mx-auto my-6 h-0.75 w-25 bg-linear-to-r from-transparent via-violet-from to-transparent"
       aria-hidden="true"
     />
-    <OptimizedImage
-      src={image}
-      alt={imageAlt}
-      widths={widths}
-      sizes={sizes}
-      class="mt-8 w-full rounded-lg shadow-md"
-      priority
-    />
+    {!imageFirst && (
+      <OptimizedImage
+        src={image}
+        alt={imageAlt}
+        widths={widths}
+        sizes={sizes}
+        class="mt-8 w-full rounded-lg shadow-md"
+        priority
+      />
+    )}
   </header>
 ) : (
   <header class="mb-7">

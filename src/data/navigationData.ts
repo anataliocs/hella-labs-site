@@ -80,6 +80,7 @@ export const mainNav: NavItem[] = [
       { title: "Series", href: "/blog/series/", icon: "fa6-solid:book-open" },
     ],
   },
+  { title: "Videos", href: "/videos/", icon: "fa6-brands:youtube" },
   {
     title: "About",
     href: "/team/",

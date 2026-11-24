@@ -13,6 +13,7 @@ import HighlightBox from "@src/components/content/HighlightBox.astro";
 import IconDivider from "@src/components/content/IconDivider.astro";
 import LighthouseCta from "@src/components/content/LighthouseCta.astro";
 import LinkBanner from "@src/components/content/LinkBanner.astro";
+import YouTube from "@src/components/content/YouTube.astro";
 import ProjectCards from "@src/components/projects/ProjectCards.astro";
 
 export const mdxComponents = {
@@ -31,4 +32,5 @@ export const mdxComponents = {
   LighthouseCta,
   LinkBanner,
   ProjectCards,
+  YouTube,
 };

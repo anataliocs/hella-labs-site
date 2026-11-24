@@ -1,0 +1,29 @@
+---
+// Responsive, lazy-loaded YouTube embed (privacy-enhanced youtube-nocookie.com player)
+interface Props {
+  // YouTube video id, e.g. "O24v0wPksuk"
+  id: string;
+  title: string;
+  // Optional caption shown under the player
+  caption?: string;
+  class?: string;
+}
+
+const { id, title, caption, class: className } = Astro.props;
+const embedUrl = `https://www.youtube-nocookie.com/embed/${id}`;
+---
+
+<figure class:list={["mb-8", className]}>
+  <iframe
+    src={embedUrl}
+    title={title}
+    width="560"
+    height="315"
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+    class="aspect-video h-auto w-full rounded-2xl border-2 border-line"
+  ></iframe>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
