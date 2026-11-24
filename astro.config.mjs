@@ -175,6 +175,7 @@ export default defineConfig({
           "jest",
           "nestjs",
           "reactivex",
+          "solana",
           "solidity",
           "substack",
           "tailwindcss",

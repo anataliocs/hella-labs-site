@@ -66,6 +66,13 @@ export const techStack = {
     from: "#2f44c4",
     to: "#0f1a63",
   },
+  solana: {
+    name: "Solana",
+    blurb: "High-throughput blockchain with ~400 ms slots and parallel execution",
+    icon: "simple-icons:solana",
+    from: "#7b2fe0",
+    to: "#0f6e52",
+  },
   foundry: {
     name: "Foundry",
     blurb: "Fast Solidity toolkit for building, testing and deploying",

@@ -2,7 +2,7 @@
 title: "On-Chain Ethereum Data via Server-Sent Events and GraphQL with Ethers.js, RxJS and Nest.js"
 description: "Re-use one Nest.js service layer to stream finalized Ethereum blocks over Server-Sent Events and serve block queries over GraphQL, with ultra-thin vanilla JS clients and RxJS Observables."
 date: 2026-11-23T10:00:00+03:00
-image: ../../assets/images/blog/coding-sunset.jpeg
+image: ../../assets/images/blog/onchain-data-2.jpg
 imageAlt: "Illustrated developer coding on a laptop beside a window overlooking a city at sunset"
 tags: ["Nestjs", "Ethereum", "EthersJS", "RxJS", "Server-Sent Events", "GraphQL"]
 techStack: ["typescript", "nestjs", "rxjs", "ethers", "ethereum", "graphql", "anvil", "docker"]
@@ -734,9 +734,10 @@ typed, field-selected queries. Each transport was one small Nest.js class plus a
 - **Long-lived Streams Need Care**: bound memory with `distinctUntilChanged()` and `share()` a single upstream poll
   across clients
 
-Next in the series, we'll re-use the same pattern for [Solana](https://www.solanakit.com/) and
-[Bitcoin](https://github.com/bitcoinjs/bitcoinjs-lib), whose modules already live alongside the Ethers.js module in
-the [example repo](https://github.com/anataliocs/nestjs-typeorm-full-example).
+Next in the series, [Part 3: On-Chain Solana Data via WebSockets](/websocket-solana-kit-rxjs-nestjs-thinclient/)
+re-uses the same pattern for [Solana](https://www.solanakit.com/), and
+[Bitcoin](https://github.com/bitcoinjs/bitcoinjs-lib) will follow; both modules already live alongside the Ethers.js
+module in the [example repo](https://github.com/anataliocs/nestjs-typeorm-full-example).
 
 <Callout type="tip">
 
