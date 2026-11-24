@@ -32,6 +32,8 @@ export const siteData = {
   locale: "en_US",
   themeColor: "#ae00ee",
   twitterHandle: "@Hella_Web3",
+  // Bing Webmaster Tools site ownership verification (msvalidate.01)
+  bingSiteVerification: "8B55AC4C2FDC3E8C669FB64694F8FE1D",
 
   logo: { light: logoLight, dark: logoDark, alt: "Hella Labs" },
   // 1200×630 fallback for og:image when a page has no image of its own

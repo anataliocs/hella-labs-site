@@ -68,6 +68,7 @@ const structuredData = [
     <meta name="keywords" content={keywords.join(", ")} />
     <meta name="robots" content={noindex ? "noindex, follow" : "index, follow"} />
     <meta name="theme-color" content={siteData.themeColor} />
+    <meta name="msvalidate.01" content={siteData.bingSiteVerification} />
     {!noindex && <link rel="canonical" href={canonicalURL} />}
     <link rel="icon" type="image/png" href={url("/favicon.png")} />
     <link rel="icon" href={url("/favicon.ico")} sizes="any" />
