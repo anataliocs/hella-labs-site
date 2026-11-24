@@ -1,9 +1,10 @@
 ---
-// Homepage: hero, digital asset flywheel, team strip, the first page of the blog feed and a CTA
+// Homepage: hero, digital asset flywheel, team strip, the first page of the blog feed, featured videos and a CTA
 import MainLayout from "@src/layouts/MainLayout.astro";
 import Hero from "@src/components/home/Hero.astro";
 import TeamStrip from "@src/components/home/TeamStrip.astro";
 import Flywheel from "@src/components/home/Flywheel.astro";
+import FeaturedVideos from "@src/components/home/FeaturedVideos.astro";
 import PageShell from "@src/components/PageShell.astro";
 import Container from "@src/components/Container.astro";
 import PostFeed from "@src/components/blog/PostFeed.astro";
@@ -36,6 +37,7 @@ const hasMore = posts.length > pageSize;
       posts={posts.slice(0, pageSize)}
       nextUrl={hasMore ? "/page/2/" : undefined}
     />
+    <FeaturedVideos />
     <CtaSection
       title={homeCtaData.title}
       button={homeCtaData.button}

@@ -1,0 +1,38 @@
+---
+// Latest videos from videoData with a link to the full /videos/ page (homepage, under the CTA)
+import SectionHeading from "@src/components/SectionHeading.astro";
+import YouTube from "@src/components/content/YouTube.astro";
+import { videos } from "@src/data/videoData";
+import { url } from "@src/utils/path";
+
+interface Props {
+  title?: string;
+  // How many of the newest videos to show
+  limit?: number;
+}
+
+const { title = "Featured videos", limit = 2 } = Astro.props;
+const featured = videos.slice(0, limit);
+---
+
+{featured.length > 0 && (
+  <section class="mt-12" aria-label={title}>
+    <SectionHeading title={title} size="md">
+      <a
+        href={url("/videos/")}
+        class="bg-surface pl-4 text-sm font-semibold text-primary underline-offset-2 hover:underline"
+      >
+        All videos
+      </a>
+    </SectionHeading>
+    <div class:list={["grid gap-8", featured.length > 1 && "md:grid-cols-2"]}>
+      {featured.map((video) => (
+        <article>
+          <YouTube id={video.id} title={video.title} class="mb-4" />
+          <h3 class="mb-2 text-lg font-semibold">{video.title}</h3>
+          <p class="text-fg-muted">{video.description}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+)}
