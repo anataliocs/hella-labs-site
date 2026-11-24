@@ -88,7 +88,7 @@ export const flywheelData = {
       text: "Custodians, clearinghouses, and corporate ERPs integrate directly with blockchains for automated, real-time settlement.",
     },
     {
-      title: "$33T Stablecoins",
+      title: "Stablecoin Volume",
       icon: "fa6-solid:coins",
       text: "Frictionless back-office plumbing scales stablecoins into the 24/7 global settlement layer for B2B and cross-border payments.",
     },

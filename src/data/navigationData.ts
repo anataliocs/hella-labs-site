@@ -68,8 +68,6 @@ export const mainNav: NavItem[] = [
       },
     ],
   },
-  { title: "Team", href: "/team/", icon: "fa6-solid:people-group" },
-  { title: "Contact", href: "/contact/", icon: "fa6-solid:envelope" },
   {
     title: "Blog",
     href: "/blog/",
@@ -82,6 +80,18 @@ export const mainNav: NavItem[] = [
       { title: "Series", href: "/blog/series/", icon: "fa6-solid:book-open" },
     ],
   },
+  {
+    title: "About",
+    href: "/team/",
+    icon: "fa6-solid:circle-info",
+    children: [
+      { title: "Team", href: "/team/", icon: "fa6-solid:people-group" },
+      { title: "Brand Kit", href: "/brand-kit/", icon: "fa6-solid:palette" },
+      { title: "Careers", href: "/careers/", icon: "fa6-solid:user-tie" },
+    ],
+  },
+  // Kept last so it sits at the far right of the header nav
+  { title: "Contact", href: "/contact/", icon: "fa6-solid:envelope" },
 ];
 
 // Header call-to-action (rocket button)

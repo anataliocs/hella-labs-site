@@ -37,7 +37,10 @@ const linkClass =
     >
       <ul class="flex items-center gap-3 max-lg:flex-col max-lg:items-stretch max-lg:gap-1">
         {mainNav.map((item) => {
-          const active = isActivePath(pathname, item.href);
+          // Parents are also active on any child page (e.g. About on /brand-kit/)
+          const active =
+            isActivePath(pathname, item.href) ||
+            !!item.children?.some((child) => isActivePath(pathname, child.href, child.exact));
           return (
             <li class:list={["relative", item.children && "group"]}>
               <a href={url(item.href)} class={linkClass} aria-current={active ? "page" : undefined}>

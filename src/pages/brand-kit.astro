@@ -1,0 +1,144 @@
+---
+// Brand kit: logos and social covers to download, plus the color palette and typefaces
+import { Icon } from "astro-icon/components";
+import MainLayout from "@src/layouts/MainLayout.astro";
+import PageShell from "@src/components/PageShell.astro";
+import PageHeader from "@src/components/page/PageHeader.astro";
+import OptimizedImage from "@src/components/OptimizedImage.astro";
+import { brandColors, brandCovers, brandFonts, brandLogos } from "@src/data/brandData";
+import { siteData } from "@src/data/siteData";
+import { url } from "@src/utils/path";
+import { webPageJsonLd, withBrand } from "@src/utils/seo";
+
+const title = "Brand Kit";
+const description =
+  "Download the official Hella Labs logos and social media covers, and find our brand colors and typefaces for press, partner and event use.";
+const { src: image, alt: imageAlt } = siteData.defaultImage;
+
+const sectionClass = "mt-14 first:mt-0";
+const headingClass = "mb-2 text-2xl sm:text-3xl";
+const introClass = "mb-6 text-fg-muted";
+const cardClass = "flex flex-col overflow-hidden rounded-xl border border-line bg-surface-muted";
+const downloadClass =
+  "mt-auto inline-flex items-center gap-2 self-start font-heading text-sm font-semibold text-primary underline decoration-transparent underline-offset-2 hover:decoration-current";
+---
+
+<MainLayout
+  title={withBrand(title)}
+  description={description}
+  image={image}
+  imageAlt={imageAlt}
+  jsonLd={webPageJsonLd({ title, description, path: "/brand-kit/" })}
+>
+  <PageShell>
+    <article>
+      <PageHeader title={title} image={image} imageAlt={imageAlt} icon="fa6-solid:palette" />
+
+      <p class="mb-12 text-lg">
+        Writing about us, co-hosting an event or listing us as a partner? Use these assets as they
+        are: please don't recolor, stretch or rearrange the logo. For anything else,{" "}
+        <a href={url("/contact/")} class="text-primary underline underline-offset-2">
+          get in touch
+        </a>
+        .
+      </p>
+
+      <section class={sectionClass} aria-labelledby="brand-logos">
+        <h2 id="brand-logos" class={headingClass}>
+          Logos
+        </h2>
+        <p class={introClass}>High-resolution 1008 × 1044 JPGs.</p>
+        <ul class="grid gap-6 sm:grid-cols-3">
+          {brandLogos.map((asset) => (
+            <li class={cardClass}>
+              <OptimizedImage
+                src={asset.image}
+                alt={asset.alt}
+                widths={[320, 480, 640]}
+                sizes="(min-width: 1024px) 260px, (min-width: 640px) 30vw, 100vw"
+                class="aspect-square w-full object-cover"
+              />
+              <div class="flex flex-1 flex-col gap-2 p-4">
+                <h3 class="text-base">{asset.title}</h3>
+                <p class="text-sm text-fg-muted">{asset.usage}</p>
+                <a href={asset.image.src} download={asset.fileName} class={downloadClass}>
+                  <Icon name="fa6-solid:download" class="size-3.5" aria-hidden="true" />
+                  Download<span class="sr-only"> {asset.title}</span>
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class={sectionClass} aria-labelledby="brand-covers">
+        <h2 id="brand-covers" class={headingClass}>
+          Social covers
+        </h2>
+        <p class={introClass}>Profile banners sized for each network.</p>
+        <ul class="grid gap-6">
+          {brandCovers.map((asset) => (
+            <li class={cardClass}>
+              <OptimizedImage
+                src={asset.image}
+                alt={asset.alt}
+                widths={[640, 828, 1080, 1400]}
+                sizes="(min-width: 1364px) 860px, (min-width: 1024px) 63vw, 100vw"
+                class="w-full"
+              />
+              <div class="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 class="text-base">{asset.title}</h3>
+                  <p class="text-sm text-fg-muted">{asset.usage}</p>
+                </div>
+                <a href={asset.image.src} download={asset.fileName} class={downloadClass}>
+                  <Icon name="fa6-solid:download" class="size-3.5" aria-hidden="true" />
+                  Download<span class="sr-only"> {asset.title}</span>
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class={sectionClass} aria-labelledby="brand-colors">
+        <h2 id="brand-colors" class={headingClass}>
+          Colors
+        </h2>
+        <p class={introClass}>Our signature neon gradient sets the tone across the site.</p>
+        <div
+          class="mb-6 h-16 rounded-xl bg-linear-to-r from-gradient-from to-gradient-to"
+          aria-hidden="true"
+        ></div>
+        <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {brandColors.map((color) => (
+            <li class="overflow-hidden rounded-xl border border-line bg-surface-muted">
+              <div class="h-20" style={{ backgroundColor: color.hex }} aria-hidden="true" />
+              <div class="p-3">
+                <p class="font-heading text-sm font-semibold text-heading">{color.name}</p>
+                <p class="font-mono text-sm uppercase">{color.hex}</p>
+                <p class="text-xs text-fg-muted">{color.usage}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class={sectionClass} aria-labelledby="brand-type">
+        <h2 id="brand-type" class={headingClass}>
+          Typography
+        </h2>
+        <p class={introClass}>Both typefaces are free on Google Fonts.</p>
+        <ul class="grid gap-4 sm:grid-cols-2">
+          {brandFonts.map((font) => (
+            <li class="rounded-xl border border-line bg-surface-muted p-5">
+              <p class:list={["mb-2 text-3xl text-heading", font.class]}>Aa Hella</p>
+              <p class="font-heading text-sm font-semibold text-heading">{font.name}</p>
+              <p class="text-sm text-fg-muted">{font.role}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </article>
+  </PageShell>
+</MainLayout>
