@@ -103,7 +103,7 @@ export function getRelatedPosts(post: Post, posts: Post[], max = 3): Post[] {
     .map(({ p }) => p);
 }
 
-export function getFeaturedPosts(posts: Post[], excludeId?: string, max = 8): Post[] {
+export function getFeaturedPosts(posts: Post[], excludeId?: string, max = 6): Post[] {
   return posts.filter((p) => p.data.featured && p.id !== excludeId).slice(0, max);
 }
 

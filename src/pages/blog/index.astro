@@ -19,7 +19,7 @@ const countClass = "text-base font-medium text-fg-muted";
   description="Every Topic Zero article from Hella Labs: Web3 and Ethereum engineering, smart contract testing, reactive dApps, CSS craft and open-source tooling."
 >
   <Container as="section" class="mb-15 sm:mb-20">
-    <div class="mx-auto max-w-195">
+    <div class="mx-auto max-w-6xl">
       <header class="mb-8 border-b border-line">
         <h1 class="mb-8 text-5xl max-sm:text-4xl">{title}</h1>
       </header>
@@ -29,31 +29,31 @@ const countClass = "text-base font-medium text-fg-muted";
           <h2 id={`year-${group.year}`} class="mb-6 text-[1.75rem]">
             {group.year} <sup class={countClass}>{group.count}</sup>
           </h2>
-          <div class="grid lg:grid-cols-[auto_1fr]">
+          <div class="grid gap-x-8 lg:grid-cols-[10rem_1fr]">
             {group.months.map((month) => (
               <>
-                <h3 class="mr-8 text-xl font-semibold max-lg:mb-6">
+                <h3 class="text-xl font-semibold max-lg:mb-6">
                   {month.name} <sup class={countClass}>{month.posts.length}</sup>
                 </h3>
-                <ul class="mb-8 last:mb-0 sm:mb-12">
+                <ul class="mb-8 grid gap-x-8 last:mb-0 sm:mb-12 md:grid-cols-2">
                   {month.posts.map((post) => (
-                    <li class="mb-6 flex items-start gap-5 border-b border-line pb-6 max-sm:flex-col lg:mb-6">
+                    <li class="mb-6 flex items-start gap-5 border-b border-line pb-6 max-sm:flex-col">
                       <a
                         href={url(postPath(post))}
-                        class="block h-37.5 w-50 shrink-0 overflow-hidden rounded-lg max-sm:h-50 max-sm:w-full"
+                        class="block aspect-4/3 w-40 shrink-0 overflow-hidden rounded-lg max-sm:w-full"
                         tabindex="-1"
                         aria-hidden="true"
                       >
                         <OptimizedImage
                           src={post.data.image}
                           alt=""
-                          widths={[400, 640]}
-                          sizes="(min-width: 640px) 200px, 100vw"
+                          widths={[320, 640]}
+                          sizes="(min-width: 640px) 160px, 100vw"
                           class="size-full object-cover transition-transform duration-300 hover:scale-105"
                         />
                       </a>
-                      <div class="flex min-w-0 flex-1 items-center gap-8 max-sm:flex-col max-sm:items-start max-sm:gap-2">
-                        <h4 class="mr-auto text-lg leading-relaxed font-semibold max-sm:text-base">
+                      <div class="flex min-w-0 flex-1 flex-col gap-3">
+                        <h4 class="text-lg leading-snug font-semibold max-sm:text-base">
                           <a
                             href={url(postPath(post))}
                             class="underline decoration-transparent decoration-[1.4px] underline-offset-2 hover:decoration-heading"
@@ -61,11 +61,12 @@ const countClass = "text-base font-medium text-fg-muted";
                             {post.data.title}
                           </a>
                         </h4>
-                        <div class="shrink-0 font-heading leading-none tracking-wide text-fg-muted uppercase">
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 font-heading text-xs leading-none tracking-wide text-fg-muted uppercase">
                           <time class="text-sm" datetime={post.data.date.toISOString()}>
                             {formatDate(post.data.date)}
                           </time>
-                          <div class="mt-2 text-xs">{readingTime(post)}</div>
+                          <span aria-hidden="true">·</span>
+                          <span>{readingTime(post)}</span>
                         </div>
                       </div>
                     </li>
