@@ -15,13 +15,14 @@ const [latestPost] = await getPosts();
 const resolveNav = (href: string) =>
   href === latestPostHref && latestPost ? postPath(latestPost) : href;
 const linkClass =
-  "flex items-center gap-2 rounded-lg px-4 py-2 font-heading text-nav leading-6 font-medium tracking-normal hover:bg-surface-alt aria-[current=page]:bg-surface-alt max-lg:px-3 max-lg:py-1.5 max-lg:leading-snug";
+  "flex items-center gap-2 rounded-lg px-4 py-2 font-heading lg:max-xl:px-2.5 text-nav leading-6 font-medium tracking-normal hover:bg-surface-alt aria-[current=page]:bg-surface-alt max-lg:px-3 max-lg:py-1.5 max-lg:leading-snug";
 ---
 
 <header class="sticky top-0 z-30 mb-12 border-b border-line bg-surface-glass backdrop-blur-md backdrop-saturate-180 sm:mb-15">
   <div
-    class="relative flex flex-wrap items-center justify-between p-4 sm:px-8"
+    class="relative flex flex-wrap items-center justify-between p-4 sm:px-8 lg:flex-nowrap"
     x-data="{ open: false }"
+    x-init="matchMedia('(min-width: 64rem)').addEventListener('change', (e) => e.matches && (open = false)); $watch('open', (v) => document.documentElement.classList.toggle('max-lg:overflow-hidden', v))"
     x-on:keydown.escape="open = false"
     x-on:click.outside="open = false"
   >
@@ -32,18 +33,26 @@ const linkClass =
     <nav
       id="main-nav"
       aria-label="Main menu"
-      class="flex-1 not-data-open:max-lg:hidden max-lg:absolute max-lg:top-full max-lg:right-4 max-lg:z-50 max-lg:mt-2 max-lg:min-w-56 max-lg:rounded-xl max-lg:border max-lg:border-line max-lg:bg-surface max-lg:p-5 max-lg:shadow-popover lg:ml-12 dark:max-lg:bg-surface-muted"
+      class="flex-1 not-data-open:max-lg:hidden max-lg:absolute max-lg:inset-x-0 max-lg:top-full max-lg:z-50 max-lg:h-(--nav-h) max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:border-t max-lg:border-line max-lg:bg-surface max-lg:px-4 max-lg:py-5 max-lg:sm:px-8 lg:ml-6 xl:ml-12 dark:max-lg:bg-surface-muted"
       x-bind:data-open="open"
+      x-bind:style="open && { '--nav-h': `calc(100dvh - ${$el.parentElement.getBoundingClientRect().bottom}px)` }"
     >
-      <ul class="flex items-center gap-3 max-lg:flex-col max-lg:items-stretch max-lg:gap-1">
+      <ul class="flex items-center gap-3 lg:max-xl:gap-1 max-lg:flex-col max-lg:items-stretch max-lg:gap-1">
         {mainNav.map((item) => {
           // Parents are also active on any child page (e.g. About on /brand-kit/)
           const active =
             isActivePath(pathname, item.href) ||
             !!item.children?.some((child) => isActivePath(pathname, child.href, child.exact));
           return (
-            <li class:list={["relative", item.children && "group"]}>
-              <a href={url(item.href)} class={linkClass} aria-current={active ? "page" : undefined}>
+            <li
+              class:list={["relative", item.children && "group"]}
+              x-data={item.children ? `{ expanded: ${active} }` : undefined}
+            >
+              <a
+                href={url(item.href)}
+                class:list={[linkClass, item.children && "max-lg:hidden"]}
+                aria-current={active ? "page" : undefined}
+              >
                 <Icon name={item.icon} class="size-3.5 shrink-0 opacity-70" aria-hidden="true" />
                 {item.title}
                 {item.children && (
@@ -55,10 +64,44 @@ const linkClass =
                 )}
               </a>
               {item.children && (
-                <ul
-                  aria-label={`${item.title} pages`}
-                  class="lg:invisible lg:absolute lg:top-full lg:-left-6 lg:z-50 lg:mt-3 lg:min-w-64 lg:rounded-xl lg:border lg:border-line lg:bg-surface lg:p-3 lg:opacity-0 lg:shadow-popover lg:transition-all lg:group-focus-within:visible lg:group-focus-within:opacity-100 lg:group-hover:visible lg:group-hover:opacity-100 lg:before:absolute lg:before:inset-x-0 lg:before:-top-3 lg:before:h-3 dark:lg:bg-surface-muted max-lg:pl-3"
+                <button
+                  type="button"
+                  class:list={[linkClass, "w-full lg:hidden"]}
+                  aria-controls={`nav-${item.title.toLowerCase().replace(/\W+/g, "-")}`}
+                  x-bind:aria-expanded="expanded"
+                  x-on:click="expanded = !expanded"
                 >
+                  <Icon name={item.icon} class="size-3.5 shrink-0 opacity-70" aria-hidden="true" />
+                  {item.title}
+                  <Icon
+                    name="fa6-solid:chevron-down"
+                    class="ml-auto size-3 opacity-70 transition-transform"
+                    x-bind:class="expanded && 'rotate-180'"
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
+              {item.children && (
+                <ul
+                  id={`nav-${item.title.toLowerCase().replace(/\W+/g, "-")}`}
+                  aria-label={`${item.title} pages`}
+                  x-bind:class="!expanded && 'max-lg:hidden'"
+                  class="lg:invisible lg:absolute lg:top-full lg:-left-6 lg:z-50 lg:mt-3 lg:min-w-64 lg:rounded-xl lg:border lg:border-line lg:bg-surface lg:p-3 lg:opacity-0 lg:shadow-popover lg:transition-all lg:group-focus-within:visible lg:group-focus-within:opacity-100 lg:group-hover:visible lg:group-hover:opacity-100 lg:before:absolute lg:before:inset-x-0 lg:before:-top-3 lg:before:h-3 dark:lg:bg-surface-muted max-lg:pt-1 max-lg:pb-2 max-lg:pl-3"
+                >
+                  <li class="mb-1 lg:hidden">
+                    <a
+                      href={url(item.href)}
+                      class={linkClass}
+                      aria-current={isActivePath(pathname, item.href, true) ? "page" : undefined}
+                    >
+                      <Icon
+                        name={item.icon}
+                        class="size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                      {item.title} overview
+                    </a>
+                  </li>
                   {item.children.map((child) => (
                     <li class="mb-1 last:mb-0">
                       <a
@@ -88,7 +131,7 @@ const linkClass =
     </nav>
 
     <div class="ml-auto flex items-center max-lg:mr-2">
-      <div class="mr-6 border-r border-line-alt pr-4 max-lg:mr-2 max-lg:pr-2">
+      <div class="mr-6 border-r border-line-alt pr-4 lg:max-xl:mr-3 lg:max-xl:pr-3 max-lg:mr-2 max-lg:pr-2">
         <ThemeToggle />
       </div>
       <Button href={navCta.href} size="sm" icon="fa6-solid:rocket" label={navCta.label} />
