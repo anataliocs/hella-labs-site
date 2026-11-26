@@ -1,10 +1,12 @@
 // Brand kit (/brand-kit/): downloadable logos and social covers, plus palette and typefaces
 import type { ImageMetadata } from "astro";
+import longBanner from "@src/assets/images/brand/banner-long-2148x416.jpg";
 import wordmarkBanner from "@src/assets/images/brand/banner-wordmark.jpg";
 import logoIcon from "@src/assets/images/brand/hella-logo-1.jpg";
 import logoDark from "@src/assets/images/brand/hella-logo-3.jpg";
 import logoLight from "@src/assets/images/brand/hella-logo-4.jpg";
 import linkedinCover from "@src/assets/images/brand/linkedin-cover.jpg";
+import socialPostTemplate from "@src/assets/images/brand/social-post-template.jpg";
 import twitterCover from "@src/assets/images/brand/twitter-cover.jpg";
 
 export interface BrandAsset {
@@ -61,6 +63,21 @@ export const brandCovers: BrandAsset[] = [
     image: wordmarkBanner,
     alt: "Hella Labs wordmark in white beside the rock-on hand logo in a neon gradient, on navy",
     fileName: "hella-labs-wordmark-banner.jpg",
+  },
+  {
+    title: "Long banner",
+    usage: "2184 × 416 wide banner for event pages, newsletters and website headers.",
+    image: longBanner,
+    alt: "Hella Labs wide banner with hellalabs.dev: Design, Build, Launch, Scale; specialized fintech and blockchain fractional engineering, DevRel and consulting",
+    fileName: "hella-labs-long-banner.jpg",
+  },
+  {
+    title: "Social post template",
+    usage:
+      "1376 × 768 template for blog and social post graphics; swap in your title and subtitle.",
+    image: socialPostTemplate,
+    alt: "Hella Labs social post template: placeholder post title and subtitle beside the rock-on hand logo in a neon gradient, on navy",
+    fileName: "hella-labs-social-post-template.jpg",
   },
 ];
 
