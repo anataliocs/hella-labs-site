@@ -1,5 +1,6 @@
 // Brand kit (/brand-kit/): downloadable logos and social covers, plus palette and typefaces
 import type { ImageMetadata } from "astro";
+import wordmarkBanner from "@src/assets/images/brand/banner-wordmark.jpg";
 import logoIcon from "@src/assets/images/brand/hella-logo-1.jpg";
 import logoDark from "@src/assets/images/brand/hella-logo-3.jpg";
 import logoLight from "@src/assets/images/brand/hella-logo-4.jpg";
@@ -53,6 +54,13 @@ export const brandCovers: BrandAsset[] = [
     image: twitterCover,
     alt: "Hella Labs X header: Design, Build, Launch, Scale; specialized fintech and blockchain fractional engineering, DevRel and consulting",
     fileName: "hella-labs-x-cover.jpg",
+  },
+  {
+    title: "Wordmark banner",
+    usage: "1248 × 832 (3:2) lockup for blog headers, event slides and partner pages.",
+    image: wordmarkBanner,
+    alt: "Hella Labs wordmark in white beside the rock-on hand logo in a neon gradient, on navy",
+    fileName: "hella-labs-wordmark-banner.jpg",
   },
 ];
 
