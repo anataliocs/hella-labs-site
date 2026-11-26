@@ -45,6 +45,79 @@ describe("convertMdxToMarkdown", () => {
     );
   });
 
+  const post = [
+    "---",
+    'title: "Hello"',
+    'description: "Short summary"',
+    "date: 2025-08-05T09:29:35+03:00",
+    "image: ../../assets/images/blog/x.jpg",
+    'tags: ["CSS", "Web3", "Smart Contracts", "Server-Sent Events", "RxJS", "css"]',
+    "---",
+    "",
+    "Hi",
+  ].join("\n");
+  const cover = `${site}/_astro/x.jpg`;
+
+  it("writes Hashnode frontmatter with comma-separated tag slugs (max 5)", async () => {
+    const { markdown, warnings } = await convertMdxToMarkdown(post, {
+      slug: "hello",
+      siteUrl: site,
+      coverImage: cover,
+      format: "hashnode",
+    });
+    expect(markdown).toBe(
+      [
+        "---",
+        "title: Hello",
+        "slug: hello",
+        "tags: css, web3, smart-contracts, server-sent-events, rxjs",
+        `cover: ${cover}`,
+        `canonical: ${site}/hello/`,
+        "seoDescription: Short summary",
+        `ogImage: ${cover}`,
+        "publishedAt: 2025-08-05T06:29:35Z",
+        "enableToc: true",
+        "disableComments: false",
+        "saveAsDraft: false",
+        "---",
+        "",
+        "Hi",
+        "",
+      ].join("\n"),
+    );
+    expect(warnings).toEqual([]);
+  });
+
+  it("writes Dev.to frontmatter with alphanumeric tags (max 4) and draft support", async () => {
+    const { markdown, warnings } = await convertMdxToMarkdown(post, {
+      slug: "hello",
+      siteUrl: site,
+      coverImage: cover,
+      format: "devto",
+      draft: true,
+    });
+    expect(markdown).toBe(
+      [
+        "---",
+        "title: Hello",
+        "published: false",
+        "description: Short summary",
+        "tags:",
+        "  - css",
+        "  - web3",
+        "  - smartcontracts",
+        "  - serversentevents",
+        `cover_image: ${cover}`,
+        `canonical_url: ${site}/hello/`,
+        "---",
+        "",
+        "Hi",
+        "",
+      ].join("\n"),
+    );
+    expect(warnings).toEqual(["Dev.to allows 4 tags; dropped rxjs"]);
+  });
+
   it("drops imports and turns Callouts into labeled blockquotes", async () => {
     const { md } = await body(
       'import X from "./x";\n\n<Callout type="tip">\n\nKeep it **simple**.\n\n</Callout>\n',

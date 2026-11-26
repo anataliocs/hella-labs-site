@@ -1,8 +1,12 @@
 // Converts an MDX blog post (src/content/blog/*.mdx) into portable Markdown for cross-posting
 // (Dev.to, Hashnode, Medium import, GitHub, …). Used by scripts/mdx-to-md.ts.
 //
-// - Frontmatter is reduced to the fields other platforms understand (title, description, date,
-//   tags, canonical_url, cover_image).
+// - Frontmatter is rewritten for the target platform (`format`):
+//   - generic: title, description, date, tags, canonical_url, cover_image
+//   - hashnode: Hashnode's GitHub-import fields (slug, comma-separated tag slugs, cover, canonical,
+//     seoDescription, ogImage, publishedAt, enableToc, disableComments, saveAsDraft)
+//   - devto: Dev.to's fields (published, description, tags, cover_image, canonical_url)
+//   Tags are normalized to each platform's rules and capped at its limit, with a warning.
 // - The site's MDX components become plain Markdown (see `components` below); unknown components
 //   are unwrapped to their children and reported in `warnings`.
 // - Simple lowercase JSX (<p>, <strong>, <em>, <a href>, <br>) becomes Markdown; other raw HTML
@@ -29,6 +33,10 @@ import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
+export type FrontmatterFormat = "generic" | "hashnode" | "devto";
+
+export const frontmatterFormats: readonly FrontmatterFormat[] = ["generic", "hashnode", "devto"];
+
 export interface ConvertOptions {
   // Post slug; the canonical URL is `${siteUrl}/${slug}/` (posts are served at the site root)
   slug: string;
@@ -37,6 +45,10 @@ export interface ConvertOptions {
   // Absolute URL of the cover image. The frontmatter `image` is a src/assets path whose built URL
   // is hashed, so the caller resolves it (e.g. from the built page's og:image).
   coverImage?: string;
+  // Which platform's frontmatter to write (default "generic")
+  format?: FrontmatterFormat;
+  // Hashnode/Dev.to: create the post as a draft instead of publishing it
+  draft?: boolean;
 }
 
 export interface ConvertResult {
@@ -85,28 +97,101 @@ export async function convertMdxToMarkdown(
   absolutizeUrls(tree, ctx);
   const markdown = processor.stringify(tree);
 
-  const frontmatter = buildFrontmatter(data, options, siteUrl);
+  const frontmatter = frontmatterBuilders[options.format ?? "generic"](
+    { data, options, canonicalUrl: `${siteUrl}/${options.slug}/` },
+    ctx,
+  );
   return {
     markdown: `---\n${stringifyYaml(frontmatter, { lineWidth: 0 })}---\n\n${markdown}`,
     warnings: ctx.warnings,
   };
 }
 
-function buildFrontmatter(
-  data: Record<string, unknown>,
-  options: ConvertOptions,
-  siteUrl: string,
-): Record<string, unknown> {
-  const frontmatter: Record<string, unknown> = {
-    title: data.title,
-    description: data.description,
-    date: data.date,
-    tags: Array.isArray(data.tags) ? data.tags : [],
-    canonical_url: `${siteUrl}/${options.slug}/`,
-  };
-  if (options.coverImage) frontmatter.cover_image = options.coverImage;
-  // YAML can't serialize undefined; drop missing fields
-  return Object.fromEntries(Object.entries(frontmatter).filter(([, v]) => v !== undefined));
+interface FrontmatterInput {
+  data: Record<string, unknown>;
+  options: ConvertOptions;
+  canonicalUrl: string;
+}
+
+type FrontmatterBuilder = (input: FrontmatterInput, ctx: Context) => Record<string, unknown>;
+
+const frontmatterBuilders: Record<FrontmatterFormat, FrontmatterBuilder> = {
+  generic: ({ data, options, canonicalUrl }) =>
+    compact({
+      title: data.title,
+      description: data.description,
+      date: data.date,
+      tags: stringTags(data),
+      canonical_url: canonicalUrl,
+      cover_image: options.coverImage,
+    }),
+
+  // https://hashnode.com/ GitHub import: tags are comma-separated slugs (max 5)
+  hashnode: ({ data, options, canonicalUrl }, ctx) =>
+    compact({
+      title: data.title,
+      slug: options.slug,
+      tags:
+        limitTags(stringTags(data).map(hashnodeTag), 5, "Hashnode", ctx).join(", ") || undefined,
+      cover: options.coverImage,
+      canonical: canonicalUrl,
+      seoDescription: data.description,
+      ogImage: options.coverImage,
+      publishedAt: isoDate(data.date),
+      enableToc: true,
+      disableComments: false,
+      saveAsDraft: options.draft ?? false,
+    }),
+
+  // Dev.to: tags are lowercase alphanumeric (max 4)
+  devto: ({ data, options, canonicalUrl }, ctx) =>
+    compact({
+      title: data.title,
+      published: !(options.draft ?? false),
+      description: data.description,
+      tags: limitTags(stringTags(data).map(devtoTag), 4, "Dev.to", ctx),
+      cover_image: options.coverImage,
+      canonical_url: canonicalUrl,
+    }),
+};
+
+function stringTags(data: Record<string, unknown>): string[] {
+  return Array.isArray(data.tags)
+    ? data.tags.filter((t): t is string => typeof t === "string")
+    : [];
+}
+
+// "Smart Contracts" → "smart-contracts"
+function hashnodeTag(tag: string): string {
+  return tag
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+// "Server-Sent Events" → "serversentevents"
+function devtoTag(tag: string): string {
+  return tag.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+// Drops empty and duplicate tags, then keeps the first `max` (the platform rejects more)
+function limitTags(tags: string[], max: number, platform: string, ctx: Context): string[] {
+  const unique = [...new Set(tags.filter(Boolean))];
+  if (unique.length > max) {
+    ctx.warnings.push(`${platform} allows ${max} tags; dropped ${unique.slice(max).join(", ")}`);
+  }
+  return unique.slice(0, max);
+}
+
+function isoDate(value: unknown): string | undefined {
+  if (!(typeof value === "string" || value instanceof Date)) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString().replace(/\.000Z$/, "Z");
+}
+
+// YAML can't serialize undefined; drop missing fields
+function compact(fields: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
 }
 
 // ---------------------------------------------------------------------------------------------

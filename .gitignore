@@ -28,3 +28,5 @@ coverage/
 
 # Markdown exports (pnpm mdx-to-md)
 exports/
+
+/tmp

@@ -66,6 +66,8 @@ pnpm build                                    # optional, but needed for cover_i
 pnpm mdx-to-md pure-css-animations            # by slug…
 pnpm mdx-to-md src/content/blog/foo.mdx       # …or by path (several at once is fine)
 pnpm mdx-to-md --all                          # every post in src/content/blog/
+pnpm mdx-to-md foo --format hashnode          # Hashnode frontmatter (exports/markdown/hashnode/)
+pnpm mdx-to-md foo -f devto --draft           # Dev.to frontmatter, as an unpublished draft
 pnpm mdx-to-md foo --out ~/Desktop/posts      # output folder (default: exports/markdown/)
 pnpm mdx-to-md foo --site https://example.com # origin for canonical and absolute URLs
 ```
@@ -73,16 +75,24 @@ pnpm mdx-to-md foo --site https://example.com # origin for canonical and absolut
 Example
 
 ```
-pnpm mdx-to-md pure-css-animations --out ~/Documents --site https://hellalabs.dev/pure-css-animations/
+pnpm mdx-to-md pure-css-animations --out tmp/ --site https://hellalabs.dev/pure-css-animations/
 ```
 
-Each post is written to `<out>/<slug>.md`. `exports/` is git- and Prettier-ignored.
+Each post is written to `<out>/<slug>.md`; the default `<out>` is `exports/markdown/` for generic
+output and `exports/markdown/<format>/` for `hashnode` or `devto`. `exports/` is git- and Prettier-ignored.
 
 **What the conversion does**
 
-- **Frontmatter** is reduced to `title`, `description`, `date`, `tags`, `canonical_url`
-  (`https://www.hellalabs.dev/<slug>/`) and `cover_image`. These are Dev.to's field names, which
-  most platforms also accept. Site-only fields (`techStack`, `featured`, `series`, …) are dropped.
+- **Frontmatter** depends on `--format` (site-only fields like `techStack`, `featured` and
+  `series` are always dropped):
+  - `generic` (default): `title`, `description`, `date`, `tags`, `canonical_url`
+    (`https://www.hellalabs.dev/<slug>/`) and `cover_image`, which most platforms accept.
+  - `hashnode`: `title`, `slug`, `tags` (comma-separated slugs, max 5), `cover`, `canonical`,
+    `seoDescription`, `ogImage`, `publishedAt` (UTC), `enableToc: true`, `disableComments: false`
+    and `saveAsDraft` (`true` with `--draft`).
+  - `devto`: `title`, `published` (`false` with `--draft`), `description`, `tags` (lowercase
+    alphanumeric, max 4), `cover_image` and `canonical_url`.
+  - Tags past a platform's limit are dropped in order, with a warning.
 - **`cover_image`** is read from the built page's `og:image`, because `src/assets` images get hashed
   URLs at build time. Without a fresh `pnpm build` it's left out, with a warning.
 - **MDX components** become Markdown:
