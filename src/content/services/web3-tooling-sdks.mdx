@@ -12,11 +12,104 @@ cta:
   label: Build Your Tooling
 ---
 
+Your protocol is only as good as the developer experience around it. If integrating takes a week
+of reading source code, guessing at config, and decoding cryptic errors, most developers will pick
+a competitor that takes an afternoon.
+
 We build developer-centric tools, SDKs, and TUIs that simplify blockchain interactions. From fluent
 TypeScript APIs to terminal-based explorers like `etherscan-tui-go`, we create the infrastructure
-that makes your protocol accessible and easy to integrate for other developers.
+that makes your protocol accessible and easy to integrate.
+
+Great Developer Experience (DX) comes down to one thing: **eliminating cognitive load** through
+empathy-driven design and progressive disclosure. Great tools aren't built in an ivory tower.
+They're shaped by watching real engineers struggle at 2:00 AM under deadline pressure, and by a
+real desire to leave the ecosystem easier to navigate than we found it.
+
+## Why Listen to Us
+
+We've spent decades shipping software across small consultancies, Fortune 500 enterprises, Bay
+Area startups, and Web3 protocols. Every one of those environments exposes a different way tooling
+fails, and together they show what actually matters:
+
+- **Consulting firms taught us speed to context.** Consultants parachute into unfamiliar codebases
+  daily. Tooling has to be self-documenting, need zero tribal knowledge, and work out of the box
+  with sensible defaults, so a developer delivers value in hours, not weeks.
+- **Fortune 500s taught us determinism and escape hatches.** Enterprise systems demand strict type
+  safety, predictable versioning, observability, and zero-magic behavior. A great SDK makes the
+  common path effortless and still gives teams clean ways to customize timeouts, retries, and
+  transport layers.
+- **Bay Area startups taught us iteration velocity.** Early-stage teams live and die by feedback
+  loops. Devtools have to build fast, emulate locally, and fail fast with actionable errors instead
+  of silent, cascading failures.
+- **Web3 taught us resilience and state.** In asynchronous, adversarial, decentralized systems,
+  local testing is notoriously painful. Good tools hide the brittle boilerplate (ephemeral nodes,
+  mocked RPCs, deterministic fixtures) so engineers can focus on business logic and invariants.
+
+## Education as an Architectural Blueprint
+
+Writing structured developer education changes how you design APIs. Teaching forces you to surface
+the invisible assumptions an expert makes without noticing, and to map every point where a learner
+gets stuck. We design SDKs the same way we design a curriculum:
+
+<CheckList>
+
+- **Measure Time to First Hello World (TTFHW).** If a developer has to set five environment
+  variables, read three conceptual guides, and wire up dependencies by hand before seeing a
+  successful result, the API has a structural flaw.
+- **Design for progressive disclosure.** Good docs separate quickstarts from deep architecture. A
+  good SDK exposes a simple, high-level surface for 80% of use cases and layers advanced primitives
+  underneath for the other 20%.
+- **Turn errors into micro-lessons.** Every stack trace is a teaching moment. Instead of
+  `Error: Invalid configuration`, a well-designed tool explains what failed, which rule it broke,
+  and the exact steps to fix it.
+
+</CheckList>
+
+## Four Pillars of High-Velocity Devtools
+
+These are the engineering decisions we hold every tool we build to:
+
+| Pillar                            | What it looks like in practice                                                                                | Anti-pattern we avoid                                                     |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Zero-friction ergonomics**      | Idiomatic APIs that match the host language, strong static types with rich autocomplete, zero-config defaults | A custom DSL, or massive configuration objects for basic tasks            |
+| **Tight feedback loops**          | Fast cold starts, lightweight containerized dependencies, deterministic local tests that mirror production    | Slow, flaky integration suites that need a live staging environment       |
+| **Predictable performance**       | Low memory overhead, non-blocking I/O, explicit resource cleanup, visible latency bottlenecks                 | Heavy transitive dependency trees and opaque background threads that leak |
+| **Stewardship & maintainability** | Semantic versioning, migration codemods, few breaking changes, clean modular boundaries                       | Abandoned edge cases, and documentation treated as an afterthought        |
+
+## Empathy as Engineering Stewardship
+
+Building developer tools is an act of service. We refuse to accept "that's just how this stack
+works" as an excuse for poor ergonomics. When you anticipate a developer's frustration before they
+write a single line of integration code, and engineer that friction out of existence, you multiply
+the output of every team that touches your protocol.
 
 ## Open Source Projects
 
 - [**Ethereum Transaction Explorer TUI:**](https://github.com/anataliocs/etherscan-tui-go) A
   terminal Ethereum transaction explorer built with Go and the Bubble Tea TUI framework.
+- [**Foundry Anvil Testcontainers:**](/open-source/foundry-anvil-testcontainers/) Isolated,
+  reproducible Anvil nodes per test suite, with mainnet forking, account impersonation, and time
+  travel.
+- [**WireMock Testcontainers:**](/open-source/wiremock-testcontainers/) Containerized, verifiable
+  mocks for RPC providers and third-party APIs.
+
+## What We Offer
+
+<FeatureGrid>
+  <FeatureCard icon="fa6-solid:list-check" title="DX Audit" as="h3" bordered>
+    We measure your Time to First Hello World, walk your onboarding as a new developer would, and
+    deliver a ranked list of the friction points costing you integrations.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:code" title="TypeScript SDKs" as="h3" bordered>
+    Fluent, strongly typed client libraries with sensible defaults, clean escape hatches, and errors
+    that tell developers exactly how to fix them.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:laptop-code" title="CLIs & TUIs" as="h3" bordered>
+    Terminal tools for exploring, debugging, and operating your protocol, built for the developers
+    who live in the command line.
+  </FeatureCard>
+  <FeatureCard icon="fa6-solid:flask" title="Local Dev & Testing Kits" as="h3" bordered>
+    Ephemeral nodes, mocked RPCs, and deterministic fixtures that give integrators fast, reliable
+    feedback loops on their own machines.
+  </FeatureCard>
+</FeatureGrid>
