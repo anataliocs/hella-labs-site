@@ -36,10 +36,16 @@
   --hl-callout-caution: #fae6e6;
 
   --hl-code-bg: #f3f3f3;
+
+  /* Key-term emphasis: tertiary-strong on light surfaces, the logo orange on dark */
+  --hl-emphasis: #b8480a;
 }
 
 .dark {
-  --hl-primary: #d60067;
+  /* Lifted from #d60067 (3.4:1 on navy) so magenta text and accents meet WCAG AA on the dark
+     surfaces: 5.7:1 on navy, 5.0:1 on cards, 4.6:1 on code. White-text fills keep #d60067 via
+     the gradient. */
+  --hl-primary: #ff47a0;
   --hl-gradient-from: #d60067;
   --hl-gradient-to: #8311c0;
 
@@ -64,6 +70,8 @@
   --hl-callout-caution: #952222;
 
   --hl-code-bg: #1e293b;
+
+  --hl-emphasis: #f3722c;
 }
 
 @theme inline {
@@ -79,6 +87,7 @@
   --color-fg: var(--hl-text);
   --color-fg-muted: var(--hl-text-muted);
   --color-heading: var(--hl-heading);
+  --color-emphasis: var(--hl-emphasis);
 
   --color-line: var(--hl-border);
   --color-line-alt: var(--hl-border-alt);
@@ -97,10 +106,15 @@
 }
 
 @theme {
-  /* Teal accent. `secondary-strong` is the same hue darkened so white button text meets WCAG AA
-     (#60b0ba with white text is only 2.5:1). */
-  --color-secondary: #60b0ba;
-  --color-secondary-strong: #367a82;
+  /* Cyan accent sampled from the top-right of the primary logo. `secondary-strong` is the same hue
+     darkened so white button text meets WCAG AA (#2ad6e6 with white text is only 1.8:1). */
+  --color-secondary: #2ad6e6;
+  --color-secondary-strong: #10808a;
+  /* Vibrant orange accent from the logo. `tertiary-strong` is the same hue darkened so white text
+     on it, and it as text on every light surface, meets WCAG AA (#f3722c with white text is only
+     2.9:1). Use `text-emphasis` for key terms in copy: it switches between the two per theme. */
+  --color-tertiary: #f3722c;
+  --color-tertiary-strong: #b8480a;
   /* Indigo → violet gradient used by article CTA banners */
   --color-violet-from: #667eea;
   --color-violet-to: #764ba2;

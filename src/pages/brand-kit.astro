@@ -5,8 +5,15 @@ import MainLayout from "@src/layouts/MainLayout.astro";
 import PageShell from "@src/components/PageShell.astro";
 import PageHeader from "@src/components/page/PageHeader.astro";
 import OptimizedImage from "@src/components/OptimizedImage.astro";
-import { brandColors, brandCovers, brandFonts, brandLogos } from "@src/data/brandData";
+import {
+  brandColors,
+  brandCovers,
+  brandFonts,
+  brandLogos,
+  brandPaletteNotes,
+} from "@src/data/brandData";
 import { siteData } from "@src/data/siteData";
+import { renderInline } from "@src/utils/text";
 import { url } from "@src/utils/path";
 import { webPageJsonLd, withBrand } from "@src/utils/seo";
 
@@ -124,6 +131,19 @@ const downloadClass =
             </li>
           ))}
         </ul>
+
+        <div class="mt-10 [&_strong]:font-semibold [&_strong]:text-emphasis">
+          <h3 class="mb-2 text-xl sm:text-2xl">{brandPaletteNotes.title}</h3>
+          <p class="mb-6" set:html={renderInline(brandPaletteNotes.intro)} />
+          <ul class="grid gap-4 sm:grid-cols-2">
+            {brandPaletteNotes.principles.map((principle) => (
+              <li class="rounded-xl border border-line p-5">
+                <h4 class="mb-2 text-base text-heading">{principle.title}</h4>
+                <p class="text-sm" set:html={renderInline(principle.text)} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section class={sectionClass} aria-labelledby="brand-type">

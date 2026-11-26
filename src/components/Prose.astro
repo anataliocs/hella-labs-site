@@ -36,7 +36,7 @@ const { class: className } = Astro.props;
     button.textContent = "Copy";
     button.setAttribute("aria-label", "Copy code to clipboard");
     button.className =
-      "absolute top-3 right-3 rounded-full bg-heading px-3 py-2 font-heading text-sm leading-none font-medium text-surface opacity-0 transition-opacity group-hover/pre:opacity-100 hover:bg-primary hover:text-white focus-visible:opacity-100";
+      "absolute top-3 right-3 rounded-full bg-heading px-3 py-2 font-heading text-sm leading-none font-medium text-surface opacity-0 transition-opacity group-hover/pre:opacity-100 hover:bg-primary hover:text-surface focus-visible:opacity-100";
     button.addEventListener("click", async () => {
       await navigator.clipboard.writeText(pre.querySelector("code")?.innerText.trimEnd() ?? "");
       button.textContent = "Copied!";

@@ -11,7 +11,7 @@ export const heroData = {
   title: "Hella Labs",
   subtitle: "Specialized Fintech+Blockchain Fractional Engineering, DevRel & Consulting",
   description:
-    "Creators of industry-standard Web3 test automation tools. We provide fractional engineering to accelerate your transition to a decentralized future.",
+    "Creators of **industry-standard Web3 test automation** tools. We provide **fractional engineering** to accelerate your transition to a decentralized future.",
   image: {
     src: heroImage,
     alt: "Neon-tinted street at sunset with a person walking past a car, overlaid with blockchain network nodes and currency tickers",
@@ -80,32 +80,32 @@ export const flywheelData = {
     {
       title: "RWA & Tokenization",
       icon: "fa6-solid:building-columns",
-      text: "Institutions bring trillions in real-world assets (T-bills, credit, funds) on-chain as programmable collateral.",
+      text: "Institutions bring trillions in **real-world assets** (T-bills, credit, funds) on-chain as **programmable collateral**.",
     },
     {
       title: "Back-Office Rails",
       icon: "fa6-solid:gears",
-      text: "Custodians, clearinghouses, and corporate ERPs integrate directly with blockchains for automated, real-time settlement.",
+      text: "Custodians, clearinghouses, and corporate ERPs integrate directly with blockchains for automated, **real-time settlement**.",
     },
     {
       title: "Stablecoin Volume",
       icon: "fa6-solid:coins",
-      text: "Frictionless back-office plumbing scales stablecoins into the 24/7 global settlement layer for B2B and cross-border payments.",
+      text: "Frictionless back-office plumbing scales stablecoins into the **24/7 global settlement layer** for B2B and cross-border payments.",
     },
     {
       title: "x402 AI Agents",
       icon: "fa6-solid:robot",
-      text: "Autonomous agents leverage deep, instant stablecoin liquidity to pay for APIs, data, and compute per-request via HTTP 402.",
+      text: "Autonomous agents leverage deep, instant stablecoin liquidity to pay for APIs, data, and compute per-request via **HTTP 402**.",
     },
     {
       title: "Liquidity Demand",
       icon: "fa6-solid:water",
-      text: "Continuous machine-to-machine transaction volume drives massive demand for stablecoin reserves.",
+      text: "Continuous **machine-to-machine** transaction volume drives massive demand for stablecoin reserves.",
     },
     {
       title: "Idle Float",
       icon: "fa6-solid:vault",
-      text: "The idle float backing stablecoin volume drives demand for tokenized T-bills incentivizing institutions to tokenize even more assets.",
+      text: "The idle float backing stablecoin volume drives demand for **tokenized T-bills** incentivizing institutions to tokenize even more assets.",
     },
   ] satisfies FlywheelStage[],
   tagline: "Hella Labs accelerating towards the on-chain future",

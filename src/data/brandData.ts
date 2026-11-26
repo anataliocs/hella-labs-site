@@ -84,11 +84,40 @@ export const brandCovers: BrandAsset[] = [
 export const brandColors = [
   { name: "Hella Purple", hex: "#ae00ee", usage: "Primary accent, light theme" },
   { name: "Hella Pink", hex: "#f70077", usage: "Gradient start" },
-  { name: "Neon Magenta", hex: "#d60067", usage: "Primary accent, dark theme" },
+  { name: "Neon Magenta", hex: "#ff47a0", usage: "Primary accent and links, dark theme" },
+  { name: "Deep Magenta", hex: "#d60067", usage: "Gradient start behind white text, dark theme" },
   { name: "Deep Violet", hex: "#8311c0", usage: "Gradient end, dark theme" },
+  { name: "Logo Cyan", hex: "#2ad6e6", usage: "Secondary accent, from the logo's top-right" },
+  { name: "Deep Cyan", hex: "#10808a", usage: "Secondary accent behind white text (buttons)" },
+  { name: "Vibrant Orange", hex: "#f3722c", usage: "Tertiary accent, from the logo's lower left" },
   { name: "Midnight Navy", hex: "#0f172a", usage: "Dark background" },
   { name: "Ink", hex: "#10141f", usage: "Headings and body text, light theme" },
 ];
+
+// "Why this palette" notes under the swatches. Strings support **bold** via renderInline.
+export const brandPaletteNotes = {
+  title: "Cyberpunk meets institutional",
+  intro:
+    "Fintech and blockchain brands tend to default to **corporate white and blue**: safe, trusted and forgettable. We start from a midnight navy canvas lit by neon pink, purple, cyan and orange to signal a **forward-moving, bleeding-edge** team, while the restraint around it keeps the look credible to banks, custodians and enterprise partners.",
+  principles: [
+    {
+      title: "Dark by default, light when it counts",
+      text: "The site ships in dark mode, with **Midnight Navy** as the base. A full light theme swaps in **Ink** on white for print, decks and readers who prefer it, so every color has a counterpart that works on both.",
+    },
+    {
+      title: "Neon is an accent, not a background",
+      text: "The gradient, **Logo Cyan** and **Vibrant Orange** carry the energy in headlines, icons, borders and key terms. Long-form copy stays in calm neutrals (**15.7:1** for headings and **6.7:1** for body text on navy) so the page reads like an institution, not an arcade.",
+    },
+    {
+      title: "Accessible pairs for every accent",
+      text: "Bright brand values often fail under white text, so each accent has a deeper partner tuned for **WCAG AA**: **Deep Cyan** for secondary buttons (4.7:1) and a darker orange for key terms on light backgrounds (4.6:1 or better). Dark-mode emphasis uses the true logo orange at **5.4:1** or better.",
+    },
+    {
+      title: "A compromise we keep working on",
+      text: "Not every pairing reaches **AAA** yet. We recently lifted **Neon Magenta** from #d60067 to #ff47a0 so dark-mode accents clear AA on navy (**5.7:1**). A few hover and icon states on our lighter slate cards still sit at 3.6:1, which meets the 3:1 bar for UI components but not for body text, and we keep auditing combinations like that one. We aim for **AA everywhere and AAA where we can**, and we tune the palette whenever the aesthetic and accessibility pull apart.",
+    },
+  ],
+};
 
 export const brandFonts = [
   { name: "Poppins", role: "Headings, navigation and buttons", class: "font-heading" },
