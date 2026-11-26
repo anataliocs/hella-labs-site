@@ -109,6 +109,14 @@ export const brandPaletteNotes = {
       text: "The gradient, **Logo Cyan** and **Vibrant Orange** carry the energy in headlines, icons, borders and key terms. Long-form copy stays in calm neutrals (**15.7:1** for headings and **6.7:1** for body text on navy) so the page reads like an institution, not an arcade.",
     },
     {
+      title: "Color wheel relationships",
+      text: "Each accent has a place on the wheel. **Complements**: Vibrant Orange and Logo Cyan sit almost directly opposite each other, so pairing them gives the strongest contrast. **Analogous harmony**: Hella Pink, Neon Magenta, Hella Purple and Deep Violet are neighbors, so the gradient blends smoothly from one to the next. **Split-complementary contrast**: Hella Pink and Vibrant Orange sit on either side of Logo Cyan's opposite, so the three together give us **variety and energy without clashing**.",
+    },
+    {
+      title: "The psychology of color",
+      text: "Every hue has a job. **Midnight Navy** suggests depth, stability and trust, the qualities finance expects. **Pink and magenta** feel bold and unconventional, and **purple** has long signaled imagination and premium craft. **Cyan** reads as clarity and technology, and **orange** brings warmth, enthusiasm and approachability. The navy base keeps us credible, and the neon accents show we build at the edge.",
+    },
+    {
       title: "Accessible pairs for every accent",
       text: "Bright brand values often fail under white text, so each accent has a deeper partner tuned for **WCAG AA**: **Deep Cyan** for secondary buttons (4.7:1) and a darker orange for key terms on light backgrounds (4.6:1 or better). Dark-mode emphasis uses the true logo orange at **5.4:1** or better.",
     },
